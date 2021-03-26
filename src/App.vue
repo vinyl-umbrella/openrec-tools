@@ -6,10 +6,10 @@
       <nav>
         <div>最終更新日 2021年3月25日</div>
         <div>
-          google driveは
+          保管庫は
           <a
             href="https://drive.google.com/drive/folders/1U77WomTyFEVtFtA4gMQKUJf8gdXRijP8?usp=sharing"
-            >こちら</a
+            >ここ</a
           >
         </div>
       </nav>
