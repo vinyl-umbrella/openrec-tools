@@ -24,24 +24,25 @@
     ></bar-chart>
     <div class="flex-box">
       <div class="flex-items">
-        <form name="form1">
-          表示人数: <input type="number" min="1" max="1000" v-model="num" />
-        </form>
-        <form name="form2">
-          開始年月:
-          <input type="number" min="2020" max="2021" v-model="startYear" />
-          <input type="number" min="1" max="12" v-model="startMonth" />
-        </form>
-        <form name="form3">
-          終了年月:
-          <input type="number" min="2020" max="2021" v-model="endYear" />
-          <input type="number" min="1" max="12" v-model="endMonth" />
+        <form>
+          <div>
+            表示人数: <input type="number" min="1" max="1000" v-model="num" />
+          </div>
+          <div>
+            開始年月:
+            <input type="number" min="2020" max="2021" v-model="startYear" />
+            <input type="number" min="1" max="12" v-model="startMonth" />
+          </div>
+          <div>
+            終了年月:
+            <input type="number" min="2020" max="2021" v-model="endYear" />
+            <input type="number" min="1" max="12" v-model="endMonth" />
+          </div>
         </form>
       </div>
       <div @click="createGraphData()" id="update-button"><p>更新</p></div>
     </div>
     <div>{{ inputErrMsg }}</div>
-    <br />
 
     <div>
       <p v-for="(item, index) in graphData.labels" :key="index">
@@ -62,7 +63,9 @@
 
 <script>
 import barChart from "./components/barChart";
-import firebase from "firebase";
+// import firebase from "firebase";
+import firebase from "firebase/app"
+import "firebase/firestore"
 import Modal from "./components/modal";
 const firebaseConfig = require("./secret.json");
 firebase.initializeApp(firebaseConfig);
@@ -320,6 +323,10 @@ nav {
   margin-right: 100px;
 }
 
+input {
+  width: 5em;
+}
+
 #mainChart {
   margin-top: 150px;
 }
@@ -327,6 +334,8 @@ nav {
 .flex-box {
   display: flex;
   align-items: flex-end;
+  border-top: dotted 2px #444;
+  border-bottom: dotted 2px #444;
 }
 .flex-items {
   margin: 10px;
@@ -334,11 +343,10 @@ nav {
 
 #update-button {
   cursor: pointer;
-  width: 100px;
+  width: 80px;
   text-align: center;
-  margin-top: 20px;
   background: #eee;
-  color: #555;
+  color: #444;
   border-top: solid 2px #444;
   border-left: solid 2px #444;
   border-right: solid 2px #444;
