@@ -4,7 +4,7 @@
     <header>
       <h1>openchat rank</h1>
       <nav>
-        <div>最終更新日 2021年3月25日</div>
+        <div>最終更新日 2021年3月25日</div> <!-- 注目 -->
         <div>
           保管庫は
           <a
@@ -16,6 +16,7 @@
     </header>
 
     <bar-chart
+      id="mainChart"
       :chart-data="graphData"
       :options="options"
       :height="chartHeight"
@@ -44,12 +45,17 @@
 
     <div>
       <p v-for="(item, index) in graphData.labels" :key="index">
-        {{index+1}}. &nbsp;
-        <a v-bind:href="`https://openrec.tv/user/${item}`" target="_blink">
-          {{item}}
-        </a>&nbsp;&nbsp;
-        {{graphData.datasets[0].data[index]}}
+        {{ index + 1 }}. &nbsp;
+        <span @click="clickUser(item)" class="userid">{{ item }}</span>
+        &nbsp; {{ graphData.datasets[0].data[index] }}
       </p>
+      <modal
+        :val="postData"
+        :chartData="modalGraphData"
+        :chartOptions="options"
+        v-show="showModal"
+        @close="closeModal()"
+      />
     </div>
   </div>
 </template>
@@ -57,22 +63,38 @@
 <script>
 import barChart from "./components/barChart";
 import firebase from "firebase";
+import Modal from "./components/modal";
 const firebaseConfig = require("./secret.json");
 firebase.initializeApp(firebaseConfig);
 
 export default {
   components: {
     barChart,
+    Modal,
   },
 
   data() {
     return {
+      // modal
+      showModal: false,
+      postData: {
+        id: "",
+        nickname: "",
+      },
+      modalGraphData: {
+        labels: [],
+        datasets: [
+          {
+            data: [],
+          },
+        ],
+      },
       // input
       num: 30,
       startYear: 2021,
-      startMonth: 2,
+      startMonth: 3,    // 注目
       endYear: 2021,
-      endMonth: 2,
+      endMonth: 3,      // 注目
       // 入力エラー
       inputErrMsg: "",
       // グラフの描画に使用するデータ
@@ -81,7 +103,7 @@ export default {
         datasets: [
           {
             data: [],
-          }
+          },
         ],
       },
       options: {
@@ -104,18 +126,57 @@ export default {
   },
 
   mounted() {
-    // this.updataGraph([1, 2, 3, 4, 5], [5000, 200, 1500, 3000, 2500]);
     this.createGraphData();
   },
 
   methods: {
+    async clickUser(userid) {
+      let url = "https://public.openrec.tv/external/api/v5/channels/" + userid;
+      const res = await fetch(url);
+      if (res.ok) {
+        let j = await res.json();
+        this.postData["id"] = j["id"];
+        this.postData["nickname"] = j["nickname"];
+      } else {
+        this.postData["id"] = userid;
+      }
+
+      let temp = {
+        labels: [],
+        datasets: [
+          {
+            data: [],
+            backgroundColor: "rgb(178, 178, 255)",
+            hoverBackgroundColor: "rgb(127, 127, 255)",
+          },
+        ],
+      }
+      // 注目
+      temp["labels"] = ["2020-7", "2020-8", "2020-9", "2020-10", "2020-11", "2020-12", "2021-1", "2021-2", "2021-3"];
+      for (let i of temp["labels"]) {
+        let ym = i.split("-");
+        const doc = await this.getFromFirestore(ym[0], ym[1]);
+        if (doc[userid]) {
+          temp["datasets"][0]["data"].push(doc[userid]);
+        } else {
+          temp["datasets"][0]["data"].push(0);
+        }
+      }
+      // obj を丸ごと変更するとグラフに反映される
+      this.modalGraphData = temp;
+      this.showModal = true;
+    },
+
+    closeModal() {
+      this.showModal = false;
+    },
+
     // ラベルとそのデータを用いてグラフを更新
     updataGraph(label, data) {
       this.graphData = {
         labels: label,
         datasets: [
           {
-            label: "count",
             data: data,
             backgroundColor: "rgb(178, 178, 255)",
             hoverBackgroundColor: "rgb(127, 127, 255)",
@@ -166,13 +227,13 @@ export default {
           return {};
         }
         return doc.data();
-      } catch(err) {
+      } catch (err) {
         console.log("firestore err while getting data:", err);
       }
     },
 
     async createGraphData() {
-      if(this.checkYearMonth()) {
+      if (this.checkYearMonth()) {
         let ids = [];
         let counts = [];
         let graphDataObj = {};
@@ -181,7 +242,11 @@ export default {
         let m = Number(this.startMonth);
 
         // 取得するyear, monthを格納した配列を生成
-        while (Number(String(this.endYear) + this.getDoubleDigestNumber(this.endMonth)) >= Number(String(y) + this.getDoubleDigestNumber(m))) {
+        while (
+          Number(
+            String(this.endYear) + this.getDoubleDigestNumber(this.endMonth)
+          ) >= Number(String(y) + this.getDoubleDigestNumber(m))
+        ) {
           yearMonth.push([y, m]);
           if (m == 12) {
             y += 1;
@@ -197,8 +262,8 @@ export default {
           let doc = await this.getFromFirestore(elem[0], elem[1]);
 
           // 存在するなら加算 else 追加
-          for(let key of Object.keys(doc)) {
-            if(graphDataObj[key]) {
+          for (let key of Object.keys(doc)) {
+            if (graphDataObj[key]) {
               graphDataObj[key] += Number(doc[key]);
             } else {
               graphDataObj[key] = Number(doc[key]);
@@ -207,8 +272,8 @@ export default {
         }
 
         // idとcountペアの配列をpush
-        let tempArray = []
-        for(let key of Object.keys(graphDataObj)) {
+        let tempArray = [];
+        for (let key of Object.keys(graphDataObj)) {
           tempArray.push([key, graphDataObj[key]]);
         }
         // ソートする
@@ -221,14 +286,14 @@ export default {
         tempArray = tempArray.slice(0, n);
 
         // id と count の配列に分ける
-        for(let i of tempArray) {
+        for (let i of tempArray) {
           ids.push(i[0]);
-          counts.push(i[1])
+          counts.push(i[1]);
         }
 
         this.updataGraph(ids, counts);
       }
-    }
+    },
   },
 };
 </script>
@@ -255,7 +320,7 @@ nav {
   margin-right: 100px;
 }
 
-canvas {
+#mainChart {
   margin-top: 150px;
 }
 
@@ -283,5 +348,12 @@ canvas {
 #update-button:active {
   background: #ccc;
   color: #444;
+}
+
+.userid {
+  text-decoration: underline;
+}
+.userid:hover {
+  color: red;
 }
 </style>
