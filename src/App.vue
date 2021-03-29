@@ -69,6 +69,8 @@ import "firebase/firestore"
 import Modal from "./components/modal";
 const firebaseConfig = require("./secret.json");
 firebase.initializeApp(firebaseConfig);
+firebase.firestore().clearPersistence();
+firebase.firestore().enablePersistence();
 
 export default {
   components: {
@@ -224,14 +226,19 @@ export default {
       const db = firebase.firestore();
 
       try {
-        const doc = await db.collection(String(year)).doc(String(month)).get();
+        const doc = await db.collection(String(year)).doc(String(month)).get({
+          source: "cache",
+        });
         if (doc.empty) {
           console.log("no data");
           return {};
         }
         return doc.data();
       } catch (err) {
-        console.log("firestore err while getting data:", err);
+        const doc = await db.collection(String(year)).doc(String(month)).get({
+          source: "server",
+        })
+        return doc.data();
       }
     },
 
