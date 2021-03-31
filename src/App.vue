@@ -4,7 +4,7 @@
     <header>
       <h1>openchat rank</h1>
       <nav>
-        <div>最終更新日 2021年3月25日</div> <!-- 注目 -->
+        <div>最終更新日 2021年3月31日</div> <!-- 注目 -->
         <div>
           保管庫は
           <a
@@ -144,6 +144,7 @@ export default {
         this.postData["nickname"] = j["nickname"];
       } else {
         this.postData["id"] = userid;
+        this.postData["nickname"] = "";
       }
 
       let temp = {
