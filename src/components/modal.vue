@@ -1,5 +1,5 @@
 <template>
-  <div id="overlay">
+  <div id="overlay" @click.self="$emit('close')">
     <div id="content">
       <p>{{ val.nickname }} ({{ val.id }})</p>
       <!-- <p>{{ val.graphData }}</p> -->
@@ -46,9 +46,5 @@ export default {
   background-color: rgb(250, 250, 250);
   padding: 1em 10% 1em 10%;
   text-align: center;
-}
-
-#content > img {
-  width: 95%;
 }
 </style>

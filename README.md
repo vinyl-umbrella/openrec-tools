@@ -9,15 +9,16 @@ npm install
 ```
 npm run serve
 ```
-then access to `localhost:8080`
 
 ### Compiles and minifies for production
 ```
 npm run build
-firebase deploy
 ```
 
 ### Lints and fixes files
 ```
 npm run lint
 ```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
