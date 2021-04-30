@@ -47,8 +47,12 @@
         <div class="infos" v-for="(event, index) in events" :key="index">
           <span>{{ event.date }}&nbsp;</span>
           <span>[{{ event.type}}]&nbsp;</span>
-          <span v-if="event.type='URL'"><a :href="event.content" target="_blank">{{ event.content }}</a></span>
-          <span v-else>{{ event.content}}</span>
+          <span v-if="event.type=='URL'">
+            <a :href="event.content" target="_blank">{{ event.content }}</a>
+          </span>
+          <span v-else>
+            {{ event.content}}
+          </span>
         </div>
       </div>
     </div>
@@ -69,8 +73,8 @@
       <div id="content">
         <div v-if="!isLogin">
           <form autocomplete="on">
-            <input type="text" placeholder="uuid" v-model="orUuid" style="width: 400px;" />
-            <input type="password" placeholder="access-token" v-model="orAccessToken" style="width: 400px;"/>
+            <input type="text" placeholder="uuid" v-model="orUuid" style="width: 90%;" />
+            <input type="password" placeholder="access-token" v-model="orAccessToken" style="width: 90%;"/>
           </form><br>
           <button @click="closeModal()">cancel</button>
           <button @click="orLogin()">Login</button>
@@ -217,34 +221,35 @@ export default {
     },
 
     async getMovieId() {
+      let self = this;
       const URLHEAD = "https://www.openrec.tv/live/";
-      let videoUrl = this.inputUrl;
+      let videoUrl = self.inputUrl;
       let videoId = "";
       if (videoUrl.indexOf(URLHEAD)) {
-        this.urlError = "invalid url";
+        self.urlError = "invalid url";
         return "";
       } else {
-        this.urlError = "";
+        self.urlError = "";
         if (videoUrl[videoUrl.length - 1] == "/") {
           videoUrl = videoUrl.slice(0, -1);
         }
 
         videoId = videoUrl.replace(URLHEAD, "");
-        this.videoId = videoId;
+        self.videoId = videoId;
         let apiUrl = "https://public.openrec.tv/external/api/v5/movies/" + videoId;
         let movieId = "";
         try {
           let res = await (await fetch(apiUrl)).json();
           if (res.onair_status == 0 || res.onair_status == 1) {
-            this.title = res.title;
-            this.channelName = res.channel.nickname;
+            self.title = res.title;
+            self.channelName = res.channel.nickname;
             movieId = res.movie_id;
           } else {
-            this.urlError = "not on air now";
+            self.urlError = "not on air now";
           }
         } catch (e) {
           console.log(e);
-          this.urlError = "invalid url";
+          self.urlError = "invalid url";
         }
         return movieId;
       }
@@ -265,6 +270,7 @@ export default {
             let orig = JSON.parse(event.data.substr(pos));
             if(orig[0] == "message") {
               let j = JSON.parse(orig[1]);
+
               let addEvent = (type, content) => {
                 let prms = new Promise((resolve) => {
                   const d = new Date();
@@ -314,6 +320,7 @@ export default {
                       }
                     }
 
+                    // 自動スクロール
                     let comment_box = document.getElementById("comment_box");
                     if (self.isBottom(comment_box)) {
                       let prms = new Promise((resolve) => {
@@ -510,10 +517,11 @@ export default {
     },
 
     calc_speed() {
+      let self = this;
       var sub = function () {
-        this.comments_speed -= 1;
+        self.comments_speed -= 1;
       };
-      this.comments_speed += 1;
+      self.comments_speed += 1;
       setTimeout(sub, 120000);
     },
   },
