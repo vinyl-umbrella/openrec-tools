@@ -33,7 +33,7 @@
     <div class="flexbox">
       <div id="comment_box" class="comment_box">
         <div class="comments" v-for="(comment, index) in comments" :key="index">
-          <div class="user_name">{{ comment.Name }}</div>
+          <div class="user_name" v-bind:style="{color:comment.Color}">{{ comment.Name }}</div>
           <span class="message" v-if="comment.Message != ''">{{
             comment.Message
           }}</span>
@@ -333,7 +333,13 @@ export default {
                       ];
                       addEvent("URL", a);
                     }
-                    let commentData = {"Name": name, "Message": j.data.message, "Stamp": ""};
+
+                    let commentData = {
+                      "Name": name,
+                      "Color": j.data.user_color,
+                      "Message": j.data.message,
+                      "Stamp": ""
+                      };
                     if (j.data.stamp != null) {
                       commentData.Stamp = j.data.stamp.image_url;
                     }
