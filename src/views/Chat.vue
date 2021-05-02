@@ -7,7 +7,7 @@
           type="text"
           v-model="inputUrl"
           placeholder="openrec url"
-          style="width: 300px"
+          style="width: 40vw; max-width: 500px;"
           @keydown.enter="getComment"
         />
         <a class="btn" @click="getComment">接続&nbsp;</a>
@@ -72,21 +72,21 @@
 
     <!-- modal -->
     <div id="overlay" v-show="showModal" @click.self="closeModal()">
-      <div id="content">
+      <div id="content" style="background-color: var(--v-background-base);">
         <div v-if="!isLogin">
           <form autocomplete="on">
-            <input type="text" placeholder="uuid" v-model="orUuid" style="width: 90%;" />
+            <input type="text" placeholder="uuid" v-model="orUuid" style="width: 90%; margin-bottom: 0.1em"/>
             <input type="password" placeholder="access-token" v-model="orAccessToken" style="width: 90%;"/>
           </form><br>
-          <button @click="closeModal()">cancel</button>
-          <button @click="orLogin()">Login</button>
+          <button @click="closeModal()" style="margin-right: 0.2em; background-color: var(--v-background-lighten2);">cancel</button>
+          <button @click="orLogin()" style="background-color: var(--v-background-lighten2);">Login</button>
         </div>
         <div v-else>
           <h2>Config</h2>
-          <div>
+          <div style="margin-top: 0.5em ; margin-bottom: 0.5em">
             チャット保持件数<input type="number" v-model="maxCommentNum">
           </div>
-          <button @click="orLogout()">Logout</button>
+          <button @click="orLogout()" style="background-color: var(--v-background-lighten2);">Logout</button>
         </div>
       </div>
     </div>
@@ -500,6 +500,7 @@ export default {
             let name = past_comments[i].user.nickname + " (" + past_comments[i].user.id + ")";
             let comment = {
               Name: name,
+              Color: past_comments[i].chat_setting.name_color,
               Message: past_comments[i].message,
               Stamp: "",
             };
@@ -566,18 +567,28 @@ export default {
 </script>
 
 <style scoped>
-a {
-  color: #42b983;
+.chat {
+  margin-left: 10px;
 }
+
+a {
+  color: var(--v-secondary-base);
+}
+
+input {
+  background-color: var(--v-background-lighten1);
+  border-radius: 2px;
+}
+
 .stream_data {
-  border-top: dotted 2px #444;
-  border-bottom: dotted 2px #444;
+  border-top: dotted 2px var(--v-background-lighten3);
+  border-bottom: dotted 2px var(--v-background-lighten3);
   margin-top: 5px;
   margin-bottom: 5px;
 }
 
 #configBtn {
-  background-color: #ccc;
+  background-color: var(--v-background-lighten5);
   border-radius: 18px;
   padding: 5px;
   margin-top: 2px;
@@ -586,23 +597,23 @@ a {
 
 }
 #configBtn:active {
-  background-color: #aaa;
+  background-color: var(--v-background-lighten4);
 }
 
 .btn {
   display: inline-block;
   padding: 0.2em 1.2em;
   margin-bottom: 7px;
-  background: #ccc;
-  color: #222;
+  background: var(--v-background-lighten2);
+  color: var(--v-primary-lighten1);
   border-radius: 2px;
   font-size: smaller;
   margin-left: 3px;
   margin-right: 3px;
 }
 .btn:active {
-  background: #aaa;
-  color: #222;
+  color: var(--v-primary-base);
+  background-color: var(--v-background-lighten1);
 }
 
 .title a {
@@ -618,7 +629,7 @@ a {
 }
 
 .info_box, .comment_box {
-  border: 2px solid #aaa;
+  border: 2px solid var(--v-background-lighten5);
   height: 60vh;
   max-width: 500px;
   border-radius: 3px;
@@ -635,7 +646,8 @@ a {
 
 .infos, .comments {
   margin: 1em;
-  background-color: #f4f4f4;
+  background-color: var(--v-background-lighten1);
+  color: var(--v-primary-base);
   padding: 0.5em 8px;
   border-radius: 7px;
   word-break: break-all;

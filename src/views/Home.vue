@@ -6,6 +6,7 @@
         保管庫は
         <a
           href="https://drive.google.com/drive/folders/1U77WomTyFEVtFtA4gMQKUJf8gdXRijP8?usp=sharing"
+          target="_blank"
           >ここ</a
         >
       </div>
@@ -23,21 +24,21 @@
       <div class="flex-items">
         <form>
           <div>
-            表示人数: <input type="number" min="1" max="1000" v-model="num" />
+            表示人数: <input type="number" min="1" max="1000" v-model="num" />人
           </div>
           <div>
             開始年月:
-            <input type="number" min="2020" max="2021" v-model="startYear" />
-            <input type="number" min="1" max="12" v-model="startMonth" />
+            <input type="number" min="2020" max="2021" v-model="startYear" />年
+            <input type="number" min="1" max="12" v-model="startMonth" />月
           </div>
           <div>
             終了年月:
-            <input type="number" min="2020" max="2021" v-model="endYear" />
-            <input type="number" min="1" max="12" v-model="endMonth" />
+            <input type="number" min="2020" max="2021" v-model="endYear" />年
+            <input type="number" min="1" max="12" v-model="endMonth" />月
           </div>
         </form>
       </div>
-      <div @click="createGraphData()" id="update-button"><p>更新</p></div>
+      <div @click="createGraphData()" id="update-button">更新</div>
       <div>{{ inputErrMsg }}</div>
     </div>
 
@@ -114,10 +115,19 @@ export default {
           display: false,
         },
         scales: {
+          xAxes: [
+            {
+              ticks: {
+                fontColor: "#ddd",
+              }
+            }
+          ],
+
           yAxes: [
             {
               ticks: {
                 beginAtZero: true,
+                fontColor: "#ddd"
               },
             },
           ],
@@ -150,8 +160,8 @@ export default {
         datasets: [
           {
             data: [],
-            backgroundColor: "rgb(178, 178, 255)",
-            hoverBackgroundColor: "rgb(127, 127, 255)",
+            backgroundColor: "#0288D1",
+            hoverBackgroundColor: "#03A9F4",
           },
         ],
       }
@@ -182,8 +192,8 @@ export default {
         datasets: [
           {
             data: data,
-            backgroundColor: "rgb(178, 178, 255)",
-            hoverBackgroundColor: "rgb(127, 127, 255)",
+            backgroundColor: "#0288D1",
+            hoverBackgroundColor: "#03A9F4",
           },
         ],
       };
@@ -311,21 +321,26 @@ export default {
 form div input {
   margin-bottom: 3px;
 }
+
+input {
+  background-color: var(--v-background-lighten1);
+  border-radius: 2px;
+}
+
 .info {
   text-align: right;
-  margin-right: 30px;
+  margin-right: 10px;
 }
 
 .home {
   margin-left: 10px;
-  margin-right: 10px;
 }
 
 .flex-box {
   display: flex;
   align-items: flex-end;
-  border-top: dotted 2px #444;
-  border-bottom: dotted 2px #444;
+  border-top: dotted 2px var(--v-background-lighten3);
+  border-bottom: dotted 2px var(--v-background-lighten3);
 }
 .flex-box .flex-items {
   margin: 10px;
@@ -336,23 +351,24 @@ form div input {
   cursor: pointer;
   width: 80px;
   text-align: center;
-  background: #eee;
-  color: #444;
+  background: var(--v-background-lighten1);
+  color: var(--v-primary-lighten1);
   border-top: solid 2px #444;
   border-left: solid 2px #444;
   border-right: solid 2px #444;
   border-bottom: solid 4px #444;
   border-radius: 3px;
+  padding: 0.1em 0.5em;
 }
 #update-button:active {
-  background: #ccc;
-  color: #444;
+  color: var(--v-primary-base);
+  background-color: var(--v-background-lighten1);
 }
 
 .userid {
   text-decoration: underline;
 }
 .userid:hover {
-  color: #42b983;
+  color: var(--v-secondary-base);
 }
 </style>

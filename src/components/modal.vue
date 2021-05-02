@@ -1,6 +1,6 @@
 <template>
   <div id="overlay" @click.self="$emit('close')">
-    <div id="content">
+    <div id="content" style="background-color: var(--v-background-base);">
       <p>{{ val.nickname }} ({{ val.id }})</p>
       <!-- <p>{{ val.graphData }}</p> -->
 
@@ -8,7 +8,7 @@
         :chart-data="chartData"
         :options="chartOptions"
       ></bar-chart>
-      <button @click="$emit('close')">close</button>
+      <button @click="$emit('close')" style="background: var(--v-background-lighten2)">close</button>
     </div>
   </div>
 </template>
@@ -25,7 +25,6 @@ export default {
 </script>
 
 <style>
-
 #overlay {
   z-index: 1;
   position: fixed;
@@ -37,14 +36,17 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: solid 2px;
 }
 
 #content {
   z-index: 2;
   width: 50%;
-  background-color: rgb(250, 250, 250);
   padding: 1em 10% 1em 10%;
   text-align: center;
+}
+
+button {
+  background-color: var(--v-background-lighten2);
+  padding: 0.1em 0.5em;
 }
 </style>

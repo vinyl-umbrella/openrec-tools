@@ -1,17 +1,19 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <span>
-        <router-link to="/">Home</router-link> |
-        <!-- <router-link to="exp">Experiment</router-link> -->
-        <router-link to="chat">CommentViewer</router-link>
-      </span>
-      <span>
-        <router-link to="/contact">Contact</router-link>
-      </span>
+  <v-app :style="{background: $vuetify.theme.themes.dark.background}">
+    <div id="app">
+      <div id="nav">
+        <span>
+          <router-link to="/">Home</router-link> |
+          <!-- <router-link to="exp">Experiment</router-link> -->
+          <router-link to="chat">CommentViewer</router-link>
+        </span>
+        <span>
+          <router-link to="/contact">Contact</router-link>
+        </span>
+      </div>
+      <router-view/>
     </div>
-    <router-view/>
-  </div>
+  </v-app>
 </template>
 
 
@@ -20,8 +22,8 @@ html {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-  background-color: snow;
+  /* color: #2c3e50;
+  background-color: snow; */
 }
 
 #nav {
@@ -34,24 +36,26 @@ html {
   margin: 0px 10px 0px 10px;
   font-weight: bold;
   font-size: 20px;
-  color: #2c3e50;
+  color: var(--v-primary-base-lighten1);
 }
 
 #nav a.router-link-exact-active {
-  color: #42b983;
+  color: var(--v-secondary-base);
 }
 
 input {
-  padding: 0.3em;
+  color: var(--v-primary-base);
+  background-color: var(--v-background-lighten2);
+  padding: 0.1em;
   transition: 0.3s;
   width: 5em;
   margin-right: 4px;
   border-radius: 2px;
-  border: 1px solid #838383;
+  border: 1px solid #a3a3a3;
 }
 input:focus {
-  border: 1px solid #737373;
+  border: 1px solid #939393;
   outline: none;
-  box-shadow: 0 0 5px 1px #73737380;
+  box-shadow: 0 0 5px 1px #93939380;
 }
 </style>
