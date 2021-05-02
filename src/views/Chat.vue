@@ -69,6 +69,7 @@
     <a class="btn" @click="postComment">post</a>
     <span>{{ inputComment.length }}/100</span><br />
     <span>{{ postError }}</span>
+    <br><br>
 
     <!-- modal -->
     <div id="overlay" v-show="showModal" @click.self="closeModal()">
@@ -120,7 +121,7 @@ export default {
       videoId: "",
 
       comments: [],
-      maxCommentNum: 100,
+      maxCommentNum: 2000,
       events: [],
       wsConnectFlag: false,
     };
@@ -636,6 +637,7 @@ input {
   margin-left: 10px;
   padding: 10px;
   overflow-y: auto;
+  background-color: var(--v-background-darken1);
 }
 .comment_box {
   width: 60vw;
@@ -646,7 +648,7 @@ input {
 
 .infos, .comments {
   margin: 1em;
-  background-color: var(--v-background-lighten1);
+  background-color: var(--v-background-base);
   color: var(--v-primary-base);
   padding: 0.5em 8px;
   border-radius: 7px;
