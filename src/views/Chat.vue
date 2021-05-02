@@ -48,7 +48,9 @@
           <span>{{ event.date }}&nbsp;</span>
           <span>[{{ event.type}}]&nbsp;</span>
           <span v-if="event.type=='URL'">
-            <a :href="event.content" target="_blank">{{ event.content }}</a>
+            <span>{{ event.content[0] }}</span>
+            <a :href="event.content[1]" target="_blank">{{ event.content[1] }}</a>
+            <span>{{ event.content[2] }}</span>
           </span>
           <span v-else>
             {{ event.content}}
@@ -281,10 +283,19 @@ export default {
                     "content": content,
                   });
                   resolve();
-                })
+                });
                 prms.then(() => {
                   self.scrollToBottom(document.getElementById("info_box"));
                 })
+
+                // let ele = document.getElementById("info_box");
+                // if (self.isBottom(ele)) {
+                //   prms.then(() => {
+                //     self.scrollToBottom(document.getElementById("info_box"));
+                //   })
+                // } else {
+                //   ;
+                // }
               }
               switch(j.type) {
                 // message
@@ -292,21 +303,35 @@ export default {
                   if (j.data.user_key != "") {
                     let name = j.data.user_name + " (" + j.data.user_key + ")";
                     if (j.data.user_type == 1) {
-                      addEvent("chat", j.data.message);
+                      addEvent("chat", name + j.data.message);
                     }
                     if (j.data.yell != null) {
                       addEvent("yell", name + " " + j.data.yell.yells + " " + j.data.message);
                     }
                     if (j.data.badges.length != 0) {
-                      name = name + "S";
+                      name = name + "[Sub]";
                     }
                     if (j.data.is_premium) {
-                      name = name + "P";
+                      name = name + "[P]";
+                    }
+                    if (j.data.is_fresh) {
+                      name = name + "[Fresh]";
+                    }
+                    if (j.data.is_moderator) {
+                      name = name + "[Staff]";
+                    }
+                    if (j.data.is_muted) {
+                      name = name + "[Muted]";
                     }
 
                     let result = j.data.message.match(/https?:\/\/[a-zA-Z0-9.\-_@:/~?%&;=+#',()*!]+/)
                     if (result != null) {
-                      addEvent("URL", result[0]);
+                      let a = [
+                        j.data.message.slice(0, result["index"]),
+                        result[0],
+                        j.data.message.slice(result["index"] + result[0].length),
+                      ];
+                      addEvent("URL", a);
                     }
                     let commentData = {"Name": name, "Message": j.data.message, "Stamp": ""};
                     if (j.data.stamp != null) {
@@ -316,7 +341,7 @@ export default {
                     let addComment = (data) => {
                       self.comments.push(data);
                       if (self.comments.length > self.maxCommentNum) {
-                        self.comments.shift();
+                        self.comments = self.comments.slice(-self.maxCommentNum);
                       }
                     }
 
@@ -373,11 +398,7 @@ export default {
 
                 // スタッフ権限解除
                 case 9:
-                  self.events.push({
-                    "date": "00:24:21",
-                    "content": "remove staff " + j.data.owner_to_moderator_user_id,
-                  });
-                  addEvent("staff", j.data.message);
+                  addEvent("staff", "remove staff " + j.data.owner_to_moderator_user_id);
                   break;
 
                 // わからん refresh?
@@ -386,8 +407,16 @@ export default {
 
                 // ゲーム変更，タイトル変更
                 case 11:
-                  addEvent("info", j.data.system_message + " " + j.data.message);
+                  addEvent("info", j.data.system_message.type + " " + j.data.message);
                   break;
+
+                // 12, 13, 15 テロップ
+                case 12:
+                  break;
+                case 13:
+                  break;
+                case 15:
+                  break
 
                 // サブスク入会
                 case 27:
@@ -396,6 +425,7 @@ export default {
 
                 // アンケート開始
                 case 29:
+                  addEvent("vote", "[start] " + j.data.title);
                   j.data.votes.forEach(elem => {
                     addEvent("vote", elem.text);
                   });
@@ -408,6 +438,7 @@ export default {
 
                 // アンケート結果
                 case 31:
+                  addEvent("vote", "[fin] " + j.data.title);
                   j.data.votes.forEach(elem => {
                     addEvent("vote", elem.text + elem.count + "票 " + elem.ratio + "%");
                   });
