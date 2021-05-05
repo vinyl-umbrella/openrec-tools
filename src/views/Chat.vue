@@ -121,7 +121,7 @@ export default {
       videoId: "",
 
       comments: [],
-      maxCommentNum: 2000,
+      maxCommentNum: 1500,
       events: [],
       wsConnectFlag: false,
     };
@@ -310,7 +310,8 @@ export default {
                       addEvent("yell", name + " " + j.data.yell.yells + " " + j.data.message);
                     }
                     if (j.data.badges.length != 0) {
-                      name = name + "[Sub]";
+                      name = name + "[Sub" + j.data.badges[0].subscription.months + "]";
+                      //  console.log(j.data.badges);
                     }
                     if (j.data.is_premium) {
                       name = name + "[P]";
