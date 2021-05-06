@@ -2,6 +2,7 @@
   <div id="overlay" @click.self="$emit('close')">
     <div id="content" style="background-color: var(--v-background-base);">
       <p>{{ val.nickname }} ({{ val.id }})</p>
+      <p style="color: var(--v-primary-darken3)">アカウント作成日時: {{ val.created_at }}</p>
       <!-- <p>{{ val.graphData }}</p> -->
 
       <bar-chart

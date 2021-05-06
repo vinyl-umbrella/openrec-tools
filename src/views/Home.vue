@@ -84,6 +84,7 @@ export default {
       postData: {
         id: "",
         nickname: "",
+        created_at: "",
       },
       modalGraphData: {
         labels: [],
@@ -150,9 +151,11 @@ export default {
         let j = await res.json();
         this.postData["id"] = j["id"];
         this.postData["nickname"] = j["nickname"];
+        this.postData["created_at"] = j["registered_at"];
       } else {
         this.postData["id"] = userid;
         this.postData["nickname"] = "";
+        this.postData["created_at"] = "account not found";
       }
 
       let temp = {
