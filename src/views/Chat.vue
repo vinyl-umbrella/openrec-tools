@@ -298,6 +298,18 @@ export default {
                 //   ;
                 // }
               }
+
+              let findUserId = (id) => {
+                let name = "unknown";
+                for(let i=0; i < self.comments.length; i++) {
+                  if (id == self.comments[i].recxuser_id) {
+                    name = self.comments[i].Name;
+                    break;
+                  }
+                }
+                return name;
+              }
+
               switch(j.type) {
                 // message
                 case 0:
@@ -311,7 +323,9 @@ export default {
                     }
                     if (j.data.badges.length != 0) {
                       name = name + "[Sub" + j.data.badges[0].subscription.months + "]";
-                      //  console.log(j.data.badges);
+                      if (j.data.badges.length > 1) {
+                        console.log(j.data.badges);
+                      }
                     }
                     if (j.data.is_premium) {
                       name = name + "[P]";
@@ -338,6 +352,7 @@ export default {
 
                     let commentData = {
                       "Name": name,
+                      "recxuser_id": j.data.user_id,
                       "Color": j.data.user_color,
                       "Message": j.data.message,
                       "Stamp": ""
@@ -391,22 +406,23 @@ export default {
 
                 // block
                 case 6:
-                  addEvent("ban", "ban " + j.data.owner_to_banned_user_id);
+                  addEvent("ban", "ban " + findUserId(j.data.owner_to_banned_user_id));
+                  //find j.data.owner_to_banned_to_user_id
                   break;
 
                 // block 解除
                 case 7:
-                  addEvent("ban", "unban " + j.data.owner_to_banned_user_id);
+                  addEvent("ban", "unban " + findUserId(j.data.owner_to_banned_user_id));
                   break;
 
                 // スタッフ権限付与
                 case 8:
-                  addEvent("staff", "staff " + j.data.owner_to_moderator_user_id);
+                  addEvent("staff", "add staff " + findUserId(j.data.owner_to_moderator_user_id));
                   break;
 
                 // スタッフ権限解除
                 case 9:
-                  addEvent("staff", "remove staff " + j.data.owner_to_moderator_user_id);
+                  addEvent("staff", "remove staff " + findUserId(j.data.owner_to_moderator_user_id));
                   break;
 
                 // わからん refresh?
@@ -503,6 +519,7 @@ export default {
             let comment = {
               Name: name,
               Color: past_comments[i].chat_setting.name_color,
+              recxuser_id: past_comments[i].user.recxuser_id,
               Message: past_comments[i].message,
               Stamp: "",
             };
