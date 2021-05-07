@@ -300,7 +300,7 @@ export default {
               }
 
               let findUserId = (id) => {
-                let name = "unknown";
+                let name = "unknown(" + id + ")";
                 for(let i=0; i < self.comments.length; i++) {
                   if (id == self.comments[i].recxuser_id) {
                     name = self.comments[i].Name;
@@ -316,7 +316,7 @@ export default {
                   if (j.data.user_key != "") {
                     let name = j.data.user_name + " (" + j.data.user_key + ")";
                     if (j.data.user_type == 1) {
-                      addEvent("chat", name + j.data.message);
+                      addEvent("chat", name + " " + j.data.message);
                     }
                     if (j.data.yell != null) {
                       addEvent("yell", name + " " + j.data.yell.yells + " " + j.data.message);
@@ -407,7 +407,6 @@ export default {
                 // block
                 case 6:
                   addEvent("ban", "ban " + findUserId(j.data.owner_to_banned_user_id));
-                  //find j.data.owner_to_banned_to_user_id
                   break;
 
                 // block 解除
@@ -510,12 +509,28 @@ export default {
         let now = d.getFullYear() + "-" + ("00" + (d.getMonth() + 1)).slice(-2) + "-" + ("00" + d.getDate()).slice(-2) + "T" + ("00" + d.getHours()).slice(-2) + ":" + ("00" + d.getMinutes()).slice(-2) + ":" + ("00" + d.getSeconds()).slice(-2) + "Z";
 
         // get past comment
-        let url = "https://public.openrec.tv/external/api/v5/movies/" + self.videoId + "/chats?to_created_at=" + now;
+        let url = "https://public.openrec.tv/external/api/v5/movies/" + self.videoId + "/chats?to_created_at=" + now + "&limit=150";
 
         let past_comments = await (await fetch(url)).json();
         let prms = new Promise((resolve) => {
           for (let i = 0; i < past_comments.length; i++) {
             let name = past_comments[i].user.nickname + " (" + past_comments[i].user.id + ")";
+            if (past_comments[i].badges.length != 0) {
+              name = name + "[Sub" + past_comments[i].badges[0].subscription.months + "]";
+            }
+            if (past_comments[i].user.is_premium) {
+              name = name + "[P]";
+            }
+            if (past_comments[i].user.is_fresh) {
+              name = name + "[Fresh]";
+            }
+            if (past_comments[i].is_moderating) {
+              name = name + "[Staff]";
+            }
+            if (past_comments[i].is_muted) {
+              name = name + "[Muted]";
+            }
+
             let comment = {
               Name: name,
               Color: past_comments[i].chat_setting.name_color,
@@ -555,8 +570,6 @@ export default {
           headers: {
             "Accept": "application/json,text/plain,*/*",
             "Content-Type": "application/json;charset=utf-8",
-            // "uuid": "",
-            // "access-token": ""
             "uuid": self.orUuid,
             "access-token": self.orAccessToken
           },
