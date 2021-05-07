@@ -10,10 +10,10 @@
           style="width: 40vw; max-width: 500px;"
           @keydown.enter="getComment"
         />
-        <a class="btn" @click="getComment">接続&nbsp;</a>
-        <span>{{ urlError }}</span>
+        <v-btn @click="getComment" small depressed color="var(--v-background-lighten1)">接続</v-btn>
+        <span> {{ urlError }}</span>
       </div>
-      <img id="configBtn" src="../assets/conf.png" height="24px" width="24px" v-on:click="callModal()" />
+      <img id="configBtn" src="../assets/conf.png" height="28px" width="28px" v-on:click="callModal()" />
     </div>
 
     <div class="stream_data">
@@ -63,11 +63,11 @@
       v-model="inputComment"
       class="post_box"
       placeholder="コメント"
-      style="width: 400px"
+      style="min-width: 250px; width: 40vw"
       @keydown.enter="postComment"
     />
-    <a class="btn" @click="postComment">post</a>
-    <span>{{ inputComment.length }}/100</span><br />
+    <v-btn @click="postComment" small depressed color="var(--v-background-lighten1)">post</v-btn>
+    <span>  {{ inputComment.length }}/100</span><br />
     <span>{{ postError }}</span>
     <br><br>
 
@@ -79,15 +79,17 @@
             <input type="text" placeholder="uuid" v-model="orUuid" style="width: 90%; margin-bottom: 0.1em"/>
             <input type="password" placeholder="access-token" v-model="orAccessToken" style="width: 90%;"/>
           </form><br>
-          <button @click="closeModal()" style="margin-right: 0.2em; background-color: var(--v-background-lighten2);">cancel</button>
-          <button @click="orLogin()" style="background-color: var(--v-background-lighten2);">Login</button>
+          <v-btn @click="closeModal()" color="var(--v-background-lighten1)" small depressed style="margin-right: 4px;">cancel</v-btn>
+          <v-btn @click="orLogin()" color="var(--v-background-lighten1)" small depressed>Login</v-btn>
         </div>
         <div v-else>
           <h2>Config</h2>
           <div style="margin-top: 0.5em ; margin-bottom: 0.5em">
-            チャット保持件数<input type="number" v-model="maxCommentNum">
+            チャット保持件数: <input type="number" v-model="maxCommentNum"><br>
+            <!-- <v-switch v-model="testSwitch" label="新規ユーザを非表示"></v-switch> -->
           </div>
-          <button @click="orLogout()" style="background-color: var(--v-background-lighten2);">Logout</button>
+          <v-btn @click="closeModal()" color="var(--v-background-lighten1)" small depressed style="margin-right: 4px;">close</v-btn>
+          <v-btn @click="orLogout()" color="var(--v-background-lighten1)" small depressed>Logout</v-btn>
         </div>
       </div>
     </div>
@@ -121,9 +123,12 @@ export default {
       videoId: "",
 
       comments: [],
-      maxCommentNum: 1500,
       events: [],
       wsConnectFlag: false,
+
+      // config
+      maxCommentNum: 1500,
+      testSwitch: true
     };
   },
 
@@ -610,6 +615,7 @@ a {
 input {
   background-color: var(--v-background-lighten1);
   border-radius: 2px;
+  padding: 0.2em;
 }
 
 .stream_data {
@@ -632,22 +638,6 @@ input {
   background-color: var(--v-background-lighten4);
 }
 
-.btn {
-  display: inline-block;
-  padding: 0.2em 1.2em;
-  margin-bottom: 7px;
-  background: var(--v-background-lighten2);
-  color: var(--v-primary-lighten1);
-  border-radius: 2px;
-  font-size: smaller;
-  margin-left: 3px;
-  margin-right: 3px;
-}
-.btn:active {
-  color: var(--v-primary-base);
-  background-color: var(--v-background-lighten1);
-}
-
 .title a {
   font-size: 24px;
 }
@@ -663,6 +653,7 @@ input {
 .info_box, .comment_box {
   border: 2px solid var(--v-background-lighten5);
   height: 60vh;
+  min-height: 50px;
   max-width: 500px;
   border-radius: 3px;
   margin-left: 10px;
