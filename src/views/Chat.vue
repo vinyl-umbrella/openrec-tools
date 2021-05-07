@@ -5,12 +5,12 @@
         URL:
         <input
           type="text"
-          v-model="inputUrl"
-          placeholder="openrec url"
+          v-model.trim="inputUrl"
+          placeholder="OPENREC URL"
           style="width: 40vw; max-width: 500px;"
           @keydown.enter="getComment"
         />
-        <v-btn @click="getComment" small depressed color="var(--v-background-lighten1)">接続</v-btn>
+        <v-btn @click="getComment" small depressed color="var(--v-background-lighten1)">Connect</v-btn>
         <span> {{ urlError }}</span>
       </div>
       <img id="configBtn" src="../assets/conf.png" height="28px" width="28px" v-on:click="callModal()" />
@@ -62,7 +62,7 @@
       type="text"
       v-model="inputComment"
       class="post_box"
-      placeholder="コメント"
+      placeholder="Comment"
       style="min-width: 250px; width: 40vw"
       @keydown.enter="postComment"
     />
@@ -76,18 +76,29 @@
       <div id="content" style="background-color: var(--v-background-base);">
         <div v-if="!isLogin">
           <form autocomplete="on">
-            <input type="text" placeholder="uuid" v-model="orUuid" style="width: 90%; margin-bottom: 0.1em"/>
-            <input type="password" placeholder="access-token" v-model="orAccessToken" style="width: 90%;"/>
+            <v-text-field
+              v-model="orUuid"
+              label="uuid"
+              hint="get from openrec cookie"
+              outlined dense
+            ></v-text-field>
+            <v-text-field
+              v-model="orAccessToken"
+              label="access-token"
+              hint="get from openrec cookie"
+              type="password"
+              outlined dense
+            ></v-text-field>
           </form><br>
           <v-btn @click="closeModal()" color="var(--v-background-lighten1)" small depressed style="margin-right: 4px;">cancel</v-btn>
           <v-btn @click="orLogin()" color="var(--v-background-lighten1)" small depressed>Login</v-btn>
         </div>
         <div v-else>
           <h2>Config</h2>
-          <div style="margin-top: 0.5em ; margin-bottom: 0.5em">
-            チャット保持件数: <input type="number" v-model="maxCommentNum"><br>
-            <!-- <v-switch v-model="testSwitch" label="新規ユーザを非表示"></v-switch> -->
-          </div>
+          <v-container fluid>
+            <v-text-field v-model.number="maxCommentNum" label="チャット保持件数" outlined dense></v-text-field>
+            <v-checkbox v-model="hideNewcomer" label="新規ユーザを非表示"></v-checkbox>
+          </v-container>
           <v-btn @click="closeModal()" color="var(--v-background-lighten1)" small depressed style="margin-right: 4px;">close</v-btn>
           <v-btn @click="orLogout()" color="var(--v-background-lighten1)" small depressed>Logout</v-btn>
         </div>
@@ -128,7 +139,7 @@ export default {
 
       // config
       maxCommentNum: 1500,
-      testSwitch: true
+      hideNewcomer: false,
     };
   },
 
@@ -202,8 +213,8 @@ export default {
       let d = new Date();
       d.setDate(d.getDate() + 7);
       let expire = d.toUTCString();
-      document.cookie = "orUuid=" + this.orUuid + "; path=/;  expires=" + expire + "; Secure;";
-      document.cookie = "orAccessToken=" + this.orAccessToken + "; path=/;  expires=" + expire + "; Secure;";
+      document.cookie = "orUuid=" + this.orUuid + "; path=/;  expires=" + expire + "; Secure; SameSite=lax;";
+      document.cookie = "orAccessToken=" + this.orAccessToken + "; path=/;  expires=" + expire + "; Secure; SameSite=lax;";
       this.updateLoginStatus();
     },
 
@@ -238,8 +249,8 @@ export default {
         return "";
       } else {
         self.urlError = "";
-        if (videoUrl[videoUrl.length - 1] == "/") {
-          videoUrl = videoUrl.slice(0, -1);
+        if (videoUrl.lastIndexOf("?") != -1) {
+          videoUrl = videoUrl.slice(0, videoUrl.lastIndexOf("?"))
         }
 
         videoId = videoUrl.replace(URLHEAD, "");
@@ -340,6 +351,9 @@ export default {
                     }
                     if (j.data.is_moderator) {
                       name = name + "[Staff]";
+                      if (self.hideNewcomer) {
+                        break;
+                      }
                     }
                     if (j.data.is_muted) {
                       name = name + "[Muted]";
