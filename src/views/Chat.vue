@@ -360,6 +360,9 @@ export default {
                     }
                     if (j.data.is_moderator) {
                       name = name + "[Staff]";
+                      if (self.hideNewcomer) {
+                        break;
+                      }
                     }
                     if (j.data.is_muted) {
                       name = name + "[Muted]";
