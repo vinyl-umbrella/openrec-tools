@@ -150,6 +150,8 @@ export default {
   },
 
   mounted() {
+    console.clear();
+    console.log("%cHello, developers! Here is the TODO list.\nhttps://docs.google.com/spreadsheets/d/1K4LPqmZRVbnKD3VoZ9KMXsZauuFZafam1dgkJhAsZZ4/\nIf you have ideas to implement of these tasks, please send message from Google Form at the contact page. Of course, you can send other messages from Google Form.", "line-height: 2;");
     this.updateLoginStatus();
   },
 

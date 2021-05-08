@@ -9,6 +9,9 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
+    meta: {
+      title: 'rank',
+    }
   },
   {
     path: '/contact',
@@ -16,19 +19,29 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Contact.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/Contact.vue'),
+    meta: {
+      title: 'Contact'
+    }
   },
   {
     path: '/chat',
     name: 'Chat',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Chat.vue')
+    component: () => import('../views/Chat.vue'),
+    meta: {
+      title: 'Chat'
+    }
   }
 ]
 
+const DEFAULT_TITLE = 'futon-openchat'
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
+})
+router.afterEach((to) => {
+  document.title = to.meta.title + ' - ' + DEFAULT_TITLE || DEFAULT_TITLE;
 })
 
 export default router
