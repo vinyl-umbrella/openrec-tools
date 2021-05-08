@@ -9,7 +9,7 @@
         :chart-data="chartData"
         :options="chartOptions"
       ></bar-chart>
-      <button @click="$emit('close')" style="background: var(--v-background-lighten2)">close</button>
+      <v-btn @click="$emit('close')" style="background: var(--v-background-lighten2)" small depressed>close</v-btn>
     </div>
   </div>
 </template>

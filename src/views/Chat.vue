@@ -5,20 +5,20 @@
         URL:
         <input
           type="text"
-          v-model="inputUrl"
-          placeholder="openrec url"
-          style="width: 40vw; max-width: 500px;"
+          class="url_box"
+          v-model.trim="inputUrl"
+          placeholder="OPENREC URL"
           @keydown.enter="getComment"
         />
-        <v-btn @click="getComment" small depressed color="var(--v-background-lighten1)">接続</v-btn>
+        <v-btn @click="getComment" small depressed color="var(--v-background-lighten1)">Connect</v-btn>
         <span> {{ urlError }}</span>
       </div>
-      <img id="configBtn" src="../assets/conf.png" height="28px" width="28px" v-on:click="callModal()" />
+      <img id="configBtn" src="../assets/conf.png" height="28px" width="28px" @click="callModal()" />
     </div>
 
     <div class="stream_data">
       <div class="title">
-        <a :href="inputUrl" target="_blank">{{ title }}</a>
+        <a :href="streamUrl" target="_blank">{{ title }}</a>
       </div>
       <div class="channel_name">{{ channelName }}</div>
       <br />
@@ -33,7 +33,7 @@
     <div class="flexbox">
       <div id="comment_box" class="comment_box">
         <div class="comments" v-for="(comment, index) in comments" :key="index">
-          <div class="user_name" v-bind:style="{color:comment.Color}">{{ comment.Name }}</div>
+          <div class="user_name" :style="{color:comment.Color}">{{ comment.Name }}</div>
           <span class="message" v-if="comment.Message != ''">{{
             comment.Message
           }}</span>
@@ -62,8 +62,7 @@
       type="text"
       v-model="inputComment"
       class="post_box"
-      placeholder="コメント"
-      style="min-width: 250px; width: 40vw"
+      placeholder="Comment"
       @keydown.enter="postComment"
     />
     <v-btn @click="postComment" small depressed color="var(--v-background-lighten1)">post</v-btn>
@@ -76,18 +75,29 @@
       <div id="content" style="background-color: var(--v-background-base);">
         <div v-if="!isLogin">
           <form autocomplete="on">
-            <input type="text" placeholder="uuid" v-model="orUuid" style="width: 90%; margin-bottom: 0.1em"/>
-            <input type="password" placeholder="access-token" v-model="orAccessToken" style="width: 90%;"/>
-          </form><br>
+            <v-text-field
+              v-model="orUuid"
+              label="uuid"
+              hint="Get from openrec cookie"
+              outlined dense
+            ></v-text-field>
+            <v-text-field
+              v-model="orAccessToken"
+              label="access-token"
+              hint="Get from openrec cookie"
+              type="password"
+              outlined dense
+            ></v-text-field>
+          </form>
           <v-btn @click="closeModal()" color="var(--v-background-lighten1)" small depressed style="margin-right: 4px;">cancel</v-btn>
           <v-btn @click="orLogin()" color="var(--v-background-lighten1)" small depressed>Login</v-btn>
         </div>
         <div v-else>
           <h2>Config</h2>
-          <div style="margin-top: 0.5em ; margin-bottom: 0.5em">
-            チャット保持件数: <input type="number" v-model="maxCommentNum"><br>
-            <!-- <v-switch v-model="testSwitch" label="新規ユーザを非表示"></v-switch> -->
-          </div>
+          <v-container fluid>
+            <v-text-field v-model.number="maxCommentNum" label="チャット保持件数" outlined dense></v-text-field>
+            <v-checkbox v-model="hideNewcomer" label="新規ユーザを非表示"></v-checkbox>
+          </v-container>
           <v-btn @click="closeModal()" color="var(--v-background-lighten1)" small depressed style="margin-right: 4px;">close</v-btn>
           <v-btn @click="orLogout()" color="var(--v-background-lighten1)" small depressed>Logout</v-btn>
         </div>
@@ -110,6 +120,7 @@ export default {
       orAccessToken: "",
 
       inputUrl: "",
+      streamUrl: "",
       urlError: "",
       inputComment: "",
       postError: "",
@@ -128,7 +139,7 @@ export default {
 
       // config
       maxCommentNum: 1500,
-      testSwitch: true
+      hideNewcomer: false,
     };
   },
 
@@ -202,8 +213,8 @@ export default {
       let d = new Date();
       d.setDate(d.getDate() + 7);
       let expire = d.toUTCString();
-      document.cookie = "orUuid=" + this.orUuid + "; path=/;  expires=" + expire + "; Secure;";
-      document.cookie = "orAccessToken=" + this.orAccessToken + "; path=/;  expires=" + expire + "; Secure;";
+      document.cookie = "orUuid=" + this.orUuid + "; path=/;  expires=" + expire + "; Secure; SameSite=lax;";
+      document.cookie = "orAccessToken=" + this.orAccessToken + "; path=/;  expires=" + expire + "; Secure; SameSite=lax;";
       this.updateLoginStatus();
     },
 
@@ -231,16 +242,22 @@ export default {
     async getMovieId() {
       let self = this;
       const URLHEAD = "https://www.openrec.tv/live/";
+      const mURLHEAD = "https://www.openrec.tv/m/live/";
       let videoUrl = self.inputUrl;
       let videoId = "";
+      if (videoUrl.indexOf(mURLHEAD) != -1) {
+        videoUrl = videoUrl.replace(mURLHEAD, URLHEAD);
+        self.inputUrl = videoUrl;
+      }
       if (videoUrl.indexOf(URLHEAD)) {
         self.urlError = "invalid url";
         return "";
       } else {
         self.urlError = "";
-        if (videoUrl[videoUrl.length - 1] == "/") {
-          videoUrl = videoUrl.slice(0, -1);
+        if (videoUrl.lastIndexOf("?") != -1) {
+          videoUrl = videoUrl.slice(0, videoUrl.lastIndexOf("?"))
         }
+        self.streamUrl = self.inputUrl;
 
         videoId = videoUrl.replace(URLHEAD, "");
         self.videoId = videoId;
@@ -337,6 +354,9 @@ export default {
                     }
                     if (j.data.is_fresh) {
                       name = name + "[Fresh]";
+                      if (self.hideNewcomer) {
+                        break;
+                      }
                     }
                     if (j.data.is_moderator) {
                       name = name + "[Staff]";
@@ -528,6 +548,9 @@ export default {
             }
             if (past_comments[i].user.is_fresh) {
               name = name + "[Fresh]";
+              if (self.hideNewcomer) {
+                continue;
+              }
             }
             if (past_comments[i].is_moderating) {
               name = name + "[Staff]";
@@ -613,8 +636,6 @@ a {
 }
 
 input {
-  background-color: var(--v-background-lighten1);
-  border-radius: 2px;
   padding: 0.2em;
 }
 
@@ -654,7 +675,7 @@ input {
   border: 2px solid var(--v-background-lighten5);
   height: 60vh;
   min-height: 50px;
-  max-width: 500px;
+  max-width: 600px;
   border-radius: 3px;
   margin-left: 10px;
   padding: 10px;
@@ -681,8 +702,19 @@ input {
   font-size: smaller;
 }
 
+.url_box {
+  width: 40vw;
+  max-width: 500px;
+}
 .post_box {
   margin-top: 20px;
   margin-left: 10px;
+  min-width: 250px;
+  width: 40vw;
+}
+.post_box, .url_box {
+  color: var(--v-primary-base);
+  background-color: var(--v-background-lighten1);
+  border: 1px solid #a3a3a3;
 }
 </style>

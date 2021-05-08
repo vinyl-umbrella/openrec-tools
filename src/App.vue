@@ -44,18 +44,10 @@ html {
 }
 
 input {
-  color: var(--v-primary-base);
-  background-color: var(--v-background-lighten2);
   padding: 0.1em;
   transition: 0.3s;
   width: 5em;
   margin-right: 4px;
   border-radius: 2px;
-  border: 1px solid #a3a3a3;
-}
-input:focus {
-  border: 1px solid #939393;
-  outline: none;
-  box-shadow: 0 0 5px 1px #93939380;
 }
 </style>

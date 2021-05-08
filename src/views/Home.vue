@@ -23,22 +23,20 @@
     <div class="flex-box">
       <div class="flex-items">
         <form>
-          <div>
-            表示人数: <input type="number" min="1" max="1000" v-model="num" />人
-          </div>
-          <div>
-            開始年月:
-            <input type="number" min="2020" max="2021" v-model="startYear" />年
-            <input type="number" min="1" max="12" v-model="startMonth" />月
-          </div>
-          <div>
-            終了年月:
-            <input type="number" min="2020" max="2021" v-model="endYear" />年
-            <input type="number" min="1" max="12" v-model="endMonth" />月
-          </div>
+          <v-row>
+            <v-text-field type="number" min="1" max="1000" v-model.number="num" label="表示人数" dense outlined></v-text-field>
+          </v-row>
+          <v-row>
+            <v-text-field type="number" min="2020" max="2021" v-model.number="startYear" label="開始年" dense outlined></v-text-field>
+            <v-text-field type="number" min="1" max="12" v-model.number="startMonth" label="開始月" dense outlined></v-text-field>
+          </v-row>
+          <v-row>
+            <v-text-field type="number" min="2020" max="2021" v-model.number="endYear" label="終了年" dense outlined></v-text-field>
+            <v-text-field type="number" min="1" max="12" v-model.number="endMonth" label="終了月" dense outlined></v-text-field>
+          </v-row>
         </form>
       </div>
-      <div @click="createGraphData()" id="update-button">更新</div>
+      <v-btn @click="createGraphData()" id="update-button" depressed>更新</v-btn>
       <div>{{ inputErrMsg }}</div>
     </div>
 
@@ -208,6 +206,7 @@ export default {
     },
 
     // 入力年月をチェック
+    // 注目
     checkYearMonth() {
       if (this.startYear >= 2020 && this.startYear <= 2021) {
         if (this.endYear >= 2020 && this.endYear <= 2021) {
@@ -304,6 +303,9 @@ export default {
         });
 
         // カット
+        if (this.num < 1) {
+          this.num = 1;
+        }
         let n = Math.min(tempArray.length, this.num);
         tempArray = tempArray.slice(0, n);
 
@@ -325,11 +327,6 @@ form div input {
   margin-bottom: 3px;
 }
 
-input {
-  background-color: var(--v-background-lighten1);
-  border-radius: 2px;
-}
-
 .info {
   text-align: right;
   margin-right: 10px;
@@ -346,26 +343,19 @@ input {
   border-bottom: dotted 2px var(--v-background-lighten3);
 }
 .flex-box .flex-items {
-  margin: 10px;
+  margin-top: 20px;
+  margin-left: 10px;
+  margin-bottom: 20px;
+}
+
+.row {
+  margin-bottom: -30px;
 }
 
 #update-button {
-  margin: 10px;
-  cursor: pointer;
-  width: 80px;
-  text-align: center;
+  margin-left: 20px;
+  margin-bottom: 20px;
   background: var(--v-background-lighten1);
-  color: var(--v-primary-lighten1);
-  border-top: solid 2px #444;
-  border-left: solid 2px #444;
-  border-right: solid 2px #444;
-  border-bottom: solid 4px #444;
-  border-radius: 3px;
-  padding: 0.1em 0.5em;
-}
-#update-button:active {
-  color: var(--v-primary-base);
-  background-color: var(--v-background-lighten1);
 }
 
 .userid {
@@ -373,5 +363,9 @@ input {
 }
 .userid:hover {
   color: var(--v-secondary-base);
+}
+
+.v-text-field{
+  max-width: 100px;
 }
 </style>
