@@ -241,7 +241,7 @@ export default {
           source: "cache",
         });
         if (doc.empty) {
-          console.log("no data");
+          // console.log("no data");
           return {};
         }
         return doc.data();
