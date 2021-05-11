@@ -67,10 +67,16 @@
     />
     <v-btn @click="postComment" small depressed color="var(--v-background-lighten1)">post</v-btn>
     <span>  {{ inputComment.length }}/100</span><br />
+    <span v-show="showStampBtn">
+      <v-btn class="stamp_btn" @click="postStamp(2533)" small depressed color="var(--v-background-lighten1)">におうな</v-btn>
+      <v-btn  class="stamp_btn" @click="postStamp(2657)" small depressed color="var(--v-background-lighten1)">んこー</v-btn>
+      <v-btn  class="stamp_btn" @click="postStamp(2658)" small depressed color="var(--v-background-lighten1)">KP</v-btn>
+      <v-btn  class="stamp_btn" @click="postStamp(2659)" small depressed color="var(--v-background-lighten1)">シュガー</v-btn>
+    </span><br />
     <span>{{ postError }}</span>
     <br><br>
 
-    <!-- modal -->
+    <!-- Config modal -->
     <div id="overlay" v-show="showModal" @click.self="closeModal()">
       <div id="content" style="background-color: var(--v-background-base);">
         <div v-if="!isLogin">
@@ -97,6 +103,7 @@
           <v-container fluid>
             <v-text-field v-model.number="maxCommentNum" label="チャット保持件数" outlined dense></v-text-field>
             <v-checkbox v-model="hideNewcomer" label="新規ユーザを非表示"></v-checkbox>
+            <v-checkbox v-model="showStampBtn" label="スタンプボタンを表示 ※魔神サブスク限定"></v-checkbox>
           </v-container>
           <v-btn @click="closeModal()" color="var(--v-background-lighten1)" small depressed style="margin-right: 4px;">close</v-btn>
           <v-btn @click="orLogout()" color="var(--v-background-lighten1)" small depressed>Logout</v-btn>
@@ -140,6 +147,7 @@ export default {
       // config
       maxCommentNum: 1500,
       hideNewcomer: false,
+      showStampBtn: false,
     };
   },
 
@@ -150,8 +158,7 @@ export default {
   },
 
   mounted() {
-    console.clear();
-    console.log("%cHello, developers! Here is the TODO list.\nhttps://docs.google.com/spreadsheets/d/1K4LPqmZRVbnKD3VoZ9KMXsZauuFZafam1dgkJhAsZZ4/\nIf you have ideas to implement of these tasks, please send message from Google Form at the contact page. Of course, you can send other messages from Google Form.", "line-height: 2;");
+    console.info("%cHello, developers! Here is the TODO list.\nhttps://docs.google.com/spreadsheets/d/1K4LPqmZRVbnKD3VoZ9KMXsZauuFZafam1dgkJhAsZZ4/\nIf you have ideas to implement of these tasks, please send message from Google Form at the contact page. Of course, you can send other messages from Google Form.", "line-height: 2;");
     this.updateLoginStatus();
   },
 
@@ -275,7 +282,7 @@ export default {
             self.urlError = "not on air now";
           }
         } catch (e) {
-          console.log(e);
+          console.error(e);
           self.urlError = "invalid url";
         }
         return movieId;
@@ -286,7 +293,7 @@ export default {
       let self = this;
       let sock  = new WebSocket(url);
       sock.addEventListener("open", function() {
-        console.log("-----CONNECT TO SERVER-----");
+        console.info("-----CONNECT TO SERVER-----");
         self.wsConnectFlag = true;
       });
 
@@ -347,9 +354,6 @@ export default {
                     }
                     if (j.data.badges.length != 0) {
                       name = name + "[Sub" + j.data.badges[0].subscription.months + "]";
-                      if (j.data.badges.length > 1) {
-                        console.log(j.data.badges);
-                      }
                     }
                     if (j.data.is_premium) {
                       name = name + "[P]";
@@ -456,6 +460,9 @@ export default {
 
                 // わからん refresh?
                 case 10:
+                  if (j.data.need_refresh != null) {
+                    console.log(j.data);
+                  }
                   break;
 
                 // ゲーム変更，タイトル変更
@@ -463,7 +470,7 @@ export default {
                   addEvent("info", j.data.system_message.type + " " + j.data.message);
                   break;
 
-                // 12, 13, 15 テロップ
+                // 12, 13, 15 テロップ．後で解析する
                 case 12:
                   break;
                 case 13:
@@ -484,9 +491,8 @@ export default {
                   });
                   break;
 
-                // アンケート
+                // アンケートの途中経過
                 case 30:
-                  console.log("type 30:", j);
                   break;
 
                 // アンケート結果
@@ -498,10 +504,10 @@ export default {
                   break;
 
                 default:
-                  console.log("unknown type:", j);
+                  console.warn("unknown type:", j);
               }
             } else {
-              console.log("unknown format:", orig);
+              console.warn("unknown format:", orig);
             }
           }
         }
@@ -513,9 +519,8 @@ export default {
       });
 
       // close
-      sock.addEventListener("close", function(event) {
-        console.log(event);
-        console.log("-----BYE SERVER-----");
+      sock.addEventListener("close", function() {
+        console.info("-----BYE SERVER-----");
         self.wsConnectFlag = false;
         self.connectWS(url);
       })
@@ -592,6 +597,41 @@ export default {
       if (self.videoId != "" && self.inputComment != "" && self.isLogin) {
         let url = "https://apiv5.openrec.tv/api/v5/movies/" + self.videoId + "/chats";
         let data = {
+          "consented_chat_terms": false,
+          "message": self.inputComment,
+          "quality_type": 2,
+          "messaged_at": "",
+          "league_key": "",
+          "to_user_id": ""
+        };
+        let param = {
+          method: "POST",
+          headers: {
+            "Accept": "application/json,text/plain,*/*",
+            "Content-Type": "application/json;charset=utf-8",
+            "uuid": self.orUuid,
+            "access-token": self.orAccessToken
+          },
+          body: JSON.stringify(data)
+        };
+
+        let j = await (await fetch(url, param)).json();
+        self.inputComment = "";
+        if (j.status != 0) {
+          self.postError = j.message;
+        } else {
+          self.postError = ""
+        }
+      }
+    },
+
+    async postStamp(stamp_id) {
+      let self = this;
+      if (self.videoId != "") {
+        let url = "https://apiv5.openrec.tv/api/v5/movies/" + self.videoId + "/chats";
+        let data = {
+          "stamp_id": stamp_id,
+          "consented_chat_terms": false,
           "message": self.inputComment,
           "quality_type": 2,
           "messaged_at": "",
@@ -721,5 +761,10 @@ input {
   color: var(--v-primary-base);
   background-color: var(--v-background-lighten1);
   border: 1px solid #a3a3a3;
+}
+
+.stamp_btn {
+  margin-top: 5px;
+  margin-left: 10px;
 }
 </style>
