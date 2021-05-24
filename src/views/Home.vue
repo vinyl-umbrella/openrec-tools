@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="info">
-      <div>最終更新日 2021年4月30日</div> <!-- 注目 -->
+      <div>最終更新日 2021年5月24日</div> <!-- 注目 -->
       <div>
         保管庫は
         <a

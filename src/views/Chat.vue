@@ -68,6 +68,7 @@
     <v-btn @click="postComment" small depressed color="var(--v-background-lighten1)">post</v-btn>
     <span>  {{ inputComment.length }}/100</span><br />
     <span v-show="showStampBtn">
+      Stamps:
       <v-btn class="stamp_btn" @click="postStamp(2533)" small depressed color="var(--v-background-lighten1)">におうな</v-btn>
       <v-btn  class="stamp_btn" @click="postStamp(2657)" small depressed color="var(--v-background-lighten1)">んこー</v-btn>
       <v-btn  class="stamp_btn" @click="postStamp(2658)" small depressed color="var(--v-background-lighten1)">KP</v-btn>
@@ -718,9 +719,9 @@ input {
 
 .info_box, .comment_box {
   border: 2px solid var(--v-background-lighten5);
-  height: 60vh;
+  height: 68vh;
   min-height: 50px;
-  max-width: 600px;
+  max-width: 900px;
   border-radius: 3px;
   margin-left: 10px;
   padding: 10px;
