@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="info">
-      <div>最終更新日 2021年5月24日</div> <!-- 注目 -->
+      <div>最終更新日 2021年6月1日</div> <!-- 注目 -->
       <div>
         保管庫は
         <a
@@ -95,9 +95,9 @@ export default {
       // input default value
       num: 30,
       startYear: 2021,
-      startMonth: 4,    // 注目
+      startMonth: 5,    // 注目
       endYear: 2021,
-      endMonth: 4,      // 注目
+      endMonth: 5,      // 注目
       // 入力エラー
       inputErrMsg: "",
       // グラフの描画に使用するデータ
@@ -167,7 +167,7 @@ export default {
         ],
       }
       // 注目
-      temp["labels"] = ["2020-7", "2020-8", "2020-9", "2020-10", "2020-11", "2020-12", "2021-1", "2021-2", "2021-3", "2021-4"];
+      temp["labels"] = ["2020-7", "2020-8", "2020-9", "2020-10", "2020-11", "2020-12", "2021-1", "2021-2", "2021-3", "2021-4", "2021-5"];
       for (let i of temp["labels"]) {
         let ym = i.split("-");
         const doc = await this.getFromFirestore(ym[0], ym[1]);
