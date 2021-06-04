@@ -1,12 +1,13 @@
 <template>
   <div class="home">
     <div class="info">
-      <div>最終更新日 2021年6月1日</div> <!-- 注目 -->
+      <div>最終更新日 2021年6月1日</div> <!-- !!注目 -->
       <div>
         保管庫は
         <a
           href="https://drive.google.com/drive/folders/1U77WomTyFEVtFtA4gMQKUJf8gdXRijP8?usp=sharing"
           target="_blank"
+          rel=" noopener norefferer"
           >ここ</a
         >
       </div>
@@ -88,9 +89,9 @@ export default {
       // input default value
       num: 30,
       startYear: 2021,
-      startMonth: 5,    // 注目
+      startMonth: 5,    // !!注目
       endYear: 2021,
-      endMonth: 5,      // 注目
+      endMonth: 5,      // !!注目
       // 入力エラー
       inputErrMsg: "",
       // グラフの描画に使用するデータ

@@ -11,6 +11,7 @@ const routes = [
     component: Home,
     meta: {
       title: 'rank',
+      desc: '布団ちゃん オプチャランク'
     }
   },
   {
@@ -21,7 +22,8 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/Contact.vue'),
     meta: {
-      title: 'Contact'
+      title: 'Contact',
+      desc: '要望、連絡先など'
     }
   },
   {
@@ -29,7 +31,8 @@ const routes = [
     name: 'Chat',
     component: () => import('../views/Chat.vue'),
     meta: {
-      title: 'Chat'
+      title: 'Chat',
+      desc: 'OPENREC.tv コメントビューア'
     }
   }
 ]
@@ -42,6 +45,8 @@ const router = new VueRouter({
 })
 router.afterEach((to) => {
   document.title = to.meta.title + ' - ' + DEFAULT_TITLE || DEFAULT_TITLE;
+  document.querySelector("meta[name='description']").textContent = to.meta.desc;
+  console.log(document.querySelector("meta[name='description']").textContent);
 })
 
 export default router

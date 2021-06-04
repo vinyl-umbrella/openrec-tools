@@ -13,12 +13,12 @@
         <v-btn @click="getComment" small depressed color="var(--v-background-lighten1)">Connect</v-btn>
         <span> {{ urlError }}</span>
       </div>
-      <img id="configBtn" src="../assets/conf.png" height="28px" width="28px" @click="callModal()" />
+      <img id="configBtn" alt="config" src="../assets/conf.png" height="28px" width="28px" @click="callModal()" />
     </div>
 
     <div class="stream_data">
-      <div class="title">
-        <a :href="streamUrl" target="_blank">{{ title }}</a>
+      <div class="title" v-show="streamUrl!=''">
+        <a :href="streamUrl" target="_blank" rel=" noopener norefferer">{{ title }}</a>
       </div>
       <div class="channel_name">{{ channelName }}</div>
       <br />

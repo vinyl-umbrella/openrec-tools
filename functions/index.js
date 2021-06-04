@@ -45,7 +45,9 @@ app.get('/v1/user/:userid', (req, res) => {
         }
         return data;
     }).then(data => {
-        res.send({
+        res
+        .set("Cache-Control", "public, max-age=604800")
+        .send({
             "status": status,
             "data": data
         })
@@ -58,7 +60,9 @@ app.get('/v1/ym/:year/:month', function(req, res) {
         if (!doc.exists) {
             res.send({"status": -1});
         } else {
-            res.send({
+            res
+            .set("Cache-Control", "public, max-age=604800")
+            .send({
                 "status": 1,
                 "data": doc.data()
             });
