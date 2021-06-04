@@ -60,14 +60,7 @@
 
 <script>
 import barChart from "../components/barChart";
-import firebase from "firebase/app"
-import "firebase/firestore"
 import Modal from "../components/modal";
-
-const firebaseConfig = require("../secret.json");
-firebase.initializeApp(firebaseConfig);
-firebase.firestore().clearPersistence();
-firebase.firestore().enablePersistence();
 
 export default {
   components: {
@@ -144,7 +137,7 @@ export default {
   methods: {
     async clickUser(userid) {
       let url = "https://public.openrec.tv/external/api/v5/channels/" + userid;
-      const res = await fetch(url);
+      let res = await fetch(url);
       if (res.ok) {
         let j = await res.json();
         this.postData["id"] = j["id"];
@@ -156,7 +149,7 @@ export default {
         this.postData["created_at"] = "account not found";
       }
 
-      let temp = {
+      let tempGraphData = {
         labels: [],
         datasets: [
           {
@@ -167,18 +160,35 @@ export default {
         ],
       }
       // 注目
-      temp["labels"] = ["2020-7", "2020-8", "2020-9", "2020-10", "2020-11", "2020-12", "2021-1", "2021-2", "2021-3", "2021-4", "2021-5"];
-      for (let i of temp["labels"]) {
-        let ym = i.split("-");
-        const doc = await this.getFromFirestore(ym[0], ym[1]);
-        if (doc[userid]) {
-          temp["datasets"][0]["data"].push(doc[userid]);
-        } else {
-          temp["datasets"][0]["data"].push(0);
+      tempGraphData["labels"] = ["2020-7", "2020-8", "2020-9", "2020-10", "2020-11", "2020-12", "2021-1", "2021-2", "2021-3", "2021-4", "2021-5"];
+
+      res = await fetch("https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v1/user/" + userid);
+
+      if (res.ok) {
+        let j = await res.json();
+        if (j.status == 1) {
+          let ymKeys = Object.keys(j.data);
+          let tempArray = [];
+          let ym = [];
+          for (let i of ymKeys) {
+            tempArray.push(i.split("-"));
+          }
+          // sort y m
+          tempArray.sort(function(a, b) {return a[1] - b[1];});
+          tempArray.sort(function(a, b) {return a[0] - b[0];});
+
+          for (let i of tempArray) {
+            ym.push(i[0] + "-" + i[1]);
+          }
+          tempGraphData["labels"] = ym;
+          for (let i of tempGraphData["labels"]) {
+            tempGraphData["datasets"][0]["data"].push(j.data[i]);
+          }
         }
       }
+
       // obj を丸ごと変更するとグラフに反映される
-      this.modalGraphData = temp;
+      this.modalGraphData = tempGraphData;
       this.showModal = true;
     },
 
@@ -233,26 +243,6 @@ export default {
       return false;
     },
 
-    async getFromFirestore(year, month) {
-      const db = firebase.firestore();
-
-      try {
-        const doc = await db.collection(String(year)).doc(String(month)).get({
-          source: "cache",
-        });
-        if (doc.empty) {
-          // console.log("no data");
-          return {};
-        }
-        return doc.data();
-      } catch (err) {
-        const doc = await db.collection(String(year)).doc(String(month)).get({
-          source: "server",
-        })
-        return doc.data();
-      }
-    },
-
     async createGraphData() {
       if (this.checkYearMonth()) {
         let ids = [];
@@ -280,14 +270,19 @@ export default {
         for (let elem of yearMonth) {
           // console.log(elem);
           // 各月のデータを取得
-          let doc = await this.getFromFirestore(elem[0], elem[1]);
+          let data = {}
+          let res = await fetch("https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v1/ym/" + elem[0] + "/" + elem[1]);
+          if (res.ok) {
+            let j = await res.json();
+            data = j.data;
+          }
 
           // 存在するなら加算 else 追加
-          for (let key of Object.keys(doc)) {
+          for (let key of Object.keys(data)) {
             if (graphDataObj[key]) {
-              graphDataObj[key] += Number(doc[key]);
+              graphDataObj[key] += Number(data[key]);
             } else {
-              graphDataObj[key] = Number(doc[key]);
+              graphDataObj[key] = Number(data[key]);
             }
           }
         }
