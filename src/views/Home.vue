@@ -159,8 +159,6 @@ export default {
           },
         ],
       }
-      // 注目
-      tempGraphData["labels"] = ["2020-7", "2020-8", "2020-9", "2020-10", "2020-11", "2020-12", "2021-1", "2021-2", "2021-3", "2021-4", "2021-5"];
 
       res = await fetch("https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v1/user/" + userid);
 
@@ -267,50 +265,46 @@ export default {
           }
         }
 
-        for (let elem of yearMonth) {
-          // console.log(elem);
-          // 各月のデータを取得
-          let data = {}
-          let res = await fetch("https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v1/ym/" + elem[0] + "/" + elem[1]);
-          if (res.ok) {
-            let j = await res.json();
-            data = j.data;
-          }
+        let promiseArray = yearMonth.map(yearMonth => fetch(`https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v1/ym/${yearMonth[0]}/${yearMonth[1]}`));
 
-          // 存在するなら加算 else 追加
-          for (let key of Object.keys(data)) {
-            if (graphDataObj[key]) {
-              graphDataObj[key] += Number(data[key]);
-            } else {
-              graphDataObj[key] = Number(data[key]);
+        Promise.all(promiseArray).then(res =>
+          Promise.all(res.map(r => r.json()))
+        ).then(jArr => {
+          for(let j of jArr){
+            let data = j.data;
+            for (let key of Object.keys(data)) {
+              if (graphDataObj[key]) {
+                graphDataObj[key] += Number(data[key]);
+              } else {
+                graphDataObj[key] = Number(data[key]);
+              }
             }
           }
-        }
+          // idとcountペアの配列をpush
+          let tempArray = [];
+          for (let key of Object.keys(graphDataObj)) {
+            tempArray.push([key, graphDataObj[key]]);
+          }
+          // ソートする
+          tempArray.sort(function (a, b) {
+            return b[1] - a[1];
+          });
 
-        // idとcountペアの配列をpush
-        let tempArray = [];
-        for (let key of Object.keys(graphDataObj)) {
-          tempArray.push([key, graphDataObj[key]]);
-        }
-        // ソートする
-        tempArray.sort(function (a, b) {
-          return b[1] - a[1];
+          // カット
+          if (this.num < 1) {
+            this.num = 1;
+          }
+          let n = Math.min(tempArray.length, this.num);
+          tempArray = tempArray.slice(0, n);
+
+          // id と count の配列に分ける
+          for (let i of tempArray) {
+            ids.push(i[0]);
+            counts.push(i[1]);
+          }
+
+          this.updataGraph(ids, counts);
         });
-
-        // カット
-        if (this.num < 1) {
-          this.num = 1;
-        }
-        let n = Math.min(tempArray.length, this.num);
-        tempArray = tempArray.slice(0, n);
-
-        // id と count の配列に分ける
-        for (let i of tempArray) {
-          ids.push(i[0]);
-          counts.push(i[1]);
-        }
-
-        this.updataGraph(ids, counts);
       }
     },
   },
