@@ -724,7 +724,6 @@ input {
   max-width: 900px;
   border-radius: 3px;
   margin-left: 10px;
-  padding: 10px;
   overflow-y: auto;
   background-color: var(--v-background-darken1);
 }
@@ -736,10 +735,10 @@ input {
 }
 
 .infos, .comments {
-  margin: 1em;
+  margin: 0.8em;
   background-color: var(--v-background-base);
   color: var(--v-primary-base);
-  padding: 0.5em 8px;
+  padding: 0.3em 8px;
   border-radius: 7px;
   word-break: break-all;
 }

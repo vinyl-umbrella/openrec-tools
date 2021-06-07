@@ -45,8 +45,7 @@ const router = new VueRouter({
 })
 router.afterEach((to) => {
   document.title = to.meta.title + ' - ' + DEFAULT_TITLE || DEFAULT_TITLE;
-  document.querySelector("meta[name='description']").textContent = to.meta.desc;
-  console.log(document.querySelector("meta[name='description']").textContent);
+  document.querySelector("meta[name='description']").setAttribute('content', to.meta.desc);
 })
 
 export default router
