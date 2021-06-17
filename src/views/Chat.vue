@@ -18,14 +18,14 @@
 
     <div class="stream_data">
       <div class="title" v-show="streamUrl!=''">
-        <a :href="streamUrl" target="_blank" rel=" noopener norefferer">{{ title }}</a>
+        <a :href="streamUrl" target="_blank" rel="noopener norefferer">{{ title }}</a>
       </div>
       <div class="channel_name">{{ channelName }}</div>
       <br />
 
       <div>
         <span>同接: {{ viewers }}&nbsp;</span>
-        <span>最大同接: {{ max_viewers }}&nbsp;</span>
+        <span>最大同接: {{ maxViewers }}&nbsp;</span>
         <span>コメ速: {{ calcAvg }}/min</span>
       </div>
     </div>
@@ -49,7 +49,7 @@
           <span>[{{ event.type}}]&nbsp;</span>
           <span v-if="event.type=='URL'">
             <span>{{ event.content[0] }}</span>
-            <a :href="event.content[1]" target="_blank">{{ event.content[1] }}</a>
+            <a :href="event.content[1]" target="_blank" rel="noopener norefferer">{{ event.content[1] }}</a>
             <span>{{ event.content[2] }}</span>
           </span>
           <span v-else>
@@ -136,8 +136,8 @@ export default {
       title: "",
       channelName: "",
       viewers: 0,
-      max_viewers: 0,
-      comments_speed: 0,
+      maxViewers: 0,
+      commentsSpeed: 0,
 
       videoId: "",
 
@@ -154,7 +154,7 @@ export default {
 
   computed: {
     calcAvg() {
-      return parseInt(this.comments_speed / 2);
+      return parseInt(this.commentsSpeed / 2);
     },
   },
 
@@ -399,7 +399,8 @@ export default {
                     let addComment = (data) => {
                       self.comments.push(data);
                       if (self.comments.length > self.maxCommentNum) {
-                        self.comments = self.comments.slice(-self.maxCommentNum);
+                        // self.comments = self.comments.slice(-self.maxCommentNum);
+                        self.comments.shift();
                       }
                     }
 
@@ -424,8 +425,8 @@ export default {
                 // 同接
                 case 1:
                   self.viewers = j.data.live_viewers;
-                  if (self.max_viewers < self.viewers) {
-                      self.max_viewers = self.viewers;
+                  if (self.maxViewers < self.viewers) {
+                      self.maxViewers = self.viewers;
                   }
                   break;
 
@@ -536,7 +537,7 @@ export default {
     async getComment() {
       let self = this;
       self.viewers = 0;
-      self.max_viewers = 0;
+      self.maxViewers = 0;
       let movieId = await self.getMovieId();
       self.comments = [];
       if (movieId != "") {
@@ -663,9 +664,9 @@ export default {
     calc_speed() {
       let self = this;
       var sub = function () {
-        self.comments_speed -= 1;
+        self.commentsSpeed -= 1;
       };
-      self.comments_speed += 1;
+      self.commentsSpeed += 1;
       setTimeout(sub, 120000);
     },
   },
