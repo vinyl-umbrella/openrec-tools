@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="info">
-      <div>最終更新日 2021年6月1日</div> <!-- !!注目 -->
+      <div>最終更新日 2021年6月13日</div> <!-- !!注目 -->
       <div>
         保管庫は
         <a
@@ -137,19 +137,8 @@ export default {
 
   methods: {
     async clickUser(userid) {
-      let url = "https://public.openrec.tv/external/api/v5/channels/" + userid;
-      let res = await fetch(url);
-      if (res.ok) {
-        let j = await res.json();
-        this.postData["id"] = j["id"];
-        this.postData["nickname"] = j["nickname"];
-        this.postData["created_at"] = j["registered_at"];
-      } else {
-        this.postData["id"] = userid;
-        this.postData["nickname"] = "";
-        this.postData["created_at"] = "account not found";
-      }
-
+      let orApiUrl = "https://public.openrec.tv/external/api/v5/channels/" + userid;
+      let webappApiUrl = "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v1/user/" + userid;
       let tempGraphData = {
         labels: [],
         datasets: [
@@ -161,10 +150,27 @@ export default {
         ],
       }
 
-      res = await fetch("https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v1/user/" + userid);
+      this.showModal = true;
 
-      if (res.ok) {
-        let j = await res.json();
+      // while fetching
+      this.postData["nickname"] = "now loading";
+      this.postData["id"] = "now loading";
+      this.postData["created_at"] = "now loading";
+
+      const [res1, res2] = await Promise.all([fetch(orApiUrl), fetch(webappApiUrl)]);
+      if (res1.ok) {
+        let j = await res1.json();
+        this.postData["id"] = j["id"];
+        this.postData["nickname"] = j["nickname"];
+        this.postData["created_at"] = j["registered_at"];
+      } else {
+        this.postData["id"] = userid;
+        this.postData["nickname"] = "";
+        this.postData["created_at"] = "account not found";
+      }
+
+      if (res2.ok) {
+        let j = await res2.json();
         if (j.status == 1) {
           let ymKeys = Object.keys(j.data);
           let tempArray = [];
@@ -188,7 +194,6 @@ export default {
 
       // obj を丸ごと変更するとグラフに反映される
       this.modalGraphData = tempGraphData;
-      this.showModal = true;
     },
 
     closeModal() {
