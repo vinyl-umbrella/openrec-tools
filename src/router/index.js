@@ -10,25 +10,22 @@ const routes = [
     name: 'Home',
     component: Home,
     meta: {
+      title: 'masaoroid',
+      desc: 'オプチャAI masaoroid'
+    }
+  },
+  {
+    path: '/rank',
+    name: 'Rank',
+    component: () => import('../views/Rank.vue'),
+    meta: {
       title: 'rank',
       desc: '布団ちゃん オプチャランク'
     }
   },
   {
-    path: '/masaoroid',
-    name: 'Masaoroid',
-    component: () => import('../views/Masaoroid.vue'),
-    meta: {
-      title: 'masaoroid',
-      desc: '布団ちゃん オプチャAI masaoroid'
-    }
-  },
-  {
     path: '/contact',
     name: 'Contact',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: () => import('../views/Contact.vue'),
     meta: {
       title: 'Contact',

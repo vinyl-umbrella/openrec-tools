@@ -4,8 +4,8 @@
       <div id="nav">
         <span>
           <router-link to="/">Home</router-link> |
-          <router-link to="/chat">CommentViewer</router-link> |
-          <router-link to="/masaoroid">masaoroid</router-link>
+          <router-link to="/rank">Rank</router-link> |
+          <router-link to="/chat">CommentViewer</router-link>
         </span>
         <span>
           <router-link to="/contact">Contact</router-link>
