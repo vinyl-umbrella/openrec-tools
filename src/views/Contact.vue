@@ -1,8 +1,4 @@
 <template>
-  <!--
-  ログイン
-  import blocklist
-  local storage -->
   <div class="contact">
     <h2>Contact</h2>
     アマギフ，苦情，その他管理人に伝えたいことは
