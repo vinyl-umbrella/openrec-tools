@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: http://futonchan-openchat.web.app/sitemap.xml
