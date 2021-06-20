@@ -333,7 +333,7 @@ export default {
 
               let findUserId = (id) => {
                 let name = "unknown(" + id + ")";
-                for(let i=0; i < self.comments.length; i++) {
+                for (let i=self.comments.length-1; i >= 0; i--) {
                   if (id == self.comments[i].recxuser_id) {
                     name = self.comments[i].Name;
                     break;
@@ -676,6 +676,25 @@ export default {
 <style scoped>
 .chat {
   margin-left: 10px;
+}
+
+#overlay {
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#content {
+  z-index: 2;
+  width: 50%;
+  padding: 1em 10% 1em 10%;
+  text-align: center;
 }
 
 a {
