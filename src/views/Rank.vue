@@ -1,13 +1,13 @@
 <template>
   <div class="rank">
     <div class="info">
-      <div>最終更新日 2021年6月13日</div> <!-- !!注目 -->
+      <div>最終更新日 2021年6月24日</div> <!-- !!注目 -->
       <div>
         保管庫は
         <a
           href="https://drive.google.com/drive/folders/1U77WomTyFEVtFtA4gMQKUJf8gdXRijP8?usp=sharing"
           target="_blank"
-          rel=" noopener norefferer"
+          rel="noopener norefferer"
           >ここ</a
         >
       </div>

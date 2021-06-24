@@ -8,7 +8,13 @@
       </div>
       <div class="masao-face">( ･᷄෴･᷅.)</div>
     </div>
-    <v-btn @click="getMasaoMessage()" small depressed color="var(--v-background-lighten1)">再生成</v-btn>
+    <v-btn
+      @click="getMasaoMessage()"
+      small
+      depressed
+      color="var(--v-background-lighten1)"
+      >再生成</v-btn
+    >
   </div>
 </template>
 
@@ -28,6 +34,7 @@ export default {
     async getMasaoMessage() {
       let url =
         "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/masaoroid";
+      this.message = "loading....";
       let res = await fetch(url);
       if (res.ok) {
         this.message = await res.text();
@@ -66,18 +73,18 @@ export default {
   border-radius: 5px;
 }
 .masao-message::before {
-    content: "";
-    position: absolute;
-    border: solid 12px transparent;
-    border-top: solid 12px var(--v-secondary-darken2);
-    top: 100%;
-    left: 50%;
-    -webkit-transform: translateX(-50%);
-    transform: translateX(-50%);
+  content: "";
+  position: absolute;
+  border: solid 12px transparent;
+  border-top: solid 12px var(--v-secondary-darken2);
+  top: 100%;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
 }
 .masao-message p {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 .masao-message .warn {
   font-size: 10px;

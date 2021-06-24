@@ -41,7 +41,7 @@ export default {
 
 #content {
   z-index: 2;
-  width: 50%;
+  width: 75%;
   padding: 1em 10% 1em 10%;
   text-align: center;
 }
