@@ -10,15 +10,30 @@
           placeholder="OPENREC URL"
           @keydown.enter="getComment"
         />
-        <v-btn @click="getComment" small depressed color="var(--v-background-lighten1)">Connect</v-btn>
+        <v-btn
+          @click="getComment"
+          small
+          depressed
+          color="var(--v-background-lighten1)"
+          >Connect</v-btn
+        >
         <span> {{ urlError }}</span>
       </div>
-      <img id="configBtn" alt="config" src="../assets/conf.png" height="28px" width="28px" @click="callModal()" />
+      <img
+        id="configBtn"
+        alt="config"
+        src="../assets/conf.png"
+        height="28px"
+        width="28px"
+        @click="callModal()"
+      />
     </div>
 
     <div class="stream_data">
-      <div class="title" v-show="streamUrl!=''">
-        <a :href="streamUrl" target="_blank" rel="noopener norefferer">{{ title }}</a>
+      <div class="title" v-show="streamUrl != ''">
+        <a :href="streamUrl" target="_blank" rel="noopener norefferer">{{
+          title
+        }}</a>
       </div>
       <div class="channel_name">{{ channelName }}</div>
       <br />
@@ -33,7 +48,9 @@
     <div class="flexbox">
       <div id="comment_box" class="comment_box">
         <div class="comments" v-for="(comment, index) in comments" :key="index">
-          <div class="user_name" :style="{color:comment.Color}">{{ comment.Name }}</div>
+          <div class="user_name" :style="{ color: comment.Color }">
+            {{ comment.Name }}
+          </div>
           <span class="message" v-if="comment.Message != ''">{{
             comment.Message
           }}</span>
@@ -46,14 +63,19 @@
       <div id="info_box" class="info_box">
         <div class="infos" v-for="(event, index) in events" :key="index">
           <span>{{ event.date }}&nbsp;</span>
-          <span>[{{ event.type}}]&nbsp;</span>
-          <span v-if="event.type=='URL'">
+          <span>[{{ event.type }}]&nbsp;</span>
+          <span v-if="event.type == 'URL'">
             <span>{{ event.content[0] }}</span>
-            <a :href="event.content[1]" target="_blank" rel="noopener norefferer">{{ event.content[1] }}</a>
+            <a
+              :href="event.content[1]"
+              target="_blank"
+              rel="noopener norefferer"
+              >{{ event.content[1] }}</a
+            >
             <span>{{ event.content[2] }}</span>
           </span>
           <span v-else>
-            {{ event.content}}
+            {{ event.content }}
           </span>
         </div>
       </div>
@@ -65,58 +87,128 @@
       placeholder="Comment"
       @keydown.enter="postComment"
     />
-    <v-btn @click="postComment" small depressed color="var(--v-background-lighten1)">post</v-btn>
-    <span>  {{ inputComment.length }}/100</span><br />
+    <v-btn
+      @click="postComment"
+      small
+      depressed
+      color="var(--v-background-lighten1)"
+      >post</v-btn
+    >
+    <span> {{ inputComment.length }}/100</span><br />
     <span v-show="showStampBtn">
       Stamps:
-      <v-btn class="stamp_btn" @click="postStamp(2533)" small depressed color="var(--v-background-lighten1)">におうな</v-btn>
-      <v-btn  class="stamp_btn" @click="postStamp(2657)" small depressed color="var(--v-background-lighten1)">んこー</v-btn>
-      <v-btn  class="stamp_btn" @click="postStamp(2658)" small depressed color="var(--v-background-lighten1)">KP</v-btn>
-      <v-btn  class="stamp_btn" @click="postStamp(2659)" small depressed color="var(--v-background-lighten1)">シュガー</v-btn>
-    </span><br />
+      <v-btn
+        class="stamp_btn"
+        @click="postStamp(2533)"
+        small
+        depressed
+        color="var(--v-background-lighten1)"
+        >におうな</v-btn
+      >
+      <v-btn
+        class="stamp_btn"
+        @click="postStamp(2657)"
+        small
+        depressed
+        color="var(--v-background-lighten1)"
+        >んこー</v-btn
+      >
+      <v-btn
+        class="stamp_btn"
+        @click="postStamp(2658)"
+        small
+        depressed
+        color="var(--v-background-lighten1)"
+        >KP</v-btn
+      >
+      <v-btn
+        class="stamp_btn"
+        @click="postStamp(2659)"
+        small
+        depressed
+        color="var(--v-background-lighten1)"
+        >シュガー</v-btn
+      > </span
+    ><br />
     <span>{{ postError }}</span>
-    <br><br>
 
     <!-- Config modal -->
     <div id="overlay" v-show="showModal" @click.self="closeModal()">
-      <div id="content" style="background-color: var(--v-background-base);">
+      <div id="content" style="background-color: var(--v-background-base)">
         <div v-if="!isLogin">
           <form autocomplete="on">
             <v-text-field
               v-model="orUuid"
               label="uuid"
               hint="Get from openrec cookie"
-              outlined dense
+              outlined
+              dense
             ></v-text-field>
             <v-text-field
               v-model="orAccessToken"
               label="access-token"
               hint="Get from openrec cookie"
               type="password"
-              outlined dense
+              outlined
+              dense
             ></v-text-field>
           </form>
-          <v-btn @click="closeModal()" color="var(--v-background-lighten1)" small depressed style="margin-right: 4px;">cancel</v-btn>
-          <v-btn @click="orLogin()" color="var(--v-background-lighten1)" small depressed>Login</v-btn>
+          <v-btn
+            @click="closeModal()"
+            color="var(--v-background-lighten1)"
+            small
+            depressed
+            style="margin-right: 4px"
+            >cancel</v-btn
+          >
+          <v-btn
+            @click="orLogin()"
+            color="var(--v-background-lighten1)"
+            small
+            depressed
+            >Login</v-btn
+          >
         </div>
         <div v-else>
           <h2>Config</h2>
           <v-container fluid>
-            <v-text-field v-model.number="maxCommentNum" label="チャット保持件数" outlined dense></v-text-field>
-            <v-checkbox v-model="hideNewcomer" label="新規ユーザを非表示"></v-checkbox>
-            <v-checkbox v-model="showStampBtn" label="スタンプボタンを表示 ※魔神サブスク限定"></v-checkbox>
+            <v-text-field
+              v-model.number="maxCommentNum"
+              label="チャット保持件数"
+              outlined
+              dense
+            ></v-text-field>
+            <v-checkbox
+              v-model="hideNewcomer"
+              label="新規ユーザを非表示"
+            ></v-checkbox>
+            <v-checkbox
+              v-model="showStampBtn"
+              label="スタンプボタンを表示 ※魔神サブスク限定"
+            ></v-checkbox>
           </v-container>
-          <v-btn @click="closeModal()" color="var(--v-background-lighten1)" small depressed style="margin-right: 4px;">close</v-btn>
-          <v-btn @click="orLogout()" color="var(--v-background-lighten1)" small depressed>Logout</v-btn>
+          <v-btn
+            @click="closeModal()"
+            color="var(--v-background-lighten1)"
+            small
+            depressed
+            style="margin-right: 4px"
+            >close</v-btn
+          >
+          <v-btn
+            @click="orLogout()"
+            color="var(--v-background-lighten1)"
+            small
+            depressed
+            >Logout</v-btn
+          >
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
-
 export default {
   data() {
     return {
@@ -159,7 +251,10 @@ export default {
   },
 
   mounted() {
-    console.info("%cHello, developers! Here is the TODO list.\nhttps://docs.google.com/spreadsheets/d/1K4LPqmZRVbnKD3VoZ9KMXsZauuFZafam1dgkJhAsZZ4/\nIf you have ideas to implement of these tasks, please send message from Google Form at the contact page. Of course, you can send other messages from Google Form.", "line-height: 2;");
+    console.info(
+      "%cHello, developers! Here is the TODO list.\nhttps://docs.google.com/spreadsheets/d/1K4LPqmZRVbnKD3VoZ9KMXsZauuFZafam1dgkJhAsZZ4/\nIf you have ideas to implement of these tasks, please send message from Google Form at the contact page. Of course, you can send other messages from Google Form.",
+      "line-height: 2;"
+    );
     this.updateLoginStatus();
   },
 
@@ -167,19 +262,24 @@ export default {
     updateLoginStatus() {
       let getCookieArray = () => {
         let arr = new Array();
-        if(document.cookie != ""){
+        if (document.cookie != "") {
           let tmp = document.cookie.split("; ");
-          for(let i=0; i<tmp.length; i++){
+          for (let i = 0; i < tmp.length; i++) {
             let data = tmp[i].split("=");
             arr[data[0]] = decodeURIComponent(data[1]);
           }
         }
         return arr;
-      }
+      };
 
       let cookieArray = getCookieArray();
 
-      if ((cookieArray["orUuid"] != "" && cookieArray["orAccessToken"] != "") && cookieArray["orUuid"] && cookieArray["orAccessToken"]){
+      if (
+        cookieArray["orUuid"] != "" &&
+        cookieArray["orAccessToken"] != "" &&
+        cookieArray["orUuid"] &&
+        cookieArray["orAccessToken"]
+      ) {
         this.isLogin = true;
         this.orUuid = cookieArray["orUuid"];
         this.orAccessToken = cookieArray["orAccessToken"];
@@ -223,8 +323,18 @@ export default {
       let d = new Date();
       d.setDate(d.getDate() + 7);
       let expire = d.toUTCString();
-      document.cookie = "orUuid=" + this.orUuid + "; path=/;  expires=" + expire + "; Secure; SameSite=lax;";
-      document.cookie = "orAccessToken=" + this.orAccessToken + "; path=/;  expires=" + expire + "; Secure; SameSite=lax;";
+      document.cookie =
+        "orUuid=" +
+        this.orUuid +
+        "; path=/;  expires=" +
+        expire +
+        "; Secure; SameSite=lax;";
+      document.cookie =
+        "orAccessToken=" +
+        this.orAccessToken +
+        "; path=/;  expires=" +
+        expire +
+        "; Secure; SameSite=lax;";
       this.updateLoginStatus();
     },
 
@@ -242,7 +352,10 @@ export default {
     },
 
     isBottom(container) {
-      return (container.scrollHeight - container.scrollTop)*0.95 < container.clientHeight;
+      return (
+        (container.scrollHeight - container.scrollTop) * 0.95 <
+        container.clientHeight
+      );
     },
 
     scrollToBottom(container) {
@@ -265,13 +378,14 @@ export default {
       } else {
         self.urlError = "";
         if (videoUrl.lastIndexOf("?") != -1) {
-          videoUrl = videoUrl.slice(0, videoUrl.lastIndexOf("?"))
+          videoUrl = videoUrl.slice(0, videoUrl.lastIndexOf("?"));
         }
         self.streamUrl = self.inputUrl;
 
         videoId = videoUrl.replace(URLHEAD, "");
         self.videoId = videoId;
-        let apiUrl = "https://public.openrec.tv/external/api/v5/movies/" + videoId;
+        let apiUrl =
+          "https://public.openrec.tv/external/api/v5/movies/" + videoId;
         let movieId = "";
         try {
           let res = await (await fetch(apiUrl)).json();
@@ -292,34 +406,43 @@ export default {
 
     async connectWS(url) {
       let self = this;
-      let sock  = new WebSocket(url);
-      sock.addEventListener("open", function() {
+      let sock = new WebSocket(url);
+      sock.addEventListener("open", function () {
         console.info("-----CONNECT TO SERVER-----");
         self.wsConnectFlag = true;
       });
 
-      sock.addEventListener("message", function(event) {
+      sock.addEventListener("message", function (event) {
         if (event.data.length > 2) {
           let pos = event.data.indexOf("[");
           if (pos == 2) {
             let orig = JSON.parse(event.data.substr(pos));
-            if(orig[0] == "message") {
+            if (orig[0] == "message") {
               let j = JSON.parse(orig[1]);
 
               let addEvent = (type, content) => {
                 let prms = new Promise((resolve) => {
                   const d = new Date();
-                  let now = ("00" + (d.getMonth() + 1)).slice(-2) + "-" + ("00" + d.getDate()).slice(-2) + " " + ("00" + d.getHours()).slice(-2) + ":" + ("00" + d.getMinutes()).slice(-2) + ":" + ("00" + d.getSeconds()).slice(-2);
+                  let now =
+                    ("00" + (d.getMonth() + 1)).slice(-2) +
+                    "-" +
+                    ("00" + d.getDate()).slice(-2) +
+                    " " +
+                    ("00" + d.getHours()).slice(-2) +
+                    ":" +
+                    ("00" + d.getMinutes()).slice(-2) +
+                    ":" +
+                    ("00" + d.getSeconds()).slice(-2);
                   self.events.push({
-                    "date": now,
-                    "type": type,
-                    "content": content,
+                    date: now,
+                    type: type,
+                    content: content,
                   });
                   resolve();
                 });
                 prms.then(() => {
                   self.scrollToBottom(document.getElementById("info_box"));
-                })
+                });
 
                 // let ele = document.getElementById("info_box");
                 // if (self.isBottom(ele)) {
@@ -329,20 +452,20 @@ export default {
                 // } else {
                 //   ;
                 // }
-              }
+              };
 
               let findUserId = (id) => {
                 let name = "unknown(" + id + ")";
-                for (let i=self.comments.length-1; i >= 0; i--) {
+                for (let i = self.comments.length - 1; i >= 0; i--) {
                   if (id == self.comments[i].recxuser_id) {
                     name = self.comments[i].Name;
                     break;
                   }
                 }
                 return name;
-              }
+              };
 
-              switch(j.type) {
+              switch (j.type) {
                 // message
                 case 0:
                   if (j.data.user_key != "") {
@@ -351,10 +474,17 @@ export default {
                       addEvent("chat", name + " " + j.data.message);
                     }
                     if (j.data.yell != null) {
-                      addEvent("yell", name + " " + j.data.yell.yells + " " + j.data.message);
+                      addEvent(
+                        "yell",
+                        name + " " + j.data.yell.yells + " " + j.data.message
+                      );
                     }
                     if (j.data.badges.length != 0) {
-                      name = name + "[Sub" + j.data.badges[0].subscription.months + "]";
+                      name =
+                        name +
+                        "[Sub" +
+                        j.data.badges[0].subscription.months +
+                        "]";
                     }
                     if (j.data.is_premium) {
                       name = name + "[P]";
@@ -375,23 +505,27 @@ export default {
                       name = name + "[Muted]";
                     }
 
-                    let result = j.data.message.match(/https?:\/\/[a-zA-Z0-9.\-_@:/~?%&;=+#',()*!]+/)
+                    let result = j.data.message.match(
+                      /https?:\/\/[a-zA-Z0-9.\-_@:/~?%&;=+#',()*!]+/
+                    );
                     if (result != null) {
                       let a = [
                         j.data.message.slice(0, result["index"]),
                         result[0],
-                        j.data.message.slice(result["index"] + result[0].length),
+                        j.data.message.slice(
+                          result["index"] + result[0].length
+                        ),
                       ];
                       addEvent("URL", a);
                     }
 
                     let commentData = {
-                      "Name": name,
-                      "recxuser_id": j.data.user_id,
-                      "Color": j.data.user_color,
-                      "Message": j.data.message,
-                      "Stamp": ""
-                      };
+                      Name: name,
+                      recxuser_id: j.data.user_id,
+                      Color: j.data.user_color,
+                      Message: j.data.message,
+                      Stamp: "",
+                    };
                     if (j.data.stamp != null) {
                       commentData.Stamp = j.data.stamp.image_url;
                     }
@@ -402,7 +536,7 @@ export default {
                         // self.comments = self.comments.slice(-self.maxCommentNum);
                         self.comments.shift();
                       }
-                    }
+                    };
 
                     // 自動スクロール
                     let comment_box = document.getElementById("comment_box");
@@ -410,10 +544,10 @@ export default {
                       let prms = new Promise((resolve) => {
                         addComment(commentData);
                         resolve();
-                      })
+                      });
                       prms.then(() => {
-                        self.scrollToBottom(comment_box)
-                      })
+                        self.scrollToBottom(comment_box);
+                      });
                     } else {
                       addComment(commentData);
                     }
@@ -426,7 +560,7 @@ export default {
                 case 1:
                   self.viewers = j.data.live_viewers;
                   if (self.maxViewers < self.viewers) {
-                      self.maxViewers = self.viewers;
+                    self.maxViewers = self.viewers;
                   }
                   break;
 
@@ -442,22 +576,35 @@ export default {
 
                 // block
                 case 6:
-                  addEvent("ban", "ban " + findUserId(j.data.owner_to_banned_user_id));
+                  addEvent(
+                    "ban",
+                    "ban " + findUserId(j.data.owner_to_banned_user_id)
+                  );
                   break;
 
                 // block 解除
                 case 7:
-                  addEvent("ban", "unban " + findUserId(j.data.owner_to_banned_user_id));
+                  addEvent(
+                    "ban",
+                    "unban " + findUserId(j.data.owner_to_banned_user_id)
+                  );
                   break;
 
                 // スタッフ権限付与
                 case 8:
-                  addEvent("staff", "add staff " + findUserId(j.data.owner_to_moderator_user_id));
+                  addEvent(
+                    "staff",
+                    "add staff " + findUserId(j.data.owner_to_moderator_user_id)
+                  );
                   break;
 
                 // スタッフ権限解除
                 case 9:
-                  addEvent("staff", "remove staff " + findUserId(j.data.owner_to_moderator_user_id));
+                  addEvent(
+                    "staff",
+                    "remove staff " +
+                      findUserId(j.data.owner_to_moderator_user_id)
+                  );
                   break;
 
                 // わからん refresh?
@@ -469,7 +616,10 @@ export default {
 
                 // ゲーム変更，タイトル変更
                 case 11:
-                  addEvent("info", j.data.system_message.type + " " + j.data.message);
+                  addEvent(
+                    "info",
+                    j.data.system_message.type + " " + j.data.message
+                  );
                   break;
 
                 // 12, 13, 15 テロップ．後で解析する
@@ -478,7 +628,7 @@ export default {
                 case 13:
                   break;
                 case 15:
-                  break
+                  break;
 
                 // サブスク入会
                 case 27:
@@ -488,7 +638,7 @@ export default {
                 // アンケート開始
                 case 29:
                   addEvent("vote", "[start] " + j.data.title);
-                  j.data.votes.forEach(elem => {
+                  j.data.votes.forEach((elem) => {
                     addEvent("vote", elem.text);
                   });
                   break;
@@ -500,8 +650,11 @@ export default {
                 // アンケート結果
                 case 31:
                   addEvent("vote", "[fin] " + j.data.title);
-                  j.data.votes.forEach(elem => {
-                    addEvent("vote", elem.text + elem.count + "票 " + elem.ratio + "%");
+                  j.data.votes.forEach((elem) => {
+                    addEvent(
+                      "vote",
+                      elem.text + elem.count + "票 " + elem.ratio + "%"
+                    );
                   });
                   break;
 
@@ -516,21 +669,21 @@ export default {
       });
 
       // error
-      sock.addEventListener("error", function(event) {
+      sock.addEventListener("error", function (event) {
         console.error("ws error:", event);
       });
 
       // close
-      sock.addEventListener("close", function() {
+      sock.addEventListener("close", function () {
         console.info("-----BYE SERVER-----");
         self.wsConnectFlag = false;
         self.connectWS(url);
-      })
+      });
 
       //なぜ"2"なのかはわからん
-      var keepConnect = function() {
+      var keepConnect = function () {
         sock.send("2");
-      }
+      };
       setInterval(keepConnect, 25000);
     },
 
@@ -543,17 +696,42 @@ export default {
       if (movieId != "") {
         // current date
         const d = new Date();
-        let now = d.getFullYear() + "-" + ("00" + (d.getMonth() + 1)).slice(-2) + "-" + ("00" + d.getDate()).slice(-2) + "T" + ("00" + d.getHours()).slice(-2) + ":" + ("00" + d.getMinutes()).slice(-2) + ":" + ("00" + d.getSeconds()).slice(-2) + "Z";
+        let now =
+          d.getFullYear() +
+          "-" +
+          ("00" + (d.getMonth() + 1)).slice(-2) +
+          "-" +
+          ("00" + d.getDate()).slice(-2) +
+          "T" +
+          ("00" + d.getHours()).slice(-2) +
+          ":" +
+          ("00" + d.getMinutes()).slice(-2) +
+          ":" +
+          ("00" + d.getSeconds()).slice(-2) +
+          "Z";
 
         // get past comment
-        let url = "https://public.openrec.tv/external/api/v5/movies/" + self.videoId + "/chats?to_created_at=" + now + "&limit=150";
+        let url =
+          "https://public.openrec.tv/external/api/v5/movies/" +
+          self.videoId +
+          "/chats?to_created_at=" +
+          now +
+          "&limit=150";
 
         let past_comments = await (await fetch(url)).json();
         let prms = new Promise((resolve) => {
           for (let i = 0; i < past_comments.length; i++) {
-            let name = past_comments[i].user.nickname + " (" + past_comments[i].user.id + ")";
+            let name =
+              past_comments[i].user.nickname +
+              " (" +
+              past_comments[i].user.id +
+              ")";
             if (past_comments[i].badges.length != 0) {
-              name = name + "[Sub" + past_comments[i].badges[0].subscription.months + "]";
+              name =
+                name +
+                "[Sub" +
+                past_comments[i].badges[0].subscription.months +
+                "]";
             }
             if (past_comments[i].user.is_premium) {
               name = name + "[P]";
@@ -581,14 +759,17 @@ export default {
             self.comments.push(comment);
           }
           resolve();
-        })
+        });
 
         prms.then(() => {
-          self.scrollToBottom(document.getElementById("comment_box"))
-        })
+          self.scrollToBottom(document.getElementById("comment_box"));
+        });
 
-        url = "wss://chat.openrec.tv/socket.io/?movieId=" + movieId + "&EIO=3&transport=websocket";
-        if (!self.wsConnectFlag){
+        url =
+          "wss://chat.openrec.tv/socket.io/?movieId=" +
+          movieId +
+          "&EIO=3&transport=websocket";
+        if (!self.wsConnectFlag) {
           self.connectWS(url);
         }
       }
@@ -597,24 +778,25 @@ export default {
     async postComment() {
       let self = this;
       if (self.videoId != "" && self.inputComment != "" && self.isLogin) {
-        let url = "https://apiv5.openrec.tv/api/v5/movies/" + self.videoId + "/chats";
+        let url =
+          "https://apiv5.openrec.tv/api/v5/movies/" + self.videoId + "/chats";
         let data = {
-          "consented_chat_terms": false,
-          "message": self.inputComment,
-          "quality_type": 2,
-          "messaged_at": "",
-          "league_key": "",
-          "to_user_id": ""
+          consented_chat_terms: false,
+          message: self.inputComment,
+          quality_type: 2,
+          messaged_at: "",
+          league_key: "",
+          to_user_id: "",
         };
         let param = {
           method: "POST",
           headers: {
-            "Accept": "application/json,text/plain,*/*",
+            Accept: "application/json,text/plain,*/*",
             "Content-Type": "application/json;charset=utf-8",
-            "uuid": self.orUuid,
-            "access-token": self.orAccessToken
+            uuid: self.orUuid,
+            "access-token": self.orAccessToken,
           },
-          body: JSON.stringify(data)
+          body: JSON.stringify(data),
         };
 
         let j = await (await fetch(url, param)).json();
@@ -622,7 +804,7 @@ export default {
         if (j.status != 0) {
           self.postError = j.message;
         } else {
-          self.postError = ""
+          self.postError = "";
         }
       }
     },
@@ -630,25 +812,26 @@ export default {
     async postStamp(stamp_id) {
       let self = this;
       if (self.videoId != "") {
-        let url = "https://apiv5.openrec.tv/api/v5/movies/" + self.videoId + "/chats";
+        let url =
+          "https://apiv5.openrec.tv/api/v5/movies/" + self.videoId + "/chats";
         let data = {
-          "stamp_id": stamp_id,
-          "consented_chat_terms": false,
-          "message": self.inputComment,
-          "quality_type": 2,
-          "messaged_at": "",
-          "league_key": "",
-          "to_user_id": ""
+          stamp_id: stamp_id,
+          consented_chat_terms: false,
+          message: self.inputComment,
+          quality_type: 2,
+          messaged_at: "",
+          league_key: "",
+          to_user_id: "",
         };
         let param = {
           method: "POST",
           headers: {
-            "Accept": "application/json,text/plain,*/*",
+            Accept: "application/json,text/plain,*/*",
             "Content-Type": "application/json;charset=utf-8",
-            "uuid": self.orUuid,
-            "access-token": self.orAccessToken
+            uuid: self.orUuid,
+            "access-token": self.orAccessToken,
           },
-          body: JSON.stringify(data)
+          body: JSON.stringify(data),
         };
 
         let j = await (await fetch(url, param)).json();
@@ -656,7 +839,7 @@ export default {
         if (j.status != 0) {
           self.postError = j.message;
         } else {
-          self.postError = ""
+          self.postError = "";
         }
       }
     },
@@ -692,7 +875,7 @@ export default {
 }
 #content {
   z-index: 2;
-  width: 50%;
+  width: 75%;
   padding: 1em 10% 1em 10%;
   text-align: center;
 }
@@ -719,7 +902,6 @@ input {
   margin-top: 2px;
   margin-left: auto;
   margin-right: 5px;
-
 }
 #configBtn:active {
   background-color: var(--v-background-lighten4);
@@ -733,11 +915,12 @@ input {
   font-size: 20px;
 }
 
-.flexbox{
+.flexbox {
   display: flex;
 }
 
-.info_box, .comment_box {
+.info_box,
+.comment_box {
   border: 2px solid var(--v-background-lighten5);
   height: 68vh;
   min-height: 50px;
@@ -754,7 +937,8 @@ input {
   width: 30vw;
 }
 
-.infos, .comments {
+.infos,
+.comments {
   margin: 0.8em;
   background-color: var(--v-background-base);
   color: var(--v-primary-base);
@@ -777,7 +961,8 @@ input {
   min-width: 250px;
   width: 40vw;
 }
-.post_box, .url_box {
+.post_box,
+.url_box {
   color: var(--v-primary-base);
   background-color: var(--v-background-lighten1);
   border: 1px solid #a3a3a3;
