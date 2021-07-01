@@ -16,7 +16,7 @@ app.use(cors({ origin: true }));
 app.get('/v1/user/:userid', (req, res) => {
     const userid  = req.params.userid;
     let year = 2020;
-    let month = 6;  // !!注目
+    let month = 7;  // !!注目
     let ym = [];
     let status = -1;
     let data = {};
@@ -46,7 +46,7 @@ app.get('/v1/user/:userid', (req, res) => {
         return data;
     }).then(data => {
         res
-        .set("Cache-Control", "public, max-age=604800")
+        .set("Cache-Control", "public, max-age=3600")
         .send({
             "status": status,
             "data": data
@@ -61,7 +61,7 @@ app.get('/v1/ym/:year/:month', function(req, res) {
             res.send({"status": -1});
         } else {
             res
-            .set("Cache-Control", "public, max-age=604800")
+            .set("Cache-Control", "public, max-age=3600")
             .send({
                 "status": 1,
                 "data": doc.data()
