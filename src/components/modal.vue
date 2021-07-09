@@ -8,6 +8,7 @@
       <bar-chart
         :chart-data="chartData"
         :options="chartOptions"
+        :height="graphHeight"
       ></bar-chart>
       <v-btn @click="$emit('close')" style="background: var(--v-background-lighten2)" small depressed>close</v-btn>
     </div>
@@ -22,6 +23,11 @@ export default {
   components: {
     barChart,
   },
+  data () {
+    return {
+      graphHeight: window.innerHeight * 0.25,
+    }
+  }
 };
 </script>
 
