@@ -756,6 +756,9 @@ export default {
               Message: past_comments[i].message,
               Stamp: "",
             };
+            if (past_comments[i].stamp != null) {
+              comment.Stamp = past_comments[i].stamp.image_url;
+            }
             self.comments.push(comment);
           }
           resolve();
