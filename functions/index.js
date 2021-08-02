@@ -16,7 +16,7 @@ app.use(cors({ origin: true }));
 app.get('/v1/user/:userid', (req, res) => {
     const userid  = req.params.userid;
     let year = 2020;
-    let month = 7;  // !!注目
+    let month = 8;  // !!注目
     let ym = [];
     let status = -1;
     let data = {};

@@ -470,7 +470,7 @@ export default {
                 case 0:
                   if (j.data.user_key != "") {
                     let name = j.data.user_name + " (" + j.data.user_key + ")";
-                    if (j.data.user_type == 1) {
+                    if (j.data.user_type == 1 || j.data.user_key == "yocchan-umaimon") {
                       addEvent("chat", name + " " + j.data.message);
                     }
                     if (j.data.yell != null) {
