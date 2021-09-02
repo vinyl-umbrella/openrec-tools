@@ -1,7 +1,7 @@
 <template>
   <div class="rank">
     <div class="info">
-      <div>最終更新日 2021年8月2日</div> <!-- !!注目 -->
+      <div>最終更新日 2021年9月2日</div> <!-- !!注目 -->
       <div>
         保管庫は
         <a
@@ -89,9 +89,9 @@ export default {
       // input default value
       num: 30,
       startYear: 2021,
-      startMonth: 7,    // !!注目
+      startMonth: 8,    // !!注目
       endYear: 2021,
-      endMonth: 7,      // !!注目
+      endMonth: 8,      // !!注目
       // 入力エラー
       inputErrMsg: "",
       // グラフの描画に使用するデータ
