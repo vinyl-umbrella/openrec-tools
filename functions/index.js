@@ -1,16 +1,15 @@
 const functions = require("firebase-functions");
 
-// load express
 const express = require('express');
 const mysql = require('mysql')
 const cors = require('cors');
 
-// cloud functionでfirestoreを使うのに必要な設定は以下の２行
+// firestore
 const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase)
-// データベースの参照を作成
 var fireStore = admin.firestore()
 
+// msyql at oci
 const conn = mysql.createConnection({
     host: functions.config().oci.ip,
     user: functions.config().oci.user,
@@ -84,13 +83,17 @@ app.get('/v1/ym/:year/:month', function (req, res) {
 app.post('/v1/messages', (req, res) => {
     // intial value
     let userid = "";
-    let search_string = "%"
-    let startdate = "2015-01-01 00:00:00"
-    let enddate = "2030-12-31 23:59:59"
-    if (req.body.userid) userid = req.body.userid;
-    if (req.body.search_string) search_string = "%" + req.body.search_string + "%";
-    if (req.body.startdate) startdate = req.body.startdate;
-    if (req.body.enddate) enddate = req.body.enddate;
+    let search_string = "%";
+    let startdate = "2015-01-01 00:00:00";
+    let enddate = "2030-12-31 23:59:59";
+    let border = 0;
+    // 与えられている かつ 空でないなら
+    // 初期値を与えられたものに変更
+    if (req.body.userid && req.body.userid != "") userid = req.body.userid;
+    if (req.body.border && req.body.border != "") border = req.body.border;
+    if (req.body.search_string && req.body.search_string != "") search_string = "%" + req.body.search_string + "%";
+    if (req.body.startdate && req.body.startdate != "") startdate = req.body.startdate;
+    if (req.body.enddate && req.body.enddate != "") enddate = req.body.enddate;
 
 
     if (!req.body.videoid) {
@@ -102,8 +105,8 @@ app.post('/v1/messages', (req, res) => {
 
     if (req.body.userid) {
         conn.query(
-            'SELECT time, userid, message FROM ?? WHERE userid = ? AND message like ? AND time BETWEEN ? AND ? LIMIT 10',
-            [req.body.videoid, req.body.userid, search_string, startdate, enddate],
+            'SELECT id, time, userid, message FROM ?? WHERE id > ? AND userid = ? AND time BETWEEN ? AND ? AND message like ? ORDER BY id LIMIT 10',
+            [req.body.videoid, border, userid, startdate, enddate, search_string],
             (err, results) => {
                 if (err) {
                     console.error(err);
@@ -114,8 +117,8 @@ app.post('/v1/messages', (req, res) => {
         )
     } else {
         conn.query(
-            'SELECT time, userid, message FROM ?? WHERE message like ? AND time BETWEEN ? AND ? LIMIT 10',
-            [req.body.videoid, search_string, startdate, enddate],
+            'SELECT id, time, userid, message FROM ?? WHERE id > ? AND time BETWEEN ? AND ? AND message like ? ORDER BY id LIMIT 10',
+            [req.body.videoid, border, startdate, enddate, search_string],
             (err, results) => {
                 if (err) {
                     console.error(err);
