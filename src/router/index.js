@@ -40,6 +40,15 @@ const routes = [
       title: 'Chat',
       desc: 'OPENREC.tv コメントビューア'
     }
+  },
+  {
+    path: '/message',
+    name: 'Message',
+    component: () => import('../views/Message.vue'),
+    meta: {
+      title: 'Explore Messages',
+      desc: 'おぷちゃ過去ログ検索システム'
+    }
   }
 ]
 

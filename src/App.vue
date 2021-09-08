@@ -4,8 +4,9 @@
       <div id="nav">
         <span>
           <router-link to="/">Home</router-link> |
-          <router-link to="/rank">Rank</router-link> |
-          <router-link to="/chat">CommentViewer</router-link>
+          <router-link to="/rank">ランキング</router-link> |
+          <router-link to="/chat">コメビュ</router-link> |
+          <router-link to="/message">過去ログ検索</router-link>
         </span>
         <span>
           <router-link to="/contact">Contact</router-link>
