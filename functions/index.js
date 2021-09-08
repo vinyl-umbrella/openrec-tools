@@ -28,6 +28,8 @@ app.get('/v1/user/:userid', (req, res) => {
     let status = -1;
     let data = {};
 
+    console.log(req.ip, "[rank-user]", userid);
+
     // 過去12ヶ月分
     for (let i = 1; i < 13; i++) {
         if (month == 13) {
@@ -52,32 +54,29 @@ app.get('/v1/user/:userid', (req, res) => {
         }
         return data;
     }).then(data => {
-        res
-            .set("Cache-Control", "public, max-age=3600")
-            .send({
-                "status": status,
-                "data": data
-            })
+        res.set("Cache-Control", "public, max-age=3600").send({
+            "status": status,
+            "data": data
+        })
     })
 })
 
 app.get('/v1/ym/:year/:month', function (req, res) {
     let doc = fireStore.collection(req.params.year).doc(req.params.month);
+    console.log(req.ip, "[rank-ym]", req.params.year, req.params.month);
+
     doc.get().then(doc => {
         if (!doc.exists) {
             res.send({ "status": -1 });
         } else {
-            res
-                .set("Cache-Control", "public, max-age=3600")
-                .send({
-                    "status": 1,
-                    "data": doc.data()
-                });
+            res.set("Cache-Control", "public, max-age=3600").send({
+                "status": 1,
+                "data": doc.data()
+            });
         }
+    }).catch(err => {
+        res.send(err);
     })
-        .catch(err => {
-            res.send(err);
-        })
 })
 
 app.post('/v1/messages', (req, res) => {
@@ -115,8 +114,7 @@ app.post('/v1/messages', (req, res) => {
         arr = [req.body.videoid, border, startdate, enddate, search_string]
     }
 
-    console.log(sql);
-    console.log(arr);
+    console.log(req.ip, "[message]", req.body.videoid, userid, search_string, border);
 
     conn.query(sql, arr, (err, results) => {
             if (err) {
