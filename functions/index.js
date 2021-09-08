@@ -97,37 +97,35 @@ app.post('/v1/messages', (req, res) => {
 
 
     if (!req.body.videoid) {
-        res.send({
+        res.status(500).send({
             "status": -1,
             "message": "need video id"
         })
     }
 
+    let sql = '';
+    let arr = [];
+    let temp1 = 'SELECT id, time, userid, message FROM ?? WHERE id > ? AND ';
+    let temp2 = 'time BETWEEN ? AND ? AND message like ? ORDER BY id LIMIT 50';
     if (req.body.userid) {
-        conn.query(
-            'SELECT id, time, userid, message FROM ?? WHERE id > ? AND userid = ? AND time BETWEEN ? AND ? AND message like ? ORDER BY id LIMIT 10',
-            [req.body.videoid, border, userid, startdate, enddate, search_string],
-            (err, results) => {
-                if (err) {
-                    console.error(err);
-                    res.send([]);
-                }
-                res.send(results);
-            }
-        )
+        sql = temp1 + 'userid = ? AND ' + temp2;
+        arr = [req.body.videoid, border, userid, startdate, enddate, search_string];
     } else {
-        conn.query(
-            'SELECT id, time, userid, message FROM ?? WHERE id > ? AND time BETWEEN ? AND ? AND message like ? ORDER BY id LIMIT 10',
-            [req.body.videoid, border, startdate, enddate, search_string],
-            (err, results) => {
-                if (err) {
-                    console.error(err);
-                    res.send([]);
-                }
-                res.send(results);
-            }
-        )
+        sql = temp1 + temp2;
+        arr = [req.body.videoid, border, startdate, enddate, search_string]
     }
+
+    console.log(sql);
+    console.log(arr);
+
+    conn.query(sql, arr, (err, results) => {
+            if (err) {
+                console.error(err);
+                res.status(404).send([]);
+            }
+            res.send(results);
+        }
+    )
 })
 
 const api = functions.region('asia-northeast1').https.onRequest(app);
