@@ -2,19 +2,15 @@
   <div class="explore">
     <h1>おぷちゃ過去ログ検索システム(β)</h1>
     <div class="container">
-      <v-text-field type="string" v-model.trim="videoid" label="枠ID(必須)" dense outlined></v-text-field>
+      <!-- <v-text-field type="string" v-model.trim="videoid" label="枠ID(必須)" dense outlined></v-text-field> -->
+      <v-select v-model="tempVideoid" :items="videoIdObj" label="枠ID(必須)" dense outlined return-object></v-select>
       <v-text-field type="string" v-model.trim="userid" label="ユーザID(任意)" dense outlined></v-text-field>
       <v-text-field type="string" v-model="search_string" label="検索ワード(任意)" dense outlined></v-text-field>
       <v-text-field type="string" v-model="startdate" label="検索開始日時(任意)" dense outlined></v-text-field>
       <v-text-field type="string" v-model="enddate" label="検索終了日時(任意)" dense outlined></v-text-field>
-      <v-btn @click="getMessages(0)" color="#2e2c37">更新</v-btn>
+      <v-btn @click="getMessages(0)" color="#2e2c37">取得</v-btn>
     </div>
-    <div>
-      おぷちゃ1, 2k8mmxdly86<br>
-      おぷちゃ2, ov82d410wzw<br>
-      おぷちゃ3, n9ze3m2w184<br>
-      日時フォーマット:YYYY-MM-DD&nbsp;hh:mm:mm<br>
-    </div>
+
     <table>
       <thead>
         <th width=25%>time</th>
@@ -37,11 +33,14 @@
 </template>
 
 <script>
+import videoIdObj from '../assets/videoid.json'
+
 export default {
   data() {
     return {
+      videoIdObj: videoIdObj,
+      tempVideoid: {text: "おぷちゃ3", value: "n9ze3m2w184"},
       messages: [],
-      videoid: "n9ze3m2w184",
       userid: "",
       search_string: "",
       startdate: "",
@@ -62,7 +61,7 @@ export default {
       const url =
         "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v1/messages";
       let postdata = {
-        videoid: this.videoid,
+        videoid: this.tempVideoid["value"],
         userid: this.userid,
         search_string: this.search_string,
         startdate: this.startdate,
@@ -84,6 +83,7 @@ export default {
           this.messages = [{ time: "", userid: "", message: "no result" }];
           return;
         }
+        window.scroll({top: 0, behavior: 'smooth'})
         this.messages = j;
         this.lastid = j[j.length - 1]["id"];
       }
@@ -124,10 +124,12 @@ table td {
 }
 
 .nextbtn {
-  margin: 6px;
+  float: right;
+  margin-top: 10px;
+  margin-right: 5%;
 }
 </style>
 // TODO
 // 	ociの料金確認
-// 	videoIDとタイトルの対応のjsonの制作(SQL で作る？)
+// 	videoIDとタイトルの対応をSQL で作る？
 // 	rankもsqlで作りたい(firestoreから脱却)
