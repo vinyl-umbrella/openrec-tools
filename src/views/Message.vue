@@ -3,7 +3,7 @@
     <h1>おぷちゃ過去ログ検索システム(β)</h1>
     <div class="container">
       <!-- <v-text-field type="string" v-model.trim="videoid" label="枠ID(必須)" dense outlined></v-text-field> -->
-      <v-select v-model="tempVideoid" :items="videoIdObj" label="枠ID(必須)" dense outlined return-object></v-select>
+      <v-select v-model="tempVideoid" :items="videoIdObj" label="枠" dense outlined return-object></v-select>
       <v-text-field type="string" v-model.trim="userid" label="ユーザID(任意)" dense outlined></v-text-field>
       <v-text-field type="string" v-model="search_string" label="検索ワード(任意)" dense outlined></v-text-field>
       <v-text-field type="string" v-model="startdate" label="検索開始日時(任意)" dense outlined></v-text-field>

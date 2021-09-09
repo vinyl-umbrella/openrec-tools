@@ -21,6 +21,7 @@ const app = express();
 app.use(cors({ origin: true }));
 
 app.get('/v1/user/:userid', (req, res) => {
+    var ip = req.header('x-forwarded-for');
     const userid = req.params.userid;
     let year = 2020;
     let month = 9;  // !!注目
@@ -28,7 +29,7 @@ app.get('/v1/user/:userid', (req, res) => {
     let status = -1;
     let data = {};
 
-    console.log(req.ip, "[rank-user]", userid);
+    console.log(ip, "[rank-user]", userid);
 
     // 過去12ヶ月分
     for (let i = 1; i < 13; i++) {
@@ -62,8 +63,9 @@ app.get('/v1/user/:userid', (req, res) => {
 })
 
 app.get('/v1/ym/:year/:month', function (req, res) {
+    var ip = req.header('x-forwarded-for');
     let doc = fireStore.collection(req.params.year).doc(req.params.month);
-    console.log(req.ip, "[rank-ym]", req.params.year, req.params.month);
+    console.log(ip, "[rank-ym]", req.params.year, req.params.month);
 
     doc.get().then(doc => {
         if (!doc.exists) {
@@ -81,6 +83,7 @@ app.get('/v1/ym/:year/:month', function (req, res) {
 
 app.post('/v1/messages', (req, res) => {
     // intial value
+    var ip = req.header('x-forwarded-for');
     let userid = "";
     let search_string = "%";
     let startdate = "2015-01-01 00:00:00";
@@ -114,7 +117,7 @@ app.post('/v1/messages', (req, res) => {
         arr = [req.body.videoid, border, startdate, enddate, search_string]
     }
 
-    console.log(req.ip, "[message]", req.body.videoid, userid, search_string, border);
+    console.log(ip, "[message]", req.body.videoid, userid, search_string, border);
 
     conn.query(sql, arr, (err, results) => {
             if (err) {
