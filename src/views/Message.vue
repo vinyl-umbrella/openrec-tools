@@ -1,6 +1,6 @@
 <template>
   <div class="explore">
-    <h1>おぷちゃ過去ログ検索システム(β)</h1>
+    <h1>おぷちゃ過去ログ検索システム</h1>
     <div class="container">
       <!-- <v-text-field type="string" v-model.trim="videoid" label="枠ID(必須)" dense outlined></v-text-field> -->
       <v-select v-model="tempVideoid" :items="videoIdObj" label="枠" dense outlined return-object></v-select>
@@ -10,21 +10,22 @@
       <v-text-field type="string" v-model="enddate" label="検索終了日時(任意)" dense outlined></v-text-field>
       <v-btn @click="getMessages(0)" color="#2e2c37">取得</v-btn>
     </div>
-
-    <table>
-      <thead>
-        <th width=25%>time</th>
-        <th width=25%>userid</th>
-        <th>message</th>
-      </thead>
-      <tbody>
-        <tr v-for="(item, index) in messages" :key="index">
-          <td>{{ item.time | timeFormat }}</td>
-          <td>{{ item.userid }}</td>
-          <td>{{ item.message }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table_wrap">
+      <table>
+        <thead>
+          <th width=20%>time</th>
+          <th width=20%>userid</th>
+          <th>message</th>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in messages" :key="index">
+            <td>{{ item.time | timeFormat }}</td>
+            <td>{{ item.userid }}</td>
+            <td>{{ item.message }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <span v-if="messages.length > 49">
       <v-btn @click="getMessages(lastid)" class="nextbtn" color="#2e2c37">次の50件</v-btn>
     </span>
@@ -98,8 +99,12 @@ export default {
   margin-right: 10px;
 }
 
+.table_wrap {
+  overflow: scroll;
+}
 table {
   width: 90%;
+  min-width: 600px;
   margin-left: auto;
   margin-right: auto;
   border-collapse: collapse;
