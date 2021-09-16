@@ -108,7 +108,7 @@ app.post('/v1/messages', (req, res) => {
     let sql = '';
     let arr = [];
     let temp1 = 'SELECT id, time, userid, message FROM ?? WHERE id > ? AND ';
-    let temp2 = 'time BETWEEN ? AND ? AND message like BINARY ? ORDER BY id LIMIT 50';
+    let temp2 = 'time BETWEEN ? AND ? AND message like ? ORDER BY id LIMIT 50';
     if (req.body.userid) {
         sql = temp1 + 'userid = BINARY ? AND ' + temp2;
         arr = [req.body.videoid, border, userid, startdate, enddate, search_string];
