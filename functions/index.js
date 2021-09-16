@@ -14,7 +14,8 @@ const conn = mysql.createConnection({
     host: functions.config().oci.ip,
     user: functions.config().oci.user,
     password: functions.config().oci.pass,
-    database: functions.config().oci.db
+    database: functions.config().oci.db,
+    charset: 'utf8mb4'
 })
 
 const app = express();
