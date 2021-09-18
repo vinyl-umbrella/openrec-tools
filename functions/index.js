@@ -63,7 +63,7 @@ app.get('/v1/user/:userid', (req, res) => {
     })
 })
 
-app.get('/v1/ym/:year/:month', function (req, res) {
+app.get('/v1/ym/:year/:month', (req, res) => {
     var ip = req.header('x-forwarded-for');
     let doc = fireStore.collection(req.params.year).doc(req.params.month);
     console.log(ip, "[rank-ym]", req.params.year, req.params.month);
@@ -100,7 +100,7 @@ app.post('/v1/messages', (req, res) => {
 
 
     if (!req.body.videoid) {
-        res.status(500).send({
+        res.status(403).send({
             "status": -1,
             "message": "need video id"
         })
@@ -109,7 +109,7 @@ app.post('/v1/messages', (req, res) => {
     let sql = '';
     let arr = [];
     let temp1 = 'SELECT id, time, userid, message FROM ?? WHERE id > ? AND ';
-    let temp2 = 'time BETWEEN ? AND ? AND message like ? ORDER BY id LIMIT 50';
+    let temp2 = 'time BETWEEN ? AND ? AND message like ? COLLATE utf8mb4_bin ORDER BY id LIMIT 50';
     if (req.body.userid) {
         sql = temp1 + 'userid = BINARY ? AND ' + temp2;
         arr = [req.body.videoid, border, userid, startdate, enddate, search_string];
@@ -121,13 +121,12 @@ app.post('/v1/messages', (req, res) => {
     console.log(ip, "[message]", req.body.videoid, userid, search_string, border);
 
     conn.query(sql, arr, (err, results) => {
-            if (err) {
-                console.error(err);
-                res.status(404).send([]);
-            }
-            res.send(results);
+        if (err) {
+            console.error(err);
+            res.status(500).send([]);
         }
-    )
+        res.send(results);
+    })
 })
 
 const api = functions.region('asia-northeast1').https.onRequest(app);
