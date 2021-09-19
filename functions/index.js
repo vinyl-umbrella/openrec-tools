@@ -1,7 +1,7 @@
 const functions = require("firebase-functions");
 
 const express = require('express');
-const mysql = require('mysql')
+const mysql = require('mysql2/promise')
 const cors = require('cors');
 
 // firestore
@@ -9,8 +9,8 @@ const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase)
 const fireStore = admin.firestore()
 
-function connectDB(dbname) {
-    conn = mysql.createConnection({
+async function connectDB(dbname) {
+    let conn = await mysql.createConnection({
         host: functions.config().oci.ip,
         user: functions.config().oci.user,
         password: functions.config().oci.pass,
@@ -18,6 +18,17 @@ function connectDB(dbname) {
         charset: 'utf8mb4'
     })
     return conn;
+}
+
+function cPool(dbname) {
+    let pool = mysql.createPool({
+        host: functions.config().oci.ip,
+        user: functions.config().oci.user,
+        password: functions.config().oci.pass,
+        database: dbname,
+        charset: 'utf8mb4'
+    })
+    return pool;
 }
 
 function ymlist() {
@@ -102,36 +113,39 @@ app.get('/v1/ym/:year/:month', (req, res) => {
     })
 })
 
-app.get('/v2/rank/user/:userid', (req, res) => {
+app.get('/v2/rank/user/:userid', async (req, res) => {
     const userid = req.params.userid;
     let ip = req.header('x-forwarded-for');
-    let conn = connectDB(functions.config().oci.rankdb);
-    let o = {}
+    console.log(ip, "[rank-user]", userid);
+    const pool = cPool(functions.config().oci.rankdb);
+
+    let tasks = [];
+    let data = {};
 
     for (let ym of ymlist()) {
         let tablename = "rank" + ym;
         let sql = "SELECT count FROM ?? WHERE userid = ?";
 
-        conn.query(sql, [tablename, userid], (err, results) => {
-            if (err) {
-                console.log(err);
-            } else {
-                let data = results;
-                if (data.length == 0) {
-                    o[tablename.substr(4)] = 0;
-                } else {
-                    o[tablename.substr(4)] = data[0]["count"];
-                }
-            }
-            if (Object.keys(o).length == 12) {
-                res.send(o);
-            }
-        })
+        try {
+            tasks.push(pool.query(sql, [tablename, userid]));
+        } catch (e) {
+            console.log(e);
+            res.status(500).send();
+        }
     }
-    // res.send(o);
+    results = await Promise.all(tasks);
+
+    for (let i=0; i<results.length; i++) {
+        if (results[i][0].length != 0) {
+            data[ymlist()[i]] = results[i][0][0]["count"];
+        } else {
+            data[ymlist()[i]] = 0;
+        }
+    }
+    res.send(data);
 })
 
-app.get('/v2/rank/:year/:month', (req, res) => {
+app.get('/v2/rank/:year/:month', async (req, res) => {
     const year = req.params.year;
     const month = req.params.month;
     let limit = 50;
@@ -140,19 +154,26 @@ app.get('/v2/rank/:year/:month', (req, res) => {
     }
     let tablename = "rank" + year + month;
     let ip = req.header('x-forwarded-for');
+    console.log(ip, "[rank-ym]", year, month, limit);
 
-    let conn = connectDB(functions.config().oci.rankdb);
+    let conn = await connectDB(functions.config().oci.rankdb);
     let sql = "SELECT userid, count FROM ?? ORDER BY count DESC LIMIT ?";
-    conn.query(sql, [tablename, limit], (err, results) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send({});
+    try {
+        [results] = await conn.query(sql, [tablename, limit]);
+        res.send(results);
+    } catch (e) {
+        if (e.code == 'ER_NO_SUCH_TABLE') {
+            res.status(404).send({});
+        } else {
+            console.log(e);
+            res.status(500).send(e);
         }
-        res.send(results)
-    })
+    } finally {
+        conn.end();
+    }
 })
 
-app.post('/v1/messages', (req, res) => {
+app.post('/v1/messages', async (req, res) => {
     // intial value
     let ip = req.header('x-forwarded-for');
     let userid = "";
@@ -160,7 +181,7 @@ app.post('/v1/messages', (req, res) => {
     let startdate = "2015-01-01 00:00:00";
     let enddate = "2030-12-31 23:59:59";
     let border = 0;
-    let conn = connectDB(functions.config().oci.logdb);
+    let conn = await connectDB(functions.config().oci.logdb);
     // 与えられている かつ 空でないなら
     // 初期値を与えられたものに変更
     if (req.body.userid && req.body.userid != "") userid = req.body.userid;
@@ -191,13 +212,16 @@ app.post('/v1/messages', (req, res) => {
 
     console.log(ip, "[message]", req.body.videoid, userid, search_string, border);
 
-    conn.query(sql, arr, (err, results) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send([]);
-        }
+    try {
+        const [results] = await conn.query(sql, arr);
         res.send(results);
-    })
+    } catch (e) {
+        await conn.rollback();
+        console.log(e);
+        res.status(500).send([]);
+    } finally {
+        conn.end();
+    }
 })
 
 const api = functions.region('asia-northeast1').https.onRequest(app);
