@@ -68,6 +68,7 @@ app.get('/v2/rank/user/:userid', async (req, res) => {
         }
     }
     results = await Promise.all(tasks);
+    pool.end();
 
     for (let i = 0; i < results.length; i++) {
         if (results[i][0].length != 0) {
