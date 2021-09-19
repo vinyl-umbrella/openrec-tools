@@ -1,7 +1,6 @@
 <template>
   <div class="rank">
     <div class="info">
-      <div>最終更新日 2021年9月2日</div> <!-- !!注目 -->
       <div>
         保管庫は
         <a
@@ -25,29 +24,33 @@
       <div class="flex-items">
         <form>
           <v-row>
-            <v-text-field type="number" min="1" max="1000" v-model.number="num" label="表示人数" dense outlined></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field type="number" min="2020" max="2021" v-model.number="startYear" label="開始年" dense outlined></v-text-field>
-            <v-text-field type="number" min="1" max="12" v-model.number="startMonth" label="開始月" dense outlined></v-text-field>
-          </v-row>
-          <v-row>
-            <v-text-field type="number" min="2020" max="2021" v-model.number="endYear" label="終了年" dense outlined></v-text-field>
-            <v-text-field type="number" min="1" max="12" v-model.number="endMonth" label="終了月" dense outlined></v-text-field>
+            <v-text-field type="number" min="1" max="1000" v-model.number="limit" label="表示人数" dense outlined></v-text-field>
+            <v-select v-model="tempYm" :items="ymObj" label="年月" dense outlined return-object></v-select>
           </v-row>
         </form>
       </div>
       <v-btn @click="createGraphData()" id="update-button" depressed>更新</v-btn>
-      <div>{{ inputErrMsg }}</div>
     </div>
 
     <div>
       <!-- user list -->
-      <p v-for="(item, index) in graphData.labels" :key="index">
-        {{ index + 1 }}. &nbsp;
-        <span @click="clickUser(item)" class="userid">{{ item }}</span>
-        &nbsp; {{ graphData.datasets[0].data[index] }}
-      </p>
+      <div class="table_wrap">
+        <table>
+          <thead>
+            <th width=5%>rank</th>
+            <th width=20%>userid</th>
+            <th>count</th>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in graphData.labels" :key="index">
+              <td>{{ index + 1 }}</td>
+              <td><span @click="clickUser(item)" class="userid">{{ item }}</span></td>
+              <td>{{ graphData.datasets[0].data[index] }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <modal
         :val="postData"
         :chartData="modalGraphData"
@@ -71,6 +74,11 @@ export default {
 
   data() {
     return {
+      // new input value
+      limit: 30,
+      ymObj: [],
+      tempYm: {text: "", value: ""},
+
       // modal
       showModal: false,
       postData: {
@@ -86,14 +94,7 @@ export default {
           },
         ],
       },
-      // input default value
-      num: 30,
-      startYear: 2021,
-      startMonth: 8,    // !!注目
-      endYear: 2021,
-      endMonth: 8,      // !!注目
-      // 入力エラー
-      inputErrMsg: "",
+
       // グラフの描画に使用するデータ
       graphData: {
         labels: [],
@@ -132,13 +133,29 @@ export default {
   },
 
   mounted() {
+    // create ym list
+    let dt = new Date();
+    let y = 2020;
+    let m = 7;
+
+    for (let i = 0; y!=dt.getFullYear() || m!=dt.getMonth()+2; i++) {
+      let ym = y+this.getDoubleDigestNumber(m);
+      this.ymObj.push({text: ym, value: ym});
+      m = m % 12 + 1;
+      if (m == 12) {
+        y++;
+      }
+    }
+    this.tempYm = this.ymObj[this.ymObj.length - 2];
+
+    // init graph data
     this.createGraphData();
   },
 
   methods: {
     async clickUser(userid) {
       let orApiUrl = "https://public.openrec.tv/external/api/v5/channels/" + userid;
-      let webappApiUrl = "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v1/user/" + userid;
+      let webappApiUrl = "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v2/rank/user/" + userid;
       let tempGraphData = {
         labels: [],
         datasets: [
@@ -170,25 +187,11 @@ export default {
       }
 
       if (res2.ok) {
-        let j = await res2.json();
-        if (j.status == 1) {
-          let ymKeys = Object.keys(j.data);
-          let tempArray = [];
-          let ym = [];
-          for (let i of ymKeys) {
-            tempArray.push(i.split("-"));
-          }
-          // sort y m
-          tempArray.sort(function(a, b) {return a[1] - b[1];});
-          tempArray.sort(function(a, b) {return a[0] - b[0];});
+        let data = await res2.json();
 
-          for (let i of tempArray) {
-            ym.push(i[0] + "-" + i[1]);
-          }
-          tempGraphData["labels"] = ym;
-          for (let i of tempGraphData["labels"]) {
-            tempGraphData["datasets"][0]["data"].push(j.data[i]);
-          }
+        tempGraphData["labels"] = Object.keys(data);
+        for (let i of tempGraphData["labels"]) {
+          tempGraphData["datasets"][0]["data"].push(data[i]);
         }
       }
 
@@ -219,98 +222,20 @@ export default {
       return ("0" + num).slice(-2);
     },
 
-    // 入力年月をチェック
-    // 注目
-    checkYearMonth() {
-      if (this.startYear >= 2020 && this.startYear <= 2021) {
-        if (this.endYear >= 2020 && this.endYear <= 2021) {
-          if (this.startMonth >= 1 && this.startMonth <= 12) {
-            if (this.endMonth >= 1 && this.endMonth <= 12) {
-              if (
-                Number(
-                  String(this.endYear) +
-                    this.getDoubleDigestNumber(this.endMonth)
-                ) >=
-                Number(
-                  String(this.startYear) +
-                    this.getDoubleDigestNumber(this.startMonth)
-                )
-              ) {
-                this.inputErrMsg = "";
-                return true;
-              }
-            }
-          }
-        }
-      }
-      this.inputErrMsg = "入力値エラー";
-      return false;
-    },
-
     async createGraphData() {
-      if (this.checkYearMonth()) {
-        let ids = [];
-        let counts = [];
-        let graphDataObj = {};
-        let yearMonth = [];
-        let y = Number(this.startYear);
-        let m = Number(this.startMonth);
+      let ids = [];
+      let counts = [];
+      let y = this.tempYm["value"].slice(0, 4);
+      let m = this.tempYm["value"].slice(-2);
 
-        // 取得するyear, monthを格納した配列を生成
-        while (
-          Number(
-            String(this.endYear) + this.getDoubleDigestNumber(this.endMonth)
-          ) >= Number(String(y) + this.getDoubleDigestNumber(m))
-        ) {
-          yearMonth.push([y, m]);
-          if (m == 12) {
-            y += 1;
-            m = 1;
-          } else {
-            m += 1;
-          }
+      let res = await fetch(`https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v2/rank/${y}/${m}?limit=${this.limit}`);
+      if (res.status == 200) {
+        let j = await res.json();
+        for (let data of j) {
+          ids.push(data["userid"]);
+          counts.push(data["count"]);
         }
-
-        let promiseArray = yearMonth.map(yearMonth => fetch(`https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v1/ym/${yearMonth[0]}/${yearMonth[1]}`));
-
-        Promise.all(promiseArray).then(res =>
-          Promise.all(res.map(r => r.json()))
-        ).then(jArr => {
-          for(let j of jArr){
-            let data = j.data;
-            for (let key of Object.keys(data)) {
-              if (graphDataObj[key]) {
-                graphDataObj[key] += Number(data[key]);
-              } else {
-                graphDataObj[key] = Number(data[key]);
-              }
-            }
-          }
-          // idとcountペアの配列をpush
-          let tempArray = [];
-          for (let key of Object.keys(graphDataObj)) {
-            tempArray.push([key, graphDataObj[key]]);
-          }
-          // ソートする
-          tempArray.sort(function (a, b) {
-            return b[1] - a[1];
-          });
-
-          // カット
-          if (this.num < 1) {
-            this.num = 1;
-          }
-          let n = Math.min(tempArray.length, this.num);
-          tempArray = tempArray.slice(0, n);
-
-          // id と count の配列に分ける
-          for (let i of tempArray) {
-            ids.push(i[0]);
-            counts.push(i[1]);
-          }
-
-          this.updataGraph(ids, counts);
-        });
+        this.updataGraph(ids, counts);
       }
     },
   },
@@ -322,13 +247,15 @@ form div input {
   margin-bottom: 3px;
 }
 
-.info {
-  text-align: right;
-  margin-right: 10px;
-}
 
 .rank {
   margin-left: 10px;
+  margin-right: 10px;
+}
+
+.info {
+  text-align: right;
+  margin-right: 10px;
 }
 
 .flex-box {
@@ -360,7 +287,27 @@ form div input {
   color: var(--v-secondary-base);
 }
 
+.table_wrap {
+  overflow: scroll;
+}
+table {
+  width: 90%;
+  min-width: 600px;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  border-collapse: collapse;
+  border: solid 3px var(--v-background-lighten5);
+}
+
+table th,
+table td {
+  /* width: 33%; */
+  border: solid 1px var(--v-background-lighten5);
+  padding: 6px;
+}
+
 .v-text-field{
-  max-width: 100px;
+  max-width: 150px;
 }
 </style>
