@@ -4,11 +4,6 @@ const express = require('express');
 const mysql = require('mysql2/promise')
 const cors = require('cors');
 
-// firestore
-const admin = require('firebase-admin');
-admin.initializeApp(functions.config().firebase)
-const fireStore = admin.firestore()
-
 async function connectDB(dbname) {
     let conn = await mysql.createConnection({
         host: functions.config().oci.ip,
@@ -34,7 +29,7 @@ function cPool(dbname) {
 function ymlist() {
     let dt = new Date();
     let y = dt.getFullYear();
-    l = [];
+    let l = [];
     for (let i = 1; i < 13; i++) {
         let m = (dt.getMonth() - i + 12) % 12 + 1;
         if (m < 10) {
@@ -52,67 +47,6 @@ function ymlist() {
 const app = express();
 app.use(cors({ origin: true }));
 
-app.get('/v1/user/:userid', (req, res) => {
-    let ip = req.header('x-forwarded-for');
-    const userid = req.params.userid;
-    let year = 2020;
-    let month = 9;  // !!注目
-    let ym = [];
-    let status = -1;
-    let data = {};
-
-    console.log(ip, "[rank-user]", userid);
-
-    // 過去12ヶ月分
-    for (let i = 1; i < 13; i++) {
-        if (month == 13) {
-            month = 1;
-            year += 1;
-        }
-        ym.push([year, month]);
-        month += 1;
-    }
-
-    let promiseArray = ym.map(yearMonth => fireStore.collection(String(yearMonth[0])).doc(String(yearMonth[1])).get());
-    Promise.all(promiseArray).then(snap => {
-        for (let i = 0; i < snap.length; i++) {
-            if (snap[i].exists) {
-                if (snap[i].data()[userid]) {
-                    data[ym[i][0] + "-" + ym[i][1]] = snap[i].data()[userid];
-                } else {
-                    data[ym[i][0] + "-" + ym[i][1]] = 0;
-                }
-                status = 1;
-            }
-        }
-        return data;
-    }).then(data => {
-        res.set("Cache-Control", "public, max-age=3600").send({
-            "status": status,
-            "data": data
-        })
-    })
-})
-
-app.get('/v1/ym/:year/:month', (req, res) => {
-    let ip = req.header('x-forwarded-for');
-    let doc = fireStore.collection(req.params.year).doc(req.params.month);
-    console.log(ip, "[rank-ym]", req.params.year, req.params.month);
-
-    doc.get().then(doc => {
-        if (!doc.exists) {
-            res.send({ "status": -1 });
-        } else {
-            res.set("Cache-Control", "public, max-age=3600").send({
-                "status": 1,
-                "data": doc.data()
-            });
-        }
-    }).catch(err => {
-        res.send(err);
-    })
-})
-
 app.get('/v2/rank/user/:userid', async (req, res) => {
     const userid = req.params.userid;
     let ip = req.header('x-forwarded-for');
@@ -124,7 +58,7 @@ app.get('/v2/rank/user/:userid', async (req, res) => {
 
     for (let ym of ymlist()) {
         let tablename = "rank" + ym;
-        let sql = "SELECT count FROM ?? WHERE userid = ?";
+        let sql = "SELECT count FROM ?? WHERE userid = BINARY ?";
 
         try {
             tasks.push(pool.query(sql, [tablename, userid]));
@@ -135,7 +69,7 @@ app.get('/v2/rank/user/:userid', async (req, res) => {
     }
     results = await Promise.all(tasks);
 
-    for (let i=0; i<results.length; i++) {
+    for (let i = 0; i < results.length; i++) {
         if (results[i][0].length != 0) {
             data[ymlist()[i]] = results[i][0][0]["count"];
         } else {
