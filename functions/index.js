@@ -7,22 +7,42 @@ const cors = require('cors');
 // firestore
 const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase)
-var fireStore = admin.firestore()
+const fireStore = admin.firestore()
 
-// msyql at oci
-const conn = mysql.createConnection({
-    host: functions.config().oci.ip,
-    user: functions.config().oci.user,
-    password: functions.config().oci.pass,
-    database: functions.config().oci.db,
-    charset: 'utf8mb4'
-})
+function connectDB(dbname) {
+    conn = mysql.createConnection({
+        host: functions.config().oci.ip,
+        user: functions.config().oci.user,
+        password: functions.config().oci.pass,
+        database: dbname,
+        charset: 'utf8mb4'
+    })
+    return conn;
+}
+
+function ymlist() {
+    let dt = new Date();
+    let y = dt.getFullYear();
+    l = [];
+    for (let i = 1; i < 13; i++) {
+        let m = (dt.getMonth() - i + 12) % 12 + 1;
+        if (m < 10) {
+            m = "0" + m;
+        }
+        if (m == 12) {
+            y--;
+        }
+        l.push(String(y) + String(m));
+    }
+    return l;
+}
+
 
 const app = express();
 app.use(cors({ origin: true }));
 
 app.get('/v1/user/:userid', (req, res) => {
-    var ip = req.header('x-forwarded-for');
+    let ip = req.header('x-forwarded-for');
     const userid = req.params.userid;
     let year = 2020;
     let month = 9;  // !!注目
@@ -64,7 +84,7 @@ app.get('/v1/user/:userid', (req, res) => {
 })
 
 app.get('/v1/ym/:year/:month', (req, res) => {
-    var ip = req.header('x-forwarded-for');
+    let ip = req.header('x-forwarded-for');
     let doc = fireStore.collection(req.params.year).doc(req.params.month);
     console.log(ip, "[rank-ym]", req.params.year, req.params.month);
 
@@ -82,14 +102,65 @@ app.get('/v1/ym/:year/:month', (req, res) => {
     })
 })
 
+app.get('/v2/rank/user/:userid', (req, res) => {
+    const userid = req.params.userid;
+    let ip = req.header('x-forwarded-for');
+    let conn = connectDB(functions.config().oci.rankdb);
+    let o = {}
+
+    for (let ym of ymlist()) {
+        let tablename = "rank" + ym;
+        let sql = "SELECT count FROM ?? WHERE userid = ?";
+
+        conn.query(sql, [tablename, userid], (err, results) => {
+            if (err) {
+                console.log(err);
+            } else {
+                let data = results;
+                if (data.length == 0) {
+                    o[tablename.substr(4)] = 0;
+                } else {
+                    o[tablename.substr(4)] = data[0]["count"];
+                }
+            }
+            if (Object.keys(o).length == 12) {
+                res.send(o);
+            }
+        })
+    }
+    // res.send(o);
+})
+
+app.get('/v2/rank/:year/:month', (req, res) => {
+    const year = req.params.year;
+    const month = req.params.month;
+    let limit = 50;
+    if (req.query.limit) {
+        limit = Number(req.query.limit);
+    }
+    let tablename = "rank" + year + month;
+    let ip = req.header('x-forwarded-for');
+
+    let conn = connectDB(functions.config().oci.rankdb);
+    let sql = "SELECT userid, count FROM ?? ORDER BY count DESC LIMIT ?";
+    conn.query(sql, [tablename, limit], (err, results) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send({});
+        }
+        res.send(results)
+    })
+})
+
 app.post('/v1/messages', (req, res) => {
     // intial value
-    var ip = req.header('x-forwarded-for');
+    let ip = req.header('x-forwarded-for');
     let userid = "";
     let search_string = "%";
     let startdate = "2015-01-01 00:00:00";
     let enddate = "2030-12-31 23:59:59";
     let border = 0;
+    let conn = connectDB(functions.config().oci.logdb);
     // 与えられている かつ 空でないなら
     // 初期値を与えられたものに変更
     if (req.body.userid && req.body.userid != "") userid = req.body.userid;
