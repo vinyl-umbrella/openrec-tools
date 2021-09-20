@@ -1,24 +1,22 @@
 # futon-openchat
 
-## Project setup
-```
+## hosting
+```sh
+# install package
 npm install
-```
-
-### Compiles and hot-reloads for development
-```
+# local server
 npm run serve
-```
-
-### Compiles and minifies for production
-```
+# lint
+npm run lint
+# make report
+npm run report
+# Compiles and minifies for production
 npm run build
 ```
 
-### Lints and fixes files
+## functions
+```sh
+# run in <project-root>/functions/
+# local emulator
+npm run serve
 ```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
