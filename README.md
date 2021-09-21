@@ -19,4 +19,6 @@ npm run build
 # run in <project-root>/functions/
 # local emulator
 npm run serve
+# run test
+npm run test
 ```
