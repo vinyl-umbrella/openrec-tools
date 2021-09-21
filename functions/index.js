@@ -10,6 +10,10 @@ const app = express();
 app.use(cors({ origin: true }));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(function (req, res, next){
+    res.set('Cache-control', 'public, max-age=300, must-revalidate');
+    next();
+})
 
 app.get('/v2/rank/user/:userid', routesRank.rankUser);
 app.get('/v2/rank/:year/:month', routesRank.rankYM);
