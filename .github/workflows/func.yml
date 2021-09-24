@@ -2,9 +2,10 @@ name: deploy functions
 
 on:
   push:
-    branches: [ main ]
-  paths:
-    - "functoins/**"
+    branches:
+      - main
+    paths:
+      - "functoins/**"
 
 defaults:
   run:
