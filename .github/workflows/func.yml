@@ -1,0 +1,33 @@
+name: deploy functions
+
+on:
+  push:
+    branches: [ main ]
+  paths:
+    - "functoins/**"
+
+defaults:
+  run:
+    working-directory: functions
+
+jobs:
+  test_and_deploy:
+    name: test&deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v2.4.0
+        with:
+          node-version: "14"
+      - name: Install packages
+        run: npm install
+      - run: |
+          npm i firebase-tools@9
+          npm audit fix
+      - name: Set env
+        run: ./node_modules/.bin/firebase --token ${{ secrets.FIREBASE_TOKEN }} functions:config:get > .runtimeconfig.json
+      - name: Test
+        run: npm run test
+      - name: Deploy
+        run: ./node_modules/.bin/firebase deploy --token ${{ secrets.FIREBASE_TOKEN }} --project ${{ secrets.FIREBASE_PROJECT_ID }} --only functions:api
