@@ -134,7 +134,3 @@ table td {
   margin-right: 5%;
 }
 </style>
-// TODO
-// 	ociの料金確認
-// 	videoIDとタイトルの対応をSQL で作る？
-// 	rankもsqlで作りたい(firestoreから脱却)
