@@ -13,12 +13,3 @@ npm run report
 # Compiles and minifies for production
 npm run build
 ```
-
-## functions
-```sh
-# run in <project-root>/functions/
-# local emulator
-npm run serve
-# run test
-npm run test
-```
