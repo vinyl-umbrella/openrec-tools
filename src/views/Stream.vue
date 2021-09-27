@@ -10,7 +10,9 @@
         outlined
       ></v-text-field>
     </div>
-    <div class="video" v-if="inputUrl != ''">
+    {{ e_message }}
+    <!-- <div class="video" v-if="e_message==''"> -->
+    <div class="video">
       <video ref="video" width="90%" controls></video>
     </div>
   </div>
@@ -22,7 +24,9 @@ import Hls from "hls.js";
 export default {
   data() {
     return {
+      hls: new Hls(),
       inputUrl: "",
+      e_message: "",
     };
   },
   methods: {
@@ -36,24 +40,38 @@ export default {
 
       try {
         let res = await fetch(
-          "https://public.openrec.tv/external/api/v5/movies/" + videoId
+          `https://public.openrec.tv/external/api/v5/movies/${videoId}`
         );
         let j = await res.json();
+        if (!j.media.url) {
+          this.e_message = "media file not found";
+          return null;
+        }
         return j.media.url;
       } catch (e) {
-        console.error(e);
+        this.e_message = `failed to fetch "${this.inputUrl}"`;
+        return null;
       }
     },
+
     async playVideo() {
-      let hls = new Hls();
-      let mediaFile = await this.getMediaFile();
-      let stream = mediaFile;
-      let video = this.$refs["video"];
-      hls.loadSource(stream);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, function () {
-        video.play();
-      });
+      this.stopVideo();
+      let stream = await this.getMediaFile();
+      if (stream) {
+        this.e_message = "";
+        let hls = this.hls;
+        let video = this.$refs["video"];
+        hls.loadSource(stream);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
+          video.play();
+        });
+      }
+    },
+
+    stopVideo() {
+      this.hls.destroy();
+      this.hls = new Hls();
     },
   },
 };
