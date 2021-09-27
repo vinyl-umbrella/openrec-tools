@@ -49,6 +49,15 @@ const routes = [
       title: 'Explore Messages',
       desc: 'おぷちゃ過去ログ検索システム'
     }
+  },
+  {
+    path: '/stream',
+    name: 'Stream',
+    component: () => import('../views/Stream.vue'),
+    meta: {
+      title: '再生',
+      desc: ''
+    }
   }
 ]
 
