@@ -1,6 +1,6 @@
 <template>
   <div class="stream">
-    <div>
+    <div class="flexbox">
       <v-text-field
         type="string"
         v-model.trim="inputUrl"
@@ -9,6 +9,13 @@
         dense
         outlined
       ></v-text-field>
+      <v-btn
+        @click="playVideo"
+        small
+        depressed
+        color="var(--v-background-lighten1)"
+        >再生</v-btn
+      >
     </div>
     {{ e_message }}
     <!-- <div class="video" v-if="e_message==''"> -->
@@ -24,7 +31,14 @@ import Hls from "hls.js";
 export default {
   data() {
     return {
-      hls: new Hls(),
+      config: {
+        fragLoadingTimeOut: 3000,
+        fragLoadingMaxRetry: 10,
+        fragLoadingMaxRetryTimeout: 3000,
+        liveBackBufferLength: 1800,
+        maxBufferSize: 256 * 1000 * 1000
+      },
+      hls: new Hls(this.config),
       inputUrl: "",
       e_message: "",
     };
@@ -57,6 +71,7 @@ export default {
     async playVideo() {
       this.stopVideo();
       let stream = await this.getMediaFile();
+      // stream = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
       if (stream) {
         this.e_message = "";
         let hls = this.hls;
@@ -71,7 +86,7 @@ export default {
 
     stopVideo() {
       this.hls.destroy();
-      this.hls = new Hls();
+      this.hls = new Hls(this.config);
     },
   },
 };
@@ -81,6 +96,14 @@ export default {
 .stream {
   margin-left: 10px;
   margin-right: 10px;
+}
+
+.flexbox {
+  display: flex;
+}
+.v-btn {
+  margin-left: 10px;
+  margin-top: 6px;
 }
 
 .video {
