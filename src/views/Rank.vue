@@ -33,7 +33,6 @@
     </div>
 
     <div>
-      <!-- user list -->
       <div class="table_wrap">
         <table>
           <thead>
@@ -249,8 +248,8 @@ form div input {
 
 
 .rank {
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 2%;
+  margin-right: 2%;
 }
 
 .info {

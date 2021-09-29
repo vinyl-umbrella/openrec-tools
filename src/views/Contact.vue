@@ -19,6 +19,7 @@ a:hover {
   color: var(--v-secondary-base);
 }
 .contact {
-  margin-left: 10px;
+  margin-left: 2%;
+  margin-right: 2%;
 }
 </style>

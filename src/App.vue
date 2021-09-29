@@ -7,6 +7,7 @@
           <router-link to="/rank">ランキング</router-link> |
           <router-link to="/chat">コメビュ</router-link> |
           <router-link to="/message">過去ログ検索</router-link>
+          <router-link to="/stream" style="color:transparent">コメつき</router-link>
         </span>
         <span>
           <router-link to="/contact">Contact</router-link>
@@ -23,8 +24,6 @@ html {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* color: #2c3e50;
-  background-color: snow; */
 }
 
 #nav {
