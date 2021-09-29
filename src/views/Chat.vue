@@ -1,23 +1,27 @@
 <template>
   <div class="chat">
     <div class="flexbox">
-      <div id="inputUrl">
-        URL:
-        <input
-          type="text"
+      <div>
+        <v-text-field
+          type="string"
           class="url_box"
           v-model.trim="inputUrl"
-          placeholder="OPENREC URL"
+          label="OPENREC URL"
           @keydown.enter="getComment"
-        />
-        <v-btn
-          @click="getComment"
-          small
-          depressed
-          color="var(--v-background-lighten1)"
-          >Connect</v-btn
+          dense
+          outlined
         >
-        <span> {{ urlError }}</span>
+          <template v-slot:append-outer>
+            <v-btn
+              @click="getComment"
+              small
+              depressed
+              color="var(--v-background-lighten1)"
+              >Connect</v-btn
+            >
+          </template>
+        </v-text-field>
+        <span v-show="urlError != ''"> {{ urlError }}</span>
       </div>
       <img
         id="configBtn"
@@ -31,12 +35,9 @@
 
     <div class="stream_data">
       <div class="title" v-show="streamUrl != ''">
-        <a :href="streamUrl" target="_blank" rel="noopener norefferer">{{
-          title
-        }}</a>
+        <a :href="streamUrl" target="_blank" rel="noopener norefferer">{{title}}</a>
       </div>
       <div class="channel_name">{{ channelName }}</div>
-      <br />
 
       <div>
         <span>同接: {{ viewers }}&nbsp;</span>
@@ -80,21 +81,25 @@
         </div>
       </div>
     </div>
-    <input
-      type="text"
+    <v-text-field
+      type="string"
       v-model="inputComment"
       class="post_box"
-      placeholder="Comment"
+      label="Comment"
       @keydown.enter="postComment"
-    />
-    <v-btn
-      @click="postComment"
-      small
-      depressed
-      color="var(--v-background-lighten1)"
-      >post</v-btn
+      outlined
+      dense
     >
-    <span> {{ inputComment.length }}/100</span><br />
+      <template v-slot:append-outer>
+        <v-btn
+          @click="postComment"
+          small
+          depressed
+          color="var(--v-background-lighten1)"
+          >post</v-btn
+        >
+      </template>
+    </v-text-field>
     <span v-show="showStampBtn">
       Stamps:
       <v-btn
@@ -209,6 +214,8 @@
 </template>
 
 <script>
+import orUtil from "../components/orComment";
+
 export default {
   data() {
     return {
@@ -287,35 +294,6 @@ export default {
     },
 
     orLogin() {
-      // let param = {
-      //   method: "POST",
-      //   mode: "no-cors",
-      //   credentials: "include",
-      //   headers: {
-      //     "Accept": "application/json,text/plain,",
-      //     "Content-Type": "application/json; charset=utf-8"
-      //   },
-      // }
-      // let res = await fetch("https://www.openrec.tv/api-tv/user", param);
-
-      // console.log(res.headers);
-
-      // param = {
-      //   method: "POST",
-      //   mode: "no-cors",
-      //   credentials: "include",
-      //   headers: {
-      //     "Accept": "application/json,text/plain,",
-      //     "Content-Type": "application/json; charset=utf-8",
-      //     "Uuid": "",
-      //     "Token": "",
-      //     "Random": "",
-      //     "_gcl_au": "",
-      //     "AWSELB": "",
-      //     "AWSELBCORS": ""
-      //   },
-      // }
-      // res = await fetch("https://www.openrec.tv/viewapp/v4/mobile/user/login", param);
       let d = new Date();
       d.setDate(d.getDate() + 7);
       let expire = d.toUTCString();
@@ -356,48 +334,6 @@ export default {
 
     scrollToBottom(container) {
       container.scrollTop = container.scrollHeight;
-    },
-
-    async getMovieId() {
-      let self = this;
-      const URLHEAD = "https://www.openrec.tv/live/";
-      const mURLHEAD = "https://www.openrec.tv/m/live/";
-      let videoUrl = self.inputUrl;
-      let videoId = "";
-      if (videoUrl.indexOf(mURLHEAD) != -1) {
-        videoUrl = videoUrl.replace(mURLHEAD, URLHEAD);
-        self.inputUrl = videoUrl;
-      }
-      if (videoUrl.indexOf(URLHEAD)) {
-        self.urlError = "invalid url";
-        return "";
-      } else {
-        self.urlError = "";
-        if (videoUrl.lastIndexOf("?") != -1) {
-          videoUrl = videoUrl.slice(0, videoUrl.lastIndexOf("?"));
-        }
-        self.streamUrl = self.inputUrl;
-
-        videoId = videoUrl.replace(URLHEAD, "");
-        self.videoId = videoId;
-        let apiUrl =
-          "https://public.openrec.tv/external/api/v5/movies/" + videoId;
-        let movieId = "";
-        try {
-          let res = await (await fetch(apiUrl)).json();
-          if (res.onair_status == 0 || res.onair_status == 1) {
-            self.title = res.title;
-            self.channelName = res.channel.nickname;
-            movieId = res.movie_id;
-          } else {
-            self.urlError = "not on air now";
-          }
-        } catch (e) {
-          console.error(e);
-          self.urlError = "invalid url";
-        }
-        return movieId;
-      }
     },
 
     async connectWS(url) {
@@ -687,32 +623,22 @@ export default {
       let self = this;
       self.viewers = 0;
       self.maxViewers = 0;
-      let movieId = await self.getMovieId();
-      self.comments = [];
-      if (movieId != "") {
-        // current date
-        const d = new Date();
-        let now =
-          d.getFullYear() +
-          "-" +
-          ("00" + (d.getMonth() + 1)).slice(-2) +
-          "-" +
-          ("00" + d.getDate()).slice(-2) +
-          "T" +
-          ("00" + d.getHours()).slice(-2) +
-          ":" +
-          ("00" + d.getMinutes()).slice(-2) +
-          ":" +
-          ("00" + d.getSeconds()).slice(-2) +
-          "Z";
+      self.videoId = await orUtil.getVideoId(self.inputUrl);
 
-        // get past comment
+      self.comments = [];
+      if (self.videoId != "") {
+        let info = await orUtil.getVideoInfo(self.videoId);
+        if (info.onair_status == 0 || info.onair_status == 1) {
+          self.streamUrl = `https://www.openrec.tv/live/${self.videoId}`;
+          self.title = info.title;
+          self.channelName = info.channel.nickname;
+        } else {
+          self.urlError = "not on air now";
+        }
+
+        let now = new Date().toISOString();
         let url =
-          "https://public.openrec.tv/external/api/v5/movies/" +
-          self.videoId +
-          "/chats?to_created_at=" +
-          now +
-          "&limit=150";
+          `https://public.openrec.tv/external/api/v5/movies/${self.videoId}/chats?to_created_at=${now}&limit=150`;
 
         let past_comments = await (await fetch(url)).json();
         let prms = new Promise((resolve) => {
@@ -764,12 +690,9 @@ export default {
           self.scrollToBottom(document.getElementById("comment_box"));
         });
 
-        url =
-          "wss://chat.openrec.tv/socket.io/?movieId=" +
-          movieId +
-          "&EIO=3&transport=websocket";
+        let wsurl = await orUtil.getWsUrl(self.videoId);
         if (!self.wsConnectFlag) {
-          self.connectWS(url);
+          self.connectWS(wsurl);
         }
       }
     },
@@ -884,10 +807,6 @@ a {
   color: var(--v-secondary-base);
 }
 
-input {
-  padding: 0.2em;
-}
-
 .stream_data {
   border-top: dotted 2px var(--v-background-lighten3);
   border-bottom: dotted 2px var(--v-background-lighten3);
@@ -931,7 +850,7 @@ input {
   background-color: var(--v-background-darken1);
 }
 .comment_box {
-  width: 60vw;
+  width: 65vw;
 }
 .info_box {
   width: 30vw;
@@ -960,12 +879,6 @@ input {
   margin-left: 10px;
   min-width: 250px;
   width: 40vw;
-}
-.post_box,
-.url_box {
-  color: var(--v-primary-base);
-  background-color: var(--v-background-lighten1);
-  border: 1px solid #a3a3a3;
 }
 
 .stamp_btn {

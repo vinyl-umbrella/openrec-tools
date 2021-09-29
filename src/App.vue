@@ -42,12 +42,4 @@ html {
 #nav a.router-link-exact-active {
   color: var(--v-secondary-base);
 }
-
-input {
-  padding: 0.1em;
-  transition: 0.3s;
-  width: 5em;
-  margin-right: 4px;
-  border-radius: 2px;
-}
 </style>

@@ -7,7 +7,7 @@
       <v-text-field type="string" v-model="search_string" label="検索ワード(任意)" dense outlined></v-text-field>
       <v-text-field type="string" v-model="startdate" label="検索開始日時(任意)" dense outlined></v-text-field>
       <v-text-field type="string" v-model="enddate" label="検索終了日時(任意)" dense outlined></v-text-field>
-      <v-btn @click="getMessages(0)" color="#2e2c37">取得</v-btn>
+      <v-btn @click="getMessages(0)" color="var(--v-background-lighten1)" depressed>取得</v-btn>
     </div>
     <div class="table_wrap">
       <table>

@@ -22,10 +22,17 @@ async function getMovieId(videoId) {
     return movieId;
 }
 
+async function getVideoInfo(videoId) {
+    let apiUrl =
+        "https://public.openrec.tv/external/api/v5/movies/" + videoId;
+    let resjson = await (await fetch(apiUrl)).json();
+    return resjson;
+}
+
 async function getWsUrl(videoId) {
     let movieId = await getMovieId(videoId);
     let wsUrl = `wss://chat.openrec.tv/socket.io/?movieId=${movieId}&EIO=3&transport=websocket`;
     return wsUrl;
 }
 
-export default { getVideoId, getWsUrl }
+export default { getVideoId, getVideoInfo, getWsUrl }
