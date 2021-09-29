@@ -19,16 +19,31 @@
     </div>
     {{ e_message }}
     <!-- <div class="video" v-if="e_message==''"> -->
-    <div class="video">
-      <video ref="video" width="90%" controls></video>
+    <div style="margin: 0 auto; width: 90%">
+      <div class="nico-player">
+        <video ref="video" width="100%" controls></video>
+        <nicoComment :messages="messages" />
+      </div>
+      <v-text-field
+        type="string"
+        label="コメント"
+        dense
+        outlined
+      ></v-text-field>
     </div>
   </div>
 </template>
 
 <script>
 import Hls from "hls.js";
+import orUtil from "../components/orComment";
+import NicoComment from "../components/nicoComment";
 
 export default {
+  components: {
+    NicoComment,
+  },
+
   data() {
     return {
       config: {
@@ -36,14 +51,59 @@ export default {
         fragLoadingMaxRetry: 10,
         fragLoadingMaxRetryTimeout: 3000,
         liveBackBufferLength: 1800,
-        maxBufferSize: 256 * 1000 * 1000
+        maxBufferSize: 256 * 1000 * 1000,
       },
       hls: new Hls(this.config),
       inputUrl: "",
+      messages: [],
       e_message: "",
     };
   },
+
+  async mounted() {},
+
   methods: {
+    async connectWS(url) {
+      let self = this;
+      let sock = new WebSocket(url);
+      sock.addEventListener("open", function () {
+        console.log("-----CONNECT TO SERVER-----");
+      });
+
+      sock.addEventListener("message", function (event) {
+        if (event.data.length > 2) {
+          let pos = event.data.indexOf("[");
+          if (pos == 2) {
+            let orig = JSON.parse(event.data.substr(pos));
+            if (orig[0] == "message") {
+              let j = JSON.parse(orig[1]);
+              switch (j.type) {
+                // message
+                case 0:
+                  self.messages.push(j.data.message);
+              }
+            }
+          }
+        }
+      });
+
+      // error
+      sock.addEventListener("error", function (event) {
+        console.error("ws error:", event);
+      });
+
+      // close
+      sock.addEventListener("close", function () {
+        console.info("-----BYE SERVER-----");
+        // self.connectWS(url);
+      });
+
+      let keepConnect = function () {
+        sock.send("2");
+      };
+      setInterval(keepConnect, 25000);
+    },
+
     async getMediaFile() {
       let openrecUrl = this.inputUrl;
       if (openrecUrl.lastIndexOf("?") != -1) {
@@ -71,6 +131,8 @@ export default {
     async playVideo() {
       this.stopVideo();
       let stream = await this.getMediaFile();
+      let wsurl = await orUtil.getWsUrl("n9ze3m2w184");
+      this.connectWS(wsurl);
       // stream = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
       if (stream) {
         this.e_message = "";
@@ -94,8 +156,8 @@ export default {
 
 <style scoped>
 .stream {
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 2%;
+  margin-right: 2%;
 }
 
 .flexbox {
@@ -106,7 +168,8 @@ export default {
   margin-top: 6px;
 }
 
-.video {
-  text-align: center;
+.nico-player {
+  position: relative;
+  overflow: hidden;
 }
 </style>
