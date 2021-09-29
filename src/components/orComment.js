@@ -1,3 +1,12 @@
+function getVideoId(url) {
+    let openrecUrl = url;
+    if (openrecUrl.lastIndexOf("?") != -1) {
+        openrecUrl = openrecUrl.slice(0, openrecUrl.lastIndexOf("?"));
+    }
+    let videoId = openrecUrl.replace("https://www.openrec.tv/live/", "");
+    return videoId;
+}
+
 async function getMovieId(videoId) {
     let apiUrl =
         `https://public.openrec.tv/external/api/v5/movies/${videoId}`;
@@ -19,4 +28,4 @@ async function getWsUrl(videoId) {
     return wsUrl;
 }
 
-export default { getWsUrl }
+export default { getVideoId, getWsUrl }

@@ -22,11 +22,11 @@
     <div style="margin: 0 auto; width: 90%">
       <div class="nico-player">
         <video ref="video" width="100%" controls></video>
-        <nicoComment :messages="messages" />
+        <nicoComment ref="nicoComment" />
       </div>
       <v-text-field
         type="string"
-        label="コメント"
+        label="コメント(実装予定)"
         dense
         outlined
       ></v-text-field>
@@ -60,8 +60,6 @@ export default {
     };
   },
 
-  async mounted() {},
-
   methods: {
     async connectWS(url) {
       let self = this;
@@ -80,7 +78,10 @@ export default {
               switch (j.type) {
                 // message
                 case 0:
-                  self.messages.push(j.data.message);
+                  self.$refs.nicoComment.addMsg(j.data.message);
+                  break;
+                case 3:
+                  sock.close();
               }
             }
           }
@@ -105,12 +106,7 @@ export default {
     },
 
     async getMediaFile() {
-      let openrecUrl = this.inputUrl;
-      if (openrecUrl.lastIndexOf("?") != -1) {
-        openrecUrl = openrecUrl.slice(0, openrecUrl.lastIndexOf("?"));
-      }
-
-      let videoId = openrecUrl.replace("https://www.openrec.tv/live/", "");
+      let videoId = orUtil.getVideoId(this.inputUrl);
 
       try {
         let res = await fetch(
@@ -131,9 +127,8 @@ export default {
     async playVideo() {
       this.stopVideo();
       let stream = await this.getMediaFile();
-      let wsurl = await orUtil.getWsUrl("n9ze3m2w184");
+      let wsurl = await orUtil.getWsUrl(orUtil.getVideoId(this.inputUrl));
       this.connectWS(wsurl);
-      // stream = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
       if (stream) {
         this.e_message = "";
         let hls = this.hls;

@@ -55,8 +55,8 @@ const routes = [
     name: 'Stream',
     component: () => import('../views/Stream.vue'),
     meta: {
-      title: '再生',
-      desc: ''
+      title: 'Player',
+      desc: 'OPENREC.tv ニコ生風プレイヤー'
     }
   }
 ]

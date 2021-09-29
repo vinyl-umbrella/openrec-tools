@@ -1,13 +1,10 @@
 <template>
-  <div id="nicoCome">
-    <div v-for="(m, index) in 8" :key="m">
-      <div
-        :class="'comment_base comment' + index"
-      >
-        {{ currentMsg[index] }}
+  <div id="nicoComme">
+    <div v-for="(m, index) in shownMsg" :key="m.id">
+      <div :class="'comment_base comment' + index" :style="updateFontSize">
+        {{ m.message }}
       </div>
     </div>
-    {{ messages }}
   </div>
 </template>
 
@@ -16,35 +13,81 @@ import anime from "animejs";
 
 export default {
   name: "NicoComment",
-  props: ["row", "fontsize", "height", "messages"],
+  props: {
+  },
+  computed: {
+    updateFontSize() {
+      return {
+        "--videoHeight": this.videoHeight + "px",
+      };
+    },
+  },
   data() {
     return {
-      currentMsg: [
-        "さんぷる",
-        "サンプル",
-        "サンプル12345",
-        "1234",
-        "ああああ",
-        "サンプルサンプルサンプル",
-        "ああ",
-        "ああああああああああああああああああああああああ",
+      videoHeight: 600,
+      shownMsg: [
+        { id: 0, message: "" },
+        { id: 1, message: "" },
+        { id: 2, message: "" },
+        { id: 3, message: "" },
+        { id: 4, message: "" },
+        { id: 5, message: "" },
+        { id: 6, message: "" },
+        { id: 7, message: "" },
+        { id: 8, message: "" },
+        { id: 9, message: "" },
+        { id: 10, message: "" },
+        { id: 11, message: "" },
+        { id: 12, message: "" },
+        { id: 13, message: "" },
+        { id: 14, message: "" },
+        { id: 15, message: "" },
       ],
     };
   },
   mounted() {
-    anime({
-      targets: ".comment_base",
-      translateX: [document.getElementById("nicoCome").clientWidth, -100],
-      translateY: function () {
-        let rand = anime.random(0, 400);
-        return [rand, rand];
-      },
-      duration: 2000,
-      easing: "linear",
-      loop: true,
-    });
+    this.videoHeight = (document.getElementById("nicoComme").clientWidth * 9) / 16;
   },
-  methods: {},
+  methods: {
+    addMsg(msg) {
+      let flag = false;
+      let classname = "";
+      // 空きチェック
+      let index = this.shownMsg.findIndex((item) => item.message == "");
+      if (index !== -1) {
+        this.shownMsg[index].message = msg;
+        classname = ".comment" + String(index);
+        flag = true;
+      }
+
+      // アニメーション
+      if (flag) {
+        this.flowComment(index, classname);
+      }
+    },
+
+    flowComment(index, classname) {
+      let self = this;
+      anime({
+        targets: classname,
+        translateX: function () {
+          return [
+            document.getElementById("nicoComme").clientWidth,
+            -self.shownMsg[index].message.length * 30,
+          ];
+        },
+        translateY: function () {
+          let rand = anime.random(0, self.videoHeight - 120);
+          return [rand, rand];
+        },
+        duration: 3000,
+        easing: "linear",
+        complete: function () {
+          self.shownMsg[index].message = "";
+        },
+      });
+    },
+  },
 };
 </script>
 
@@ -52,26 +95,12 @@ export default {
 .comment_base {
   position: absolute;
   top: 0;
-  font-size: 20px;
+  font-size: calc(var(--videoHeight) / 20);
+  font-weight: 700;
   color: snow;
   white-space: nowrap;
   user-select: none;
-  text-shadow: 1px 1px 1px black;
-  /* animation-timing-function: linear;
-  animation-duration: 4s;
-  animation-fill-mode: forwards; */
+  text-shadow: 1px 1px 0 black, -1px 1px 0 black, 1px -1px 0 black,
+    -1px -1px 0 black;
 }
-
-/* .comment0 {
-  animation-name: lane0;
-}
-@keyframes lane0 {
-  from {
-    transform: translate(85vw, 0%);
-  }
-  to {
-    transform: translate(calc(0vw - 100%), 0%);
-  }
-}
-*/
 </style>
