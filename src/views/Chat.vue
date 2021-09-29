@@ -344,258 +344,237 @@ export default {
         self.wsConnectFlag = true;
       });
 
-      sock.addEventListener("message", function (event) {
-        if (event.data.length > 2) {
-          let pos = event.data.indexOf("[");
-          if (pos == 2) {
-            let orig = JSON.parse(event.data.substr(pos));
-            if (orig[0] == "message") {
-              let j = JSON.parse(orig[1]);
+      sock.addEventListener("message", async function (event) {
+        let wsData = await orUtil.parseWsData(event.data);
+        if (wsData[0] == "message") {
+          let j = JSON.parse(wsData[1]);
 
-              let addEvent = (type, content) => {
-                let prms = new Promise((resolve) => {
-                  const d = new Date();
-                  let now =
-                    ("00" + (d.getMonth() + 1)).slice(-2) +
-                    "-" +
-                    ("00" + d.getDate()).slice(-2) +
-                    " " +
-                    ("00" + d.getHours()).slice(-2) +
-                    ":" +
-                    ("00" + d.getMinutes()).slice(-2) +
-                    ":" +
-                    ("00" + d.getSeconds()).slice(-2);
-                  self.events.push({
-                    date: now,
-                    type: type,
-                    content: content,
-                  });
-                  resolve();
-                });
-                prms.then(() => {
-                  self.scrollToBottom(document.getElementById("info_box"));
-                });
+          let addEvent = (type, content) => {
+            let prms = new Promise((resolve) => {
+              let now = new Date();
+              now.setHours(now.getHours() + 9);
+              now = now.toISOString().replace("T", " ").replace("Z", " ");
+              self.events.push({
+                date: now,
+                type: type,
+                content: content,
+              });
+              resolve();
+            });
+            prms.then(() => {
+              self.scrollToBottom(document.getElementById("info_box"));
+            });
 
-                // let ele = document.getElementById("info_box");
-                // if (self.isBottom(ele)) {
-                //   prms.then(() => {
-                //     self.scrollToBottom(document.getElementById("info_box"));
-                //   })
-                // } else {
-                //   ;
-                // }
-              };
+            // let ele = document.getElementById("info_box");
+            // if (self.isBottom(ele)) {
+            //   prms.then(() => {
+            //     self.scrollToBottom(document.getElementById("info_box"));
+            //   })
+            // } else {
+            //   ;
+            // }
+          };
 
-              let findUserId = (id) => {
-                let name = "unknown(" + id + ")";
-                for (let i = self.comments.length - 1; i >= 0; i--) {
-                  if (id == self.comments[i].recxuser_id) {
-                    name = self.comments[i].Name;
+          let findUserId = (id) => {
+            let name = "unknown(" + id + ")";
+            for (let i = self.comments.length - 1; i >= 0; i--) {
+              if (id == self.comments[i].recxuser_id) {
+                name = self.comments[i].Name;
+                break;
+              }
+            }
+            return name;
+          };
+
+          switch (j.type) {
+            // message
+            case 0:
+              if (j.data.user_key != "") {
+                let name = j.data.user_name + " (" + j.data.user_key + ")";
+                if (j.data.user_type == 1 || j.data.user_key == "yocchan-umaimon") {
+                  addEvent("chat", name + " " + j.data.message);
+                }
+                if (j.data.yell != null) {
+                  addEvent(
+                    "yell",
+                    name + " " + j.data.yell.yells + " " + j.data.message
+                  );
+                }
+                if (j.data.badges.length != 0) {
+                  name =
+                    name + "[Sub" + j.data.badges[0].subscription.months + "]";
+                }
+                if (j.data.is_premium) {
+                  name = name + "[P]";
+                }
+                if (j.data.is_fresh) {
+                  name = name + "[Fresh]";
+                  if (self.hideNewcomer) {
                     break;
                   }
                 }
-                return name;
-              };
-
-              switch (j.type) {
-                // message
-                case 0:
-                  if (j.data.user_key != "") {
-                    let name = j.data.user_name + " (" + j.data.user_key + ")";
-                    if (j.data.user_type == 1 || j.data.user_key == "yocchan-umaimon") {
-                      addEvent("chat", name + " " + j.data.message);
-                    }
-                    if (j.data.yell != null) {
-                      addEvent(
-                        "yell",
-                        name + " " + j.data.yell.yells + " " + j.data.message
-                      );
-                    }
-                    if (j.data.badges.length != 0) {
-                      name =
-                        name +
-                        "[Sub" +
-                        j.data.badges[0].subscription.months +
-                        "]";
-                    }
-                    if (j.data.is_premium) {
-                      name = name + "[P]";
-                    }
-                    if (j.data.is_fresh) {
-                      name = name + "[Fresh]";
-                      if (self.hideNewcomer) {
-                        break;
-                      }
-                    }
-                    if (j.data.is_moderator) {
-                      name = name + "[Staff]";
-                      if (self.hideNewcomer) {
-                        break;
-                      }
-                    }
-                    if (j.data.is_muted) {
-                      name = name + "[Muted]";
-                    }
-
-                    let result = j.data.message.match(
-                      /https?:\/\/[a-zA-Z0-9.\-_@:/~?%&;=+#',()*!]+/
-                    );
-                    if (result != null) {
-                      let a = [
-                        j.data.message.slice(0, result["index"]),
-                        result[0],
-                        j.data.message.slice(
-                          result["index"] + result[0].length
-                        ),
-                      ];
-                      addEvent("URL", a);
-                    }
-
-                    let commentData = {
-                      Name: name,
-                      recxuser_id: j.data.user_id,
-                      Color: j.data.user_color,
-                      Message: j.data.message,
-                      Stamp: "",
-                    };
-                    if (j.data.stamp != null) {
-                      commentData.Stamp = j.data.stamp.image_url;
-                    }
-
-                    let addComment = (data) => {
-                      self.comments.push(data);
-                      if (self.comments.length > self.maxCommentNum) {
-                        // self.comments = self.comments.slice(-self.maxCommentNum);
-                        self.comments.shift();
-                      }
-                    };
-
-                    // 自動スクロール
-                    let comment_box = document.getElementById("comment_box");
-                    if (self.isBottom(comment_box)) {
-                      let prms = new Promise((resolve) => {
-                        addComment(commentData);
-                        resolve();
-                      });
-                      prms.then(() => {
-                        self.scrollToBottom(comment_box);
-                      });
-                    } else {
-                      addComment(commentData);
-                    }
-
-                    self.calc_speed();
+                if (j.data.is_moderator) {
+                  name = name + "[Staff]";
+                  if (self.hideNewcomer) {
+                    break;
                   }
-                  break;
+                }
+                if (j.data.is_muted) {
+                  name = name + "[Muted]";
+                }
 
-                // 同接
-                case 1:
-                  self.viewers = j.data.live_viewers;
-                  if (self.maxViewers < self.viewers) {
-                    self.maxViewers = self.viewers;
+                let result = j.data.message.match(
+                  /https?:\/\/[a-zA-Z0-9.\-_@:/~?%&;=+#',()*!]+/
+                );
+                if (result != null) {
+                  let a = [
+                    j.data.message.slice(0, result["index"]),
+                    result[0],
+                    j.data.message.slice(result["index"] + result[0].length),
+                  ];
+                  addEvent("URL", a);
+                }
+
+                let commentData = {
+                  Name: name,
+                  recxuser_id: j.data.user_id,
+                  Color: j.data.user_color,
+                  Message: j.data.message,
+                  Stamp: "",
+                };
+                if (j.data.stamp != null) {
+                  commentData.Stamp = j.data.stamp.image_url;
+                }
+
+                let addComment = (data) => {
+                  self.comments.push(data);
+                  if (self.comments.length > self.maxCommentNum) {
+                    // self.comments = self.comments.slice(-self.maxCommentNum);
+                    self.comments.shift();
                   }
-                  break;
+                };
 
-                // 配信終了
-                case 3:
-                  addEvent("stream", "finished");
-                  break;
-
-                // 配信開始
-                case 5:
-                  addEvent("stream", "start");
-                  break;
-
-                // block
-                case 6:
-                  addEvent(
-                    "ban",
-                    "ban " + findUserId(j.data.owner_to_banned_user_id)
-                  );
-                  break;
-
-                // block 解除
-                case 7:
-                  addEvent(
-                    "ban",
-                    "unban " + findUserId(j.data.owner_to_banned_user_id)
-                  );
-                  break;
-
-                // スタッフ権限付与
-                case 8:
-                  addEvent(
-                    "staff",
-                    "add staff " + findUserId(j.data.owner_to_moderator_user_id)
-                  );
-                  break;
-
-                // スタッフ権限解除
-                case 9:
-                  addEvent(
-                    "staff",
-                    "remove staff " +
-                      findUserId(j.data.owner_to_moderator_user_id)
-                  );
-                  break;
-
-                // わからん refresh?
-                case 10:
-                  if (j.data.need_refresh != null) {
-                    console.log(j.data);
-                  }
-                  break;
-
-                // ゲーム変更，タイトル変更
-                case 11:
-                  addEvent(
-                    "info",
-                    j.data.system_message.type + " " + j.data.message
-                  );
-                  break;
-
-                // 12, 13, 15 テロップ．後で解析する
-                case 12:
-                  break;
-                case 13:
-                  break;
-                case 15:
-                  break;
-
-                // サブスク入会
-                case 27:
-                  addEvent("info", j.data.message);
-                  break;
-
-                // アンケート開始
-                case 29:
-                  addEvent("vote", "[start] " + j.data.title);
-                  j.data.votes.forEach((elem) => {
-                    addEvent("vote", elem.text);
+                // 自動スクロール
+                let comment_box = document.getElementById("comment_box");
+                if (self.isBottom(comment_box)) {
+                  let prms = new Promise((resolve) => {
+                    addComment(commentData);
+                    resolve();
                   });
-                  break;
-
-                // アンケートの途中経過
-                case 30:
-                  break;
-
-                // アンケート結果
-                case 31:
-                  addEvent("vote", "[fin] " + j.data.title);
-                  j.data.votes.forEach((elem) => {
-                    addEvent(
-                      "vote",
-                      elem.text + elem.count + "票 " + elem.ratio + "%"
-                    );
+                  prms.then(() => {
+                    self.scrollToBottom(comment_box);
                   });
-                  break;
+                } else {
+                  addComment(commentData);
+                }
 
-                default:
-                  console.warn("unknown type:", j);
+                self.calc_speed();
               }
-            } else {
-              console.warn("unknown format:", orig);
-            }
+              break;
+
+            // 同接
+            case 1:
+              self.viewers = j.data.live_viewers;
+              if (self.maxViewers < self.viewers) {
+                self.maxViewers = self.viewers;
+              }
+              break;
+
+            // 配信終了
+            case 3:
+              addEvent("stream", "finished");
+              break;
+
+            // 配信開始
+            case 5:
+              addEvent("stream", "start");
+              break;
+
+            // block
+            case 6:
+              addEvent(
+                "ban",
+                "ban " + findUserId(j.data.owner_to_banned_user_id)
+              );
+              break;
+
+            // block 解除
+            case 7:
+              addEvent(
+                "ban",
+                "unban " + findUserId(j.data.owner_to_banned_user_id)
+              );
+              break;
+
+            // スタッフ権限付与
+            case 8:
+              addEvent(
+                "staff",
+                "add staff " + findUserId(j.data.owner_to_moderator_user_id)
+              );
+              break;
+
+            // スタッフ権限解除
+            case 9:
+              addEvent(
+                "staff",
+                "remove staff " + findUserId(j.data.owner_to_moderator_user_id)
+              );
+              break;
+
+            // わからん refresh?
+            case 10:
+              if (j.data.need_refresh != null) {
+                console.log(j.data);
+              }
+              break;
+
+            // ゲーム変更，タイトル変更
+            case 11:
+              addEvent(
+                "info",
+                j.data.system_message.type + " " + j.data.message
+              );
+              break;
+
+            // 12, 13, 15 テロップ．後で解析する
+            case 12:
+              break;
+            case 13:
+              break;
+            case 15:
+              break;
+
+            // サブスク入会
+            case 27:
+              addEvent("info", j.data.message);
+              break;
+
+            // アンケート開始
+            case 29:
+              addEvent("vote", "[start] " + j.data.title);
+              j.data.votes.forEach((elem) => {
+                addEvent("vote", elem.text);
+              });
+              break;
+
+            // アンケートの途中経過
+            case 30:
+              break;
+
+            // アンケート結果
+            case 31:
+              addEvent("vote", "[fin] " + j.data.title);
+              j.data.votes.forEach((elem) => {
+                addEvent(
+                  "vote",
+                  elem.text + elem.count + "票 " + elem.ratio + "%"
+                );
+              });
+              break;
+
+            default:
+              console.warn("unknown type:", j);
           }
         }
       });
@@ -637,8 +616,7 @@ export default {
         }
 
         let now = new Date().toISOString();
-        let url =
-          `https://public.openrec.tv/external/api/v5/movies/${self.videoId}/chats?to_created_at=${now}&limit=150`;
+        let url = `https://public.openrec.tv/external/api/v5/movies/${self.videoId}/chats?to_created_at=${now}&limit=150`;
 
         let past_comments = await (await fetch(url)).json();
         let prms = new Promise((resolve) => {

@@ -65,25 +65,20 @@ export default {
       let self = this;
       let sock = new WebSocket(url);
       sock.addEventListener("open", function () {
-        console.log("-----CONNECT TO SERVER-----");
+        console.info("-----CONNECT TO SERVER-----");
       });
 
-      sock.addEventListener("message", function (event) {
-        if (event.data.length > 2) {
-          let pos = event.data.indexOf("[");
-          if (pos == 2) {
-            let orig = JSON.parse(event.data.substr(pos));
-            if (orig[0] == "message") {
-              let j = JSON.parse(orig[1]);
-              switch (j.type) {
-                // message
-                case 0:
-                  self.$refs.nicoComment.addMsg(j.data.message);
-                  break;
-                case 3:
-                  sock.close();
-              }
-            }
+      sock.addEventListener("message", async function (event) {
+        let wsData = await orUtil.parseWsData(event.data);
+        if (wsData[0] == "message") {
+          let j = JSON.parse(wsData[1]);
+          switch (j.type) {
+            // message
+            case 0:
+              self.$refs.nicoComment.addMsg(j.data.message);
+              break;
+            case 3:
+              sock.close();
           }
         }
       });

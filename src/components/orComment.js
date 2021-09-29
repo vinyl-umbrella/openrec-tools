@@ -35,4 +35,15 @@ async function getWsUrl(videoId) {
     return wsUrl;
 }
 
-export default { getVideoId, getVideoInfo, getWsUrl }
+async function parseWsData(data) {
+    if (data.length > 2) {
+        let pos = data.indexOf("[");
+        if (pos == 2) {
+            let orig = JSON.parse(data.substr(pos));
+            return orig;
+        }
+    }
+    return {}
+}
+
+export default { getVideoId, getVideoInfo, getWsUrl, parseWsData }
