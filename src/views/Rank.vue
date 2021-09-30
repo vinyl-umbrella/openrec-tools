@@ -50,7 +50,7 @@
         </table>
       </div>
 
-      <modal
+      <graphModal
         :val="postData"
         :chartData="modalGraphData"
         :chartOptions="options"
@@ -63,12 +63,12 @@
 
 <script>
 import barChart from "../components/barChart";
-import Modal from "../components/modal";
+import GraphModal from "../components/graphModal";
 
 export default {
   components: {
     barChart,
-    Modal,
+    GraphModal,
   },
 
   data() {

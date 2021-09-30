@@ -140,41 +140,7 @@
     <!-- Config modal -->
     <div id="overlay" v-show="showModal" @click.self="closeModal()">
       <div id="content" style="background-color: var(--v-background-base)">
-        <div v-if="!isLogin">
-          <form autocomplete="on">
-            <v-text-field
-              v-model="orUuid"
-              label="uuid"
-              hint="Get from openrec cookie"
-              outlined
-              dense
-            ></v-text-field>
-            <v-text-field
-              v-model="orAccessToken"
-              label="access-token"
-              hint="Get from openrec cookie"
-              type="password"
-              outlined
-              dense
-            ></v-text-field>
-          </form>
-          <v-btn
-            @click="closeModal()"
-            color="var(--v-background-lighten1)"
-            small
-            depressed
-            style="margin-right: 4px"
-            >cancel</v-btn
-          >
-          <v-btn
-            @click="orLogin()"
-            color="var(--v-background-lighten1)"
-            small
-            depressed
-            >Login</v-btn
-          >
-        </div>
-        <div v-else>
+        <div>
           <h2>Config</h2>
           <v-container fluid>
             <v-text-field
@@ -200,13 +166,6 @@
             style="margin-right: 4px"
             >close</v-btn
           >
-          <v-btn
-            @click="orLogout()"
-            color="var(--v-background-lighten1)"
-            small
-            depressed
-            >Logout</v-btn
-          >
         </div>
       </div>
     </div>
@@ -221,10 +180,6 @@ export default {
     return {
       // ログイン, Config
       showModal: false,
-      // login info
-      isLogin: false,
-      orUuid: "",
-      orAccessToken: "",
 
       inputUrl: "",
       streamUrl: "",
@@ -257,31 +212,7 @@ export default {
     },
   },
 
-  mounted() {
-    this.updateLoginStatus();
-  },
-
   methods: {
-    updateLoginStatus() {
-      if (localStorage.getItem("orAccessToken") && localStorage.getItem("orUuid")) {
-        this.isLogin = true;
-      } else {
-        this.isLogin = false;
-      }
-    },
-
-    orLogin() {
-      localStorage.setItem("orAccessToken", this.orAccessToken);
-      localStorage.setItem("orUuid", this.orAccessToken);
-      this.updateLoginStatus();
-    },
-
-    orLogout() {
-      localStorage.removeItem("orAccessToken");
-      localStorage.removeItem("orUuid");
-      this.updateLoginStatus();
-    },
-
     callModal() {
       this.showModal = true;
     },

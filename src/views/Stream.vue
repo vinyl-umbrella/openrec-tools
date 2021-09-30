@@ -28,12 +28,12 @@
           type="string"
           label="コメント"
           v-model.trim="inputComment"
-          @keydown.enter="sampleFunc"
+          @keydown.enter="postInputComment"
           dense
           outlined
         ></v-text-field>
         <v-btn
-          @click="sampleFunc"
+          @click="postInputComment"
           small
           depressed
           color="var(--v-background-lighten1)"
@@ -151,7 +151,7 @@ export default {
       this.hls = new Hls(this.config);
     },
 
-    async sampleFunc() {
+    async postInputComment() {
       let e_msg = await orUtil.postComment(this.videoId, this.inputComment);
       this.inputComment = "";
       if (e_msg != "") {
