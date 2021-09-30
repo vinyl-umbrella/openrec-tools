@@ -17,7 +17,7 @@
               small
               depressed
               color="var(--v-background-lighten1)"
-              >Connect</v-btn
+              >接続</v-btn
             >
           </template>
         </v-text-field>
@@ -85,18 +85,18 @@
       type="string"
       v-model="inputComment"
       class="post_box"
-      label="Comment"
-      @keydown.enter="postComment"
+      label="コメント"
+      @keydown.enter="postInputComment"
       outlined
       dense
     >
       <template v-slot:append-outer>
         <v-btn
-          @click="postComment"
+          @click="postInputComment"
           small
           depressed
           color="var(--v-background-lighten1)"
-          >post</v-btn
+          >送信</v-btn
         >
       </template>
     </v-text-field>
@@ -263,58 +263,22 @@ export default {
 
   methods: {
     updateLoginStatus() {
-      let getCookieArray = () => {
-        let arr = new Array();
-        if (document.cookie != "") {
-          let tmp = document.cookie.split("; ");
-          for (let i = 0; i < tmp.length; i++) {
-            let data = tmp[i].split("=");
-            arr[data[0]] = decodeURIComponent(data[1]);
-          }
-        }
-        return arr;
-      };
-
-      let cookieArray = getCookieArray();
-
-      if (
-        cookieArray["orUuid"] != "" &&
-        cookieArray["orAccessToken"] != "" &&
-        cookieArray["orUuid"] &&
-        cookieArray["orAccessToken"]
-      ) {
+      if (localStorage.getItem("orAccessToken") && localStorage.getItem("orUuid")) {
         this.isLogin = true;
-        this.orUuid = cookieArray["orUuid"];
-        this.orAccessToken = cookieArray["orAccessToken"];
       } else {
         this.isLogin = false;
-        this.orUuid = "";
-        this.orAccessToken = "";
       }
     },
 
     orLogin() {
-      let d = new Date();
-      d.setDate(d.getDate() + 7);
-      let expire = d.toUTCString();
-      document.cookie =
-        "orUuid=" +
-        this.orUuid +
-        "; path=/;  expires=" +
-        expire +
-        "; Secure; SameSite=lax;";
-      document.cookie =
-        "orAccessToken=" +
-        this.orAccessToken +
-        "; path=/;  expires=" +
-        expire +
-        "; Secure; SameSite=lax;";
+      localStorage.setItem("orAccessToken", this.orAccessToken);
+      localStorage.setItem("orUuid", this.orAccessToken);
       this.updateLoginStatus();
     },
 
     orLogout() {
-      document.cookie = "orUuid=";
-      document.cookie = "orAccessToken=";
+      localStorage.removeItem("orAccessToken");
+      localStorage.removeItem("orUuid");
       this.updateLoginStatus();
     },
 
@@ -602,11 +566,12 @@ export default {
       let self = this;
       self.viewers = 0;
       self.maxViewers = 0;
-      self.videoId = await orUtil.getVideoId(self.inputUrl);
+      self.videoId = orUtil.getVideoId(self.inputUrl);
 
       self.comments = [];
       if (self.videoId != "") {
         let info = await orUtil.getVideoInfo(self.videoId);
+        self.videoId = info.id;
         if (info.onair_status == 0 || info.onair_status == 1) {
           self.streamUrl = `https://www.openrec.tv/live/${self.videoId}`;
           self.title = info.title;
@@ -675,37 +640,12 @@ export default {
       }
     },
 
-    async postComment() {
+    async postInputComment() {
       let self = this;
-      if (self.videoId != "" && self.inputComment != "" && self.isLogin) {
-        let url =
-          "https://apiv5.openrec.tv/api/v5/movies/" + self.videoId + "/chats";
-        let data = {
-          consented_chat_terms: false,
-          message: self.inputComment,
-          quality_type: 2,
-          messaged_at: "",
-          league_key: "",
-          to_user_id: "",
-        };
-        let param = {
-          method: "POST",
-          headers: {
-            Accept: "application/json,text/plain,*/*",
-            "Content-Type": "application/json;charset=utf-8",
-            uuid: self.orUuid,
-            "access-token": self.orAccessToken,
-          },
-          body: JSON.stringify(data),
-        };
-
-        let j = await (await fetch(url, param)).json();
+      if (self.videoId != "" && self.inputComment != "") {
+        let m = await orUtil.postComment(self.videoId, self.inputComment);
         self.inputComment = "";
-        if (j.status != 0) {
-          self.postError = j.message;
-        } else {
-          self.postError = "";
-        }
+        self.postError = m;
       }
     },
 

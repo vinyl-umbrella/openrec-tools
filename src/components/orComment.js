@@ -23,8 +23,7 @@ async function getMovieId(videoId) {
 }
 
 async function getVideoInfo(videoId) {
-    let apiUrl =
-        "https://public.openrec.tv/external/api/v5/movies/" + videoId;
+    let apiUrl = `https://public.openrec.tv/external/api/v5/movies/${videoId}`;
     let resjson = await (await fetch(apiUrl)).json();
     return resjson;
 }
@@ -46,4 +45,33 @@ async function parseWsData(data) {
     return {}
 }
 
-export default { getVideoId, getVideoInfo, getWsUrl, parseWsData }
+async function postComment(videoId, inputComment) {
+    let url = `https://apiv5.openrec.tv/api/v5/movies/${videoId}/chats`;
+    let data = {
+        consented_chat_terms: false,
+        message: inputComment,
+        quality_type: 2,
+        messaged_at: "",
+        league_key: "",
+        to_user_id: "",
+    };
+    let param = {
+        method: "POST",
+        headers: {
+            Accept: "application/json,text/plain,*/*",
+            "Content-Type": "application/json;charset=utf-8",
+            uuid: localStorage.getItem("orUuid"),
+            "access-token": localStorage.getItem("orAccessToken"),
+        },
+        body: JSON.stringify(data),
+    };
+    let j = await (await fetch(url, param)).json();
+    inputComment = "";
+    let status = "";
+    if (j.status != 0) {
+        status = j.message;
+    }
+    return status;
+}
+
+export default { getVideoId, getVideoInfo, getWsUrl, parseWsData, postComment }

@@ -4,7 +4,7 @@
       <v-text-field
         type="string"
         v-model.trim="inputUrl"
-        label="live OPENREC URL"
+        label="OPENREC URL"
         @keydown.enter="playVideo"
         dense
         outlined
@@ -18,18 +18,28 @@
       >
     </div>
     {{ e_message }}
-    <!-- <div class="video" v-if="e_message==''"> -->
     <div style="margin: 0 auto; width: 90%">
       <div class="nico-player">
         <video ref="video" width="100%" :poster="thumbnail" controls></video>
         <nicoComment ref="nicoComment" />
       </div>
-      <v-text-field
-        type="string"
-        label="コメント(実装予定)"
-        dense
-        outlined
-      ></v-text-field>
+      <div class="flexbox">
+        <v-text-field
+          type="string"
+          label="コメント"
+          v-model.trim="inputComment"
+          @keydown.enter="sampleFunc"
+          dense
+          outlined
+        ></v-text-field>
+        <v-btn
+          @click="sampleFunc"
+          small
+          depressed
+          color="var(--v-background-lighten1)"
+          >送信</v-btn
+        >
+      </div>
     </div>
   </div>
 </template>
@@ -55,6 +65,8 @@ export default {
       },
       hls: new Hls(this.config),
       inputUrl: "",
+      videoId: "",
+      inputComment: "",
       thumbnail: "",
       messages: [],
       e_message: "",
@@ -104,9 +116,10 @@ export default {
     async playVideo() {
       this.stopVideo();
       let stream = "";
-      let videoId = orUtil.getVideoId(this.inputUrl);
+      this.videoId = orUtil.getVideoId(this.inputUrl);
       try {
-        let info = await orUtil.getVideoInfo(videoId);
+        let info = await orUtil.getVideoInfo(this.videoId);
+        this.videoId = info.id;
         this.thumbnail = info.l_thumbnail_url;
         if (!info.media.url) {
           this.e_message = "media file not found";
@@ -119,7 +132,7 @@ export default {
         return;
       }
 
-      let wsurl = await orUtil.getWsUrl(videoId);
+      let wsurl = await orUtil.getWsUrl(this.videoId);
       this.connectWS(wsurl);
       if (stream) {
         this.e_message = "";
@@ -136,6 +149,14 @@ export default {
     stopVideo() {
       this.hls.destroy();
       this.hls = new Hls(this.config);
+    },
+
+    async sampleFunc() {
+      let e_msg = await orUtil.postComment(this.videoId, this.inputComment);
+      this.inputComment = "";
+      if (e_msg != "") {
+        console.warn(e_msg);
+      }
     },
   },
 };
