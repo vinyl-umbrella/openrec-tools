@@ -123,7 +123,6 @@ export default {
         this.thumbnail = info.l_thumbnail_url;
         if (!info.media.url) {
           this.e_message = "media file not found";
-          return;
         } else {
           stream = info.media.url;
         }
