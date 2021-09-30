@@ -21,7 +21,7 @@
     <!-- <div class="video" v-if="e_message==''"> -->
     <div style="margin: 0 auto; width: 90%">
       <div class="nico-player">
-        <video ref="video" width="100%" controls></video>
+        <video ref="video" width="100%" :poster="thumbnail" controls></video>
         <nicoComment ref="nicoComment" />
       </div>
       <v-text-field
@@ -55,6 +55,7 @@ export default {
       },
       hls: new Hls(this.config),
       inputUrl: "",
+      thumbnail: "",
       messages: [],
       e_message: "",
     };
@@ -100,29 +101,25 @@ export default {
       setInterval(keepConnect, 25000);
     },
 
-    async getMediaFile() {
-      let videoId = orUtil.getVideoId(this.inputUrl);
-
-      try {
-        let res = await fetch(
-          `https://public.openrec.tv/external/api/v5/movies/${videoId}`
-        );
-        let j = await res.json();
-        if (!j.media.url) {
-          this.e_message = "media file not found";
-          return null;
-        }
-        return j.media.url;
-      } catch (e) {
-        this.e_message = `failed to fetch "${this.inputUrl}"`;
-        return null;
-      }
-    },
-
     async playVideo() {
       this.stopVideo();
-      let stream = await this.getMediaFile();
-      let wsurl = await orUtil.getWsUrl(orUtil.getVideoId(this.inputUrl));
+      let stream = "";
+      let videoId = orUtil.getVideoId(this.inputUrl);
+      try {
+        let info = await orUtil.getVideoInfo(videoId);
+        this.thumbnail = info.l_thumbnail_url;
+        if (!info.media.url) {
+          this.e_message = "media file not found";
+          return;
+        } else {
+          stream = info.media.url;
+        }
+      } catch (e) {
+        this.e_message = `failed to fetch "${this.inputUrl}"`;
+        return;
+      }
+
+      let wsurl = await orUtil.getWsUrl(videoId);
       this.connectWS(wsurl);
       if (stream) {
         this.e_message = "";
