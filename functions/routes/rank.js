@@ -26,6 +26,8 @@ function cPool(dbname) {
 
 function ymlist() {
     let dt = new Date();
+    dt.setHours(dt.getHours() + 9);
+    console.log(dt);
     let y = dt.getFullYear();
     let l = [];
     for (let i = 1; i < 13; i++) {
