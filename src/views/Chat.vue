@@ -502,6 +502,10 @@ export default {
       self.comments = [];
       if (self.videoId != "") {
         let info = await orUtil.getVideoInfo(self.videoId);
+        if (info.chat_public_type == "member") {
+          self.urlError = "member only";
+          return;
+        }
         self.videoId = info.id;
         if (info.onair_status == 0 || info.onair_status == 1) {
           self.streamUrl = `https://www.openrec.tv/live/${self.videoId}`;

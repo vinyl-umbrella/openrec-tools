@@ -119,6 +119,10 @@ export default {
       this.videoId = orUtil.getVideoId(this.inputUrl);
       try {
         let info = await orUtil.getVideoInfo(this.videoId);
+        if (info.chat_public_type == "member") {
+          this.e_message = "member only";
+          return;
+        }
         this.videoId = info.id;
         this.thumbnail = info.l_thumbnail_url;
         if (!info.media.url) {

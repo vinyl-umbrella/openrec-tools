@@ -50,18 +50,12 @@ export default {
   },
   methods: {
     addMsg(msg) {
-      let flag = false;
       let classname = "";
       // 空きチェック
       let index = this.shownMsg.findIndex((item) => item.message == "");
       if (index !== -1) {
         this.shownMsg[index].message = msg;
         classname = ".comment" + String(index);
-        flag = true;
-      }
-
-      // アニメーション
-      if (flag) {
         this.flowComment(index, classname);
       }
     },
@@ -73,14 +67,15 @@ export default {
         translateX: function () {
           return [
             document.getElementById("nicoComme").clientWidth,
-            -self.shownMsg[index].message.length * 30,
+            -self.shownMsg[index].message.length * 35,
           ];
         },
         translateY: function () {
           let rand = anime.random(0, self.videoHeight - 120);
           return [rand, rand];
         },
-        duration: 3000,
+        delay: 500,
+        duration: 3500,
         easing: "linear",
         complete: function () {
           self.shownMsg[index].message = "";
