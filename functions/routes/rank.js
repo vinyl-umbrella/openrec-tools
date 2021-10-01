@@ -27,7 +27,6 @@ function cPool(dbname) {
 function ymlist() {
     let dt = new Date();
     dt.setHours(dt.getHours() + 9);
-    console.log(dt);
     let y = dt.getFullYear();
     let l = [];
     for (let i = 1; i < 13; i++) {
@@ -51,8 +50,9 @@ exports.rankUser = async function (req, res) {
 
     let tasks = [];
     let data = {};
+    let l = ymlist();
 
-    for (let ym of ymlist()) {
+    for (let ym of l) {
         let tablename = "rank" + ym;
         let sql = "SELECT count FROM ?? WHERE userid = BINARY ?";
 
@@ -68,9 +68,9 @@ exports.rankUser = async function (req, res) {
 
     for (let i = 0; i < results.length; i++) {
         if (results[i][0].length != 0) {
-            data[ymlist()[i]] = results[i][0][0]["count"];
+            data[l[i]] = results[i][0][0]["count"];
         } else {
-            data[ymlist()[i]] = 0;
+            data[l[i]] = 0;
         }
     }
     res.send(data);
