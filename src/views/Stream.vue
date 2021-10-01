@@ -155,10 +155,12 @@ export default {
     },
 
     async postInputComment() {
-      let e_msg = await orUtil.postComment(this.videoId, this.inputComment);
-      this.inputComment = "";
-      if (e_msg != "") {
-        console.warn(e_msg);
+      if (this.videoId != "" && this.inputComment != "") {
+        let e_msg = await orUtil.postComment(this.videoId, this.inputComment);
+        this.inputComment = "";
+        if (e_msg != "") {
+          console.warn(e_msg);
+        }
       }
     },
   },

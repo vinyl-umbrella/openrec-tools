@@ -576,23 +576,21 @@ export default {
     },
 
     async postInputComment() {
-      let self = this;
-      if (self.videoId != "" && self.inputComment != "") {
-        let m = await orUtil.postComment(self.videoId, self.inputComment);
-        self.inputComment = "";
-        self.postError = m;
+      if (this.videoId != "" && this.inputComment != "") {
+        let m = await orUtil.postComment(this.videoId, this.inputComment);
+        this.inputComment = "";
+        this.postError = m;
       }
     },
 
     async postStamp(stamp_id) {
-      let self = this;
-      if (self.videoId != "") {
+      if (this.videoId != "") {
         let url =
-          "https://apiv5.openrec.tv/api/v5/movies/" + self.videoId + "/chats";
+          "https://apiv5.openrec.tv/api/v5/movies/" + this.videoId + "/chats";
         let data = {
           stamp_id: stamp_id,
           consented_chat_terms: false,
-          message: self.inputComment,
+          message: this.inputComment,
           quality_type: 2,
           messaged_at: "",
           league_key: "",
@@ -603,18 +601,18 @@ export default {
           headers: {
             Accept: "application/json,text/plain,*/*",
             "Content-Type": "application/json;charset=utf-8",
-            uuid: self.orUuid,
-            "access-token": self.orAccessToken,
+            uuid: localStorage.getItem("orUuid"),
+            "access-token": localStorage.getItem("orAccessToken"),
           },
           body: JSON.stringify(data),
         };
 
         let j = await (await fetch(url, param)).json();
-        self.inputComment = "";
+        this.inputComment = "";
         if (j.status != 0) {
-          self.postError = j.message;
+          this.postError = j.message;
         } else {
-          self.postError = "";
+          this.postError = "";
         }
       }
     },
