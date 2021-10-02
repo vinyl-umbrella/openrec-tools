@@ -7,7 +7,7 @@
           <router-link to="/rank">ランキング</router-link> |
           <router-link to="/chat">コメビュ</router-link> |
           <router-link to="/message">過去ログ検索</router-link>
-          <router-link to="/stream" style="color: transparent"
+          <router-link to="/stream" style="opacity: 0.05"
             >コメつき</router-link
           >
         </span>

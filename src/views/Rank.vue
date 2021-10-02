@@ -11,7 +11,6 @@
         >
       </div>
     </div>
-    <h2>07-06 1:20:28 布団ちゃんにbanされた<br>まだ解除されない</h2>
     <bar-chart
       id="mainChart"
       :chart-data="graphData"
