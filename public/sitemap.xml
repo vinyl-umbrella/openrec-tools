@@ -1,23 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <url>
-        <loc>https://futonchan-openchat.web.app/</loc>
-        <lastmod>2021-06-19</lastmod>
-        <priority>1.0</priority>
-    </url>
-    <url>
-        <loc>https://futonchan-openchat.web.app/rank</loc>
-        <lastmod>2021-06-19</lastmod>
-        <priority>1.0</priority>
-    </url>
-    <url>
-        <loc>https://futonchan-openchat.web.app/chat</loc>
-        <lastmod>2021-06-19</lastmod>
-        <priority>1.0</priority>
-    </url>
-    <url>
-        <loc>https://futonchan-openchat.web.app/contact</loc>
-        <lastmod>2021-06-19</lastmod>
-        <priority>0.8</priority>
-    </url>
+
+<url>
+  <loc>https://futonchan-openchat.web.app/</loc>
+  <priority>1.0</priority>
+  <lastmod>2021-10-02T18:29:21+09:00</lastmod>
+</url>
+<url>
+    <loc>https://futonchan-openchat.web.app/rank</loc>
+    <lastmod>2021-10-02T18:29:21+09:00</lastmod>
+    <priority>1.0</priority>
+</url>
+<url>
+    <loc>https://futonchan-openchat.web.app/chat</loc>
+    <lastmod>2021-10-02T18:29:21+09:00</lastmod>
+    <priority>1.0</priority>
+</url>
+<url>
+    <loc>https://futonchan-openchat.web.app/message</loc>
+    <lastmod>2021-10-02T18:29:21+09:00</lastmod>
+    <priority>1.0</priority>
+</url>
+<url>
+    <loc>https://futonchan-openchat.web.app/stream</loc>
+    <lastmod>2021-10-02T18:29:21+09:00</lastmod>
+    <priority>1.0</priority>
+</url>
+<url>
+    <loc>https://futonchan-openchat.web.app/contact</loc>
+    <lastmod>2021-10-02T18:29:21+09:00</lastmod>
+    <priority>0.8</priority>
+</url>
+
 </urlset>
