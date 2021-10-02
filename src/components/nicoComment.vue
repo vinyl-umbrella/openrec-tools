@@ -5,6 +5,7 @@
         {{ m.message }}
       </div>
     </div>
+    <span style="position: absolute; top: 0; opacity: 0.2; font-size: 50%">商用利用禁止 https://futonchan-openchat.web.app/stream</span>
   </div>
 </template>
 
