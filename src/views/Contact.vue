@@ -9,8 +9,7 @@
     >
       google form
     </a>
-    から<br />
-    商用利用を禁ずる
+    から
   </div>
 </template>
 
