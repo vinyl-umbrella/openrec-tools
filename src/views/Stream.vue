@@ -119,7 +119,7 @@ export default {
       this.videoId = orUtil.getVideoId(this.inputUrl);
       try {
         let info = await orUtil.getVideoInfo(this.videoId);
-        if (info.chat_public_type == "member") {
+        if (info.chat_public_type == "member" && !localStorage.getItem("viewSubs")) {
           this.e_message = "member only";
           return;
         }

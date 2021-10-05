@@ -502,7 +502,7 @@ export default {
       self.comments = [];
       if (self.videoId != "") {
         let info = await orUtil.getVideoInfo(self.videoId);
-        if (info.chat_public_type == "member") {
+        if (info.chat_public_type == "member" && !localStorage.getItem("viewSubs")) {
           self.urlError = "member only";
           return;
         }
