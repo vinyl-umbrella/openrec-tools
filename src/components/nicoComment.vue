@@ -1,11 +1,11 @@
 <template>
   <div id="nicoComme">
     <div v-for="(m, index) in shownMsg" :key="m.id">
-      <div v-if="m.stamp" :class="'stamp_base comment' + index">
-        <img :src="m.message" width="8%"/>
+      <div v-if="m.stamp" :class="'stamp_base comment' + index" style="width: 5vw;">
+        <img :src="m.message" width="100%"/>
       </div>
       <div v-else :class="'comment_base comment' + index" :style="updateFontSize">
-        {{ m.message }}
+        <p>{{ m.message }}</p>
       </div>
     </div>
     <span style="position: absolute; top: 0; opacity: 0.2; font-size: 50%">商用利用禁止 https://futonchan-openchat.web.app/stream</span>
