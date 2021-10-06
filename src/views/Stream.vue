@@ -87,11 +87,27 @@ export default {
           let j = JSON.parse(wsData[1]);
           switch (j.type) {
             // message
-            case 0:
-              self.$refs.nicoComment.addMsg(j.data.message);
+            case 0: {
+              let msgObj = { type: "normal", text: j.data.message };
+              if (j.data.is_muted) {
+                break
+              }
+              if (j.data.yell != null) {
+                msgObj.type = "yell";
+                msgObj.text = `[${j.data.user_name}] ${j.data.yell.yells}円 ${j.data.message}`;
+              } else if (j.data.stamp != null) {
+                msgObj.type = "stamp";
+                msgObj.text = j.data.stamp.image_url;
+              } else if (j.data.capture != null) {
+                msgObj.type = "capture";
+                console.log("capture");
+              }
+              self.$refs.nicoComment.addMsg(msgObj);
               break;
-            case 3:
+            }
+            case 3: {
               sock.close();
+            }
           }
         }
       });
@@ -119,7 +135,10 @@ export default {
       this.videoId = orUtil.getVideoId(this.inputUrl);
       try {
         let info = await orUtil.getVideoInfo(this.videoId);
-        if (info.chat_public_type == "member" && !localStorage.getItem("viewSubs")) {
+        if (
+          info.chat_public_type == "member" &&
+          !localStorage.getItem("viewSubs")
+        ) {
           this.e_message = "member only";
           return;
         }

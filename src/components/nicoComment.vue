@@ -1,7 +1,10 @@
 <template>
   <div id="nicoComme">
     <div v-for="(m, index) in shownMsg" :key="m.id">
-      <div :class="'comment_base comment' + index" :style="updateFontSize">
+      <div v-if="m.stamp" :class="'stamp_base comment' + index">
+        <img :src="m.message" width="8%"/>
+      </div>
+      <div v-else :class="'comment_base comment' + index" :style="updateFontSize">
         {{ m.message }}
       </div>
     </div>
@@ -14,8 +17,6 @@ import anime from "animejs";
 
 export default {
   name: "NicoComment",
-  props: {
-  },
   computed: {
     updateFontSize() {
       return {
@@ -27,22 +28,22 @@ export default {
     return {
       videoHeight: 600,
       shownMsg: [
-        { id: 0, message: "" },
-        { id: 1, message: "" },
-        { id: 2, message: "" },
-        { id: 3, message: "" },
-        { id: 4, message: "" },
-        { id: 5, message: "" },
-        { id: 6, message: "" },
-        { id: 7, message: "" },
-        { id: 8, message: "" },
-        { id: 9, message: "" },
-        { id: 10, message: "" },
-        { id: 11, message: "" },
-        { id: 12, message: "" },
-        { id: 13, message: "" },
-        { id: 14, message: "" },
-        { id: 15, message: "" },
+        { id: 0, message: "", stamp: false },
+        { id: 1, message: "", stamp: false },
+        { id: 2, message: "", stamp: false },
+        { id: 3, message: "", stamp: false },
+        { id: 4, message: "", stamp: false },
+        { id: 5, message: "", stamp: false },
+        { id: 6, message: "", stamp: false },
+        { id: 7, message: "", stamp: false },
+        { id: 8, message: "", stamp: false },
+        { id: 9, message: "", stamp: false },
+        { id: 10, message: "", stamp: false },
+        { id: 11, message: "", stamp: false },
+        { id: 12, message: "", stamp: false },
+        { id: 13, message: "", stamp: false },
+        { id: 14, message: "", stamp: false },
+        { id: 15, message: "", stamp: false },
       ],
     };
   },
@@ -50,12 +51,18 @@ export default {
     this.videoHeight = (document.getElementById("nicoComme").clientWidth * 9) / 16;
   },
   methods: {
-    addMsg(msg) {
+    addMsg(msgObj) {
       let classname = "";
       // 空きチェック
       let index = this.shownMsg.findIndex((item) => item.message == "");
       if (index !== -1) {
-        this.shownMsg[index].message = msg;
+        this.shownMsg[index].stamp = false;
+        if (msgObj.type == "yell") {
+          // 色付け
+        } else if (msgObj.type == "stamp") {
+          this.shownMsg[index].stamp = true;
+        }
+        this.shownMsg[index].message = msgObj.text;
         classname = ".comment" + String(index);
         this.flowComment(index, classname);
       }
@@ -63,19 +70,20 @@ export default {
 
     flowComment(index, classname) {
       let self = this;
+      let len = self.shownMsg[index].message.length;
+      if (this.shownMsg[index].stamp) {
+        len = 5;
+      }
       anime({
         targets: classname,
         translateX: function () {
-          return [
-            document.getElementById("nicoComme").clientWidth,
-            -self.shownMsg[index].message.length * 35,
-          ];
+          return [document.getElementById("nicoComme").clientWidth, -len * 35];
         },
         translateY: function () {
           let rand = anime.random(0, self.videoHeight - 120);
           return [rand, rand];
         },
-        delay: 500,
+        delay: 1000,
         duration: 3500,
         easing: "linear",
         complete: function () {
@@ -98,5 +106,12 @@ export default {
   user-select: none;
   text-shadow: 1px 1px 0 black, -1px 1px 0 black, 1px -1px 0 black,
     -1px -1px 0 black;
+}
+
+.stamp_base {
+  position: absolute;
+  top: 0;
+  white-space: nowrap;
+  user-select: none;
 }
 </style>

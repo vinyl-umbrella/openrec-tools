@@ -338,6 +338,7 @@ export default {
                   Stamp: "",
                 };
                 if (j.data.stamp != null) {
+                  console.log(j.data);
                   commentData.Stamp = j.data.stamp.image_url;
                 }
 
