@@ -3,7 +3,7 @@ function getVideoId(url) {
     if (openrecUrl.lastIndexOf("?") != -1) {
         openrecUrl = openrecUrl.slice(0, openrecUrl.lastIndexOf("?"));
     }
-    let re = /^https:\/\/www\.openrec.tv\/(m\/)?live\/([a-z\d]*)/
+    let re = /^https:\/\/www\.openrec.tv\/(m\/)?live\/([a-z\d_-]*)/
     let result = openrecUrl.match(re);
     let videoId = ""
     if (result) {

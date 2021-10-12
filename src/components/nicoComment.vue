@@ -34,7 +34,6 @@ export default {
     for (let i = 0; i < 32; i++) {
       this.shownMsg.push({ id: i, message: "", stamp: false });
     }
-    console.log(this.shownMsg);
     this.videoHeight = (document.getElementById("nicoComme").clientWidth * 9) / 16;
   },
   methods: {

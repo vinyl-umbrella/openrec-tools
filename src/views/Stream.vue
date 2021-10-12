@@ -100,7 +100,6 @@ export default {
                 msgObj.text = j.data.stamp.image_url;
               } else if (j.data.capture != null) {
                 msgObj.type = "capture";
-                console.log("capture");
               }
               self.$refs.nicoComment.addMsg(msgObj);
               break;
