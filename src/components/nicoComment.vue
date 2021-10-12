@@ -1,8 +1,8 @@
 <template>
   <div id="nicoComme">
     <div v-for="(m, index) in shownMsg" :key="m.id">
-      <div v-if="m.stamp" :class="'stamp_base comment' + index" style="width: 5vw;">
-        <img :src="m.message" width="100%"/>
+      <div v-if="m.stamp" :class="'stamp_base comment' + index" style="width: 5vw">
+        <img :src="m.message" width="100%" />
       </div>
       <div v-else :class="'comment_base comment' + index" :style="updateFontSize">
         <p>{{ m.message }}</p>
@@ -27,27 +27,14 @@ export default {
   data() {
     return {
       videoHeight: 600,
-      shownMsg: [
-        { id: 0, message: "", stamp: false },
-        { id: 1, message: "", stamp: false },
-        { id: 2, message: "", stamp: false },
-        { id: 3, message: "", stamp: false },
-        { id: 4, message: "", stamp: false },
-        { id: 5, message: "", stamp: false },
-        { id: 6, message: "", stamp: false },
-        { id: 7, message: "", stamp: false },
-        { id: 8, message: "", stamp: false },
-        { id: 9, message: "", stamp: false },
-        { id: 10, message: "", stamp: false },
-        { id: 11, message: "", stamp: false },
-        { id: 12, message: "", stamp: false },
-        { id: 13, message: "", stamp: false },
-        { id: 14, message: "", stamp: false },
-        { id: 15, message: "", stamp: false },
-      ],
+      shownMsg: [],
     };
   },
   mounted() {
+    for (let i = 0; i < 32; i++) {
+      this.shownMsg.push({ id: i, message: "", stamp: false });
+    }
+    console.log(this.shownMsg);
     this.videoHeight = (document.getElementById("nicoComme").clientWidth * 9) / 16;
   },
   methods: {
