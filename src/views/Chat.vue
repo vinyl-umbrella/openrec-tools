@@ -157,13 +157,28 @@
               v-model="showStampBtn"
               label="スタンプボタンを表示 ※魔神サブスク限定"
             ></v-checkbox>
+            <div class="flexbox">
+              <v-text-field
+                v-model.trim="nameColor"
+                label="ユーザ名の色 (プレ垢限定)"
+                outlined
+                dense
+              ></v-text-field>
+              <v-btn
+                @click="changeNameColor"
+                color="var(--v-background-lighten1)"
+                small
+                depressed
+                style="margin-left: 4px; margin-top: 4px;"
+                >変更</v-btn
+              >
+            </div>
           </v-container>
           <v-btn
             @click="closeModal()"
             color="var(--v-background-lighten1)"
             small
             depressed
-            style="margin-right: 4px"
             >close</v-btn
           >
         </div>
@@ -203,6 +218,7 @@ export default {
       maxCommentNum: 1500,
       hideNewcomer: false,
       showStampBtn: false,
+      nameColor: "#00FF00"
     };
   },
 
@@ -625,6 +641,10 @@ export default {
       self.commentsSpeed += 1;
       setTimeout(sub, 120000);
     },
+
+    async changeNameColor() {
+      this.urlError = await orUtil.updateChatSetting({name_color: this.nameColor});
+    }
   },
 };
 </script>

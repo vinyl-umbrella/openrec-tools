@@ -81,4 +81,24 @@ async function postComment(videoId, inputComment) {
     return status;
 }
 
-export default { getVideoId, getVideoInfo, getWsUrl, parseWsData, postComment }
+async function updateChatSetting(conf) {
+    let url = "https://apiv5.openrec.tv/api/v5/users/me/chat-setting"
+    let param = {
+        method: "PUT",
+        headers: {
+            Accept: "application/json,text/plain,*/*",
+            "Content-Type": "application/json;charset=utf-8",
+            uuid: localStorage.getItem("orUuid"),
+            "access-token": localStorage.getItem("orAccessToken"),
+        },
+        body: JSON.stringify(conf),
+    };
+    let j = await (await fetch(url, param)).json();
+    let status = "";
+    if (j.status != 0) {
+        status = j.message;
+    }
+    return status;
+}
+
+export default { getVideoId, getVideoInfo, getWsUrl, parseWsData, postComment, updateChatSetting }
