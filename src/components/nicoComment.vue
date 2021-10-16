@@ -92,6 +92,7 @@ export default {
   user-select: none;
   text-shadow: 1px 1px 0 black, -1px 1px 0 black, 1px -1px 0 black,
     -1px -1px 0 black;
+  opacity: 0.85;
 }
 
 .stamp_base {
