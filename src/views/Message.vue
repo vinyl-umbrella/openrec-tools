@@ -2,11 +2,10 @@
   <div class="explore">
     <h1>おぷちゃ過去ログ検索システム</h1>
     <div class="container">
-      <v-select v-model="tempVideoid" :items="videoIdObj" label="枠" dense outlined return-object></v-select>
-      <v-text-field type="string" v-model.trim="userid" label="ユーザID(任意)" dense outlined></v-text-field>
-      <v-text-field type="string" v-model="search_string" label="検索ワード(任意)" dense outlined></v-text-field>
-      <v-text-field type="string" v-model="startdate" label="検索開始日時(任意)" dense outlined></v-text-field>
-      <v-text-field type="string" v-model="enddate" label="検索終了日時(任意)" dense outlined></v-text-field>
+      <v-select v-model="tempVideoid" :items="videoIdObj" label="枠" dense outlined return-object ></v-select>
+      <v-text-field type="string" v-model.trim="userid" label="ユーザID(任意)" dense outlined @keydown.enter="getMessages(0)"></v-text-field>
+      <v-text-field type="string" v-model="search_string" label="検索ワード(任意)" dense outlined @keydown.enter="getMessages(0)"></v-text-field>
+      <v-text-field type="string" v-model="startdate" label="検索開始日時(任意)" dense outlined @keydown.enter="getMessages(0)"></v-text-field>
       <v-btn @click="getMessages(0)" color="var(--v-background-lighten1)" depressed>取得</v-btn>
     </div>
     <div class="table_wrap">
@@ -19,7 +18,17 @@
         <tbody>
           <tr v-for="(item, index) in messages" :key="index">
             <td>{{ item.time | timeFormat }}</td>
-            <td>{{ item.userid }}</td>
+            <td>
+              <v-tooltip right>
+                <template v-slot:activator="{ on }">
+                  <span v-on="on" v-on:mouseover="getUserData(item.userid)">{{ item.userid}}</span>
+                </template>
+                <div>
+                  <img :src="userinfo.icon" width="35px"/>
+                  <span>{{ userinfo.nickname }}({{ item.userid }})</span>
+                </div>
+              </v-tooltip>
+            </td>
             <td>{{ item.message }}</td>
           </tr>
         </tbody>
@@ -46,6 +55,7 @@ export default {
       startdate: "",
       enddate: "",
       lastid: 0,
+      userinfo: {icon: "", nickname: ""}
     };
   },
 
@@ -57,6 +67,13 @@ export default {
   },
 
   methods: {
+    async getUserData(userid) {
+      let url = `https://public.openrec.tv/external/api/v5/channels/${userid}`;
+      let j = await (await fetch(url)).json();
+      this.userinfo.icon = j.l_icon_image_url;
+      this.userinfo.nickname = j.nickname;
+    },
+
     async getMessages(last) {
       const url =
         "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v1/messages";
