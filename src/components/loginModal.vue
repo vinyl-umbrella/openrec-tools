@@ -15,6 +15,7 @@
             label="access-token"
             hint="Get from openrec cookie"
             type="password"
+            @keydown.enter="orLogin"
             outlined
             dense
           ></v-text-field>

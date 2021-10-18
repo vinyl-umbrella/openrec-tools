@@ -163,6 +163,7 @@
                 label="ユーザ名の色 (プレ垢限定)"
                 outlined
                 dense
+                @keydown.enter="changeNameColor"
               ></v-text-field>
               <v-btn
                 @click="changeNameColor"
