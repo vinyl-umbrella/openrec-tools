@@ -35,13 +35,13 @@
 
     <div class="stream_data">
       <div class="title" v-show="streamUrl != ''">
-        <a :href="streamUrl" target="_blank" rel="noopener norefferer">{{title}}</a>
+        <a :href="streamUrl" target="_blank" rel="noopener norefferer">{{info.title}}</a>
       </div>
-      <div class="channel_name">{{ channelName }}</div>
+      <div class="channel_name">{{ info.channelName }}</div>
 
       <div>
-        <span>同接: {{ viewers }}&nbsp;</span>
-        <span>最大同接: {{ maxViewers }}&nbsp;</span>
+        <span>同接: {{ info.viewers }}&nbsp;</span>
+        <span>最大同接: {{ info.maxViewers }}&nbsp;</span>
         <span>コメ速: {{ calcAvg }}/min</span>
       </div>
     </div>
@@ -100,7 +100,7 @@
         >
       </template>
     </v-text-field>
-    <span v-show="showStampBtn">
+    <span v-show="config.showStampBtn">
       Stamps:
       <v-btn
         class="stamp_btn"
@@ -138,28 +138,28 @@
     <span>{{ postError }}</span>
 
     <!-- Config modal -->
-    <div id="overlay" v-show="showModal" @click.self="closeModal()">
+    <div id="overlay" v-show="config.showModal" @click.self="closeModal()">
       <div id="content" style="background-color: var(--v-background-base)">
         <div>
           <h2>Config</h2>
           <v-container fluid>
             <v-text-field
-              v-model.number="maxCommentNum"
+              v-model.number="config.maxCommentNum"
               label="チャット保持件数"
               outlined
               dense
             ></v-text-field>
             <v-checkbox
-              v-model="hideNewcomer"
+              v-model="config.hideNewcomer"
               label="新規ユーザを非表示"
             ></v-checkbox>
             <v-checkbox
-              v-model="showStampBtn"
+              v-model="config.showStampBtn"
               label="スタンプボタンを表示 ※魔神サブスク限定"
             ></v-checkbox>
             <div class="flexbox">
               <v-text-field
-                v-model.trim="nameColor"
+                v-model.trim="config.nameColor"
                 label="ユーザ名の色 (プレ垢限定)"
                 outlined
                 dense
@@ -194,47 +194,48 @@ import orUtil from "../components/orComment";
 export default {
   data() {
     return {
-      // ログイン, Config
-      showModal: false,
-
       inputUrl: "",
       streamUrl: "",
       urlError: "",
       inputComment: "",
       postError: "",
 
-      title: "",
-      channelName: "",
-      viewers: 0,
-      maxViewers: 0,
-      commentsSpeed: 0,
+      info: {
+        title: "",
+        channelName: "",
+        viewers: 0,
+        maxViewers: 0,
+        commentsSpeed: 0,
+      },
 
       videoId: "",
-
       comments: [],
       events: [],
       wsConnectFlag: false,
 
       // config
-      maxCommentNum: 1500,
-      hideNewcomer: false,
-      showStampBtn: false,
-      nameColor: "#00FF00"
+      config: {
+        showModal: false,
+        maxCommentNum: 1500,
+        hideNewcomer: false,
+        showStampBtn: false,
+        nameColor: "#00FF00"
+      }
     };
   },
 
   computed: {
     calcAvg() {
-      return parseInt(this.commentsSpeed / 2);
+      return parseInt(this.info.commentsSpeed / 2);
     },
   },
 
   methods: {
     callModal() {
-      this.showModal = true;
+      this.config.showModal = true;
     },
     closeModal() {
-      this.showModal = false;
+      this.config.showModal = false;
     },
 
     isBottom(container) {
@@ -321,13 +322,13 @@ export default {
                 }
                 if (j.data.is_fresh) {
                   name = name + "[Fresh]";
-                  if (self.hideNewcomer) {
+                  if (self.config.hideNewcomer) {
                     break;
                   }
                 }
                 if (j.data.is_moderator) {
                   name = name + "[Staff]";
-                  if (self.hideNewcomer) {
+                  if (self.config.hideNewcomer) {
                     break;
                   }
                 }
@@ -360,8 +361,8 @@ export default {
 
                 let addComment = (data) => {
                   self.comments.push(data);
-                  if (self.comments.length > self.maxCommentNum) {
-                    // self.comments = self.comments.slice(-self.maxCommentNum);
+                  if (self.comments.length > self.config.maxCommentNum) {
+                    // self.comments = self.comments.slice(-self.config.maxCommentNum);
                     self.comments.shift();
                   }
                 };
@@ -386,9 +387,9 @@ export default {
 
             // 同接
             case 1:
-              self.viewers = j.data.live_viewers;
-              if (self.maxViewers < self.viewers) {
-                self.maxViewers = self.viewers;
+              self.info.viewers = j.data.live_viewers;
+              if (self.info.maxViewers < self.info.viewers) {
+                self.info.maxViewers = self.info.viewers;
               }
               break;
 
@@ -512,8 +513,8 @@ export default {
 
     async getComment() {
       let self = this;
-      self.viewers = 0;
-      self.maxViewers = 0;
+      self.info.viewers = 0;
+      self.info.maxViewers = 0;
       self.videoId = orUtil.getVideoId(self.inputUrl);
 
       self.comments = [];
@@ -526,8 +527,8 @@ export default {
         self.videoId = info.id;
         if (info.onair_status == 0 || info.onair_status == 1) {
           self.streamUrl = `https://www.openrec.tv/live/${self.videoId}`;
-          self.title = info.title;
-          self.channelName = info.channel.nickname;
+          self.info.title = info.title;
+          self.info.channelName = info.channel.nickname;
         } else {
           self.urlError = "not on air now";
         }
@@ -555,7 +556,7 @@ export default {
             }
             if (past_comments[i].user.is_fresh) {
               name = name + "[Fresh]";
-              if (self.hideNewcomer) {
+              if (self.config.hideNewcomer) {
                 continue;
               }
             }
@@ -637,14 +638,14 @@ export default {
     calc_speed() {
       let self = this;
       var sub = function () {
-        self.commentsSpeed -= 1;
+        self.info.commentsSpeed -= 1;
       };
-      self.commentsSpeed += 1;
+      self.info.commentsSpeed += 1;
       setTimeout(sub, 120000);
     },
 
     async changeNameColor() {
-      this.urlError = await orUtil.updateChatSetting({name_color: this.nameColor});
+      this.urlError = await orUtil.updateChatSetting({name_color: this.config.nameColor});
     }
   },
 };
