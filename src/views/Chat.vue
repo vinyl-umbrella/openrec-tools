@@ -49,8 +49,13 @@
     <div class="flexbox">
       <div id="comment_box" class="comment_box">
         <div class="comments" v-for="(comment, index) in comments" :key="index">
-          <div class="user_name" :style="{ color: comment.Color }">
-            {{ comment.Name }}
+          <div class="user_name">
+            <span :style="{ color: comment.Color }">
+              {{ comment.Name }}
+            </span>
+            <span>
+              {{ comment.Time }}
+            </span>
           </div>
           <span class="message" v-if="comment.Message != ''">{{
             comment.Message
@@ -328,9 +333,6 @@ export default {
                 }
                 if (j.data.is_moderator) {
                   name = name + "[Staff]";
-                  if (self.config.hideNewcomer) {
-                    break;
-                  }
                 }
                 if (j.data.is_muted) {
                   name = name + "[Muted]";
@@ -354,6 +356,7 @@ export default {
                   Color: j.data.user_color,
                   Message: j.data.message,
                   Stamp: "",
+                  Time: j.data.message_dt.slice(-8)
                 };
                 if (j.data.stamp != null) {
                   commentData.Stamp = j.data.stamp.image_url;
@@ -573,6 +576,7 @@ export default {
               recxuser_id: past_comments[i].user.recxuser_id,
               Message: past_comments[i].message,
               Stamp: "",
+              Time: past_comments[i].messaged_at.slice(11, -6)
             };
             if (past_comments[i].stamp != null) {
               comment.Stamp = past_comments[i].stamp.image_url;
@@ -741,6 +745,8 @@ a {
 
 .user_name {
   font-size: smaller;
+  display: flex;
+  justify-content: space-between;
 }
 
 .url_box {
