@@ -11,7 +11,7 @@ const routes = [
     component: Home,
     meta: {
       title: 'masaoroid',
-      desc: 'オプチャAI masaoroid'
+      desc: '布団ちゃんがオプチャで発言した内容を元に作られたAI。masaoroid'
     }
   },
   {
@@ -20,7 +20,7 @@ const routes = [
     component: () => import('../views/Rank.vue'),
     meta: {
       title: 'rank',
-      desc: '布団ちゃん オプチャランク'
+      desc: '布団ちゃん オプチャ書き込み数ランキング'
     }
   },
   {
@@ -29,7 +29,7 @@ const routes = [
     component: () => import('../views/Contact.vue'),
     meta: {
       title: 'Contact',
-      desc: '要望、連絡先など'
+      desc: '要望、連絡先などのお問い合わせフォーム。google formからお願いします。'
     }
   },
   {
@@ -38,7 +38,7 @@ const routes = [
     component: () => import('../views/Chat.vue'),
     meta: {
       title: 'Chat',
-      desc: 'OPENREC.tv コメントビューア'
+      desc: 'OPENREC.tv 高機能コメントビューア'
     }
   },
   {
@@ -47,7 +47,7 @@ const routes = [
     component: () => import('../views/Message.vue'),
     meta: {
       title: 'Explore Messages',
-      desc: 'おぷちゃ過去ログ検索システム'
+      desc: '布団ちゃんオプチャ過去ログ検索システム'
     }
   },
   {
