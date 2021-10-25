@@ -159,6 +159,10 @@
               label="新規ユーザを非表示"
             ></v-checkbox>
             <v-checkbox
+              v-model="config.speesh"
+              label="チャットを読み上げ"
+            ></v-checkbox>
+            <v-checkbox
               v-model="config.showStampBtn"
               label="スタンプボタンを表示 ※魔神サブスク限定"
             ></v-checkbox>
@@ -224,7 +228,8 @@ export default {
         maxCommentNum: 1500,
         hideNewcomer: false,
         showStampBtn: false,
-        nameColor: "#00FF00"
+        nameColor: "#00FF00",
+        speesh: false
       }
     };
   },
@@ -364,6 +369,11 @@ export default {
 
                 let addComment = (data) => {
                   self.comments.push(data);
+                  if (self.config.speesh) {
+                    let utter = new SpeechSynthesisUtterance(data.Message);
+                    utter.rate = 1.5;
+                    speechSynthesis.speak(utter);
+                  }
                   if (self.comments.length > self.config.maxCommentNum) {
                     // self.comments = self.comments.slice(-self.config.maxCommentNum);
                     self.comments.shift();
