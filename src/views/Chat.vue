@@ -203,7 +203,7 @@ import orUtil from "../components/orComment";
 export default {
   data() {
     return {
-      inputUrl: "",
+      inputUrl: this.$route.query.u,
       streamUrl: "",
       urlError: "",
       inputComment: "",

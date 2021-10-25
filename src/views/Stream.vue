@@ -64,7 +64,7 @@ export default {
         maxBufferSize: 256 * 1000 * 1000,
       },
       hls: new Hls(this.config),
-      inputUrl: "",
+      inputUrl: this.$route.query.u,
       videoId: "",
       inputComment: "",
       thumbnail: "",
