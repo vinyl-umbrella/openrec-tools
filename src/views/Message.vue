@@ -11,8 +11,8 @@
     <div class="table_wrap">
       <table>
         <thead>
-          <th width=20%>time</th>
-          <th width=20%>userid</th>
+          <th width="20%">time</th>
+          <th width="20%">userid</th>
           <th>message</th>
         </thead>
         <tbody>
@@ -21,10 +21,12 @@
             <td>
               <v-tooltip right>
                 <template v-slot:activator="{ on }">
-                  <span v-on="on" v-on:mouseover="getUserData(item.userid)">{{ item.userid}}</span>
+                  <span v-on="on" v-on:mouseover="getUserData(item.userid)">
+                    {{ item.userid }}
+                  </span>
                 </template>
                 <div>
-                  <img :src="userinfo.icon" width="35px"/>
+                  <img :src="userinfo.icon" width="35px" />
                   <span>{{ userinfo.nickname }}({{ item.userid }})</span>
                 </div>
               </v-tooltip>
@@ -37,25 +39,25 @@
     <span v-if="messages.length > 49">
       <v-btn @click="getMessages(lastid)" class="nextbtn" color="#2e2c37">次の50件</v-btn>
     </span>
-    <br><br><br>
+    <br /><br /><br />
   </div>
 </template>
 
 <script>
-import videoIdObj from '../assets/videoid.json'
+import videoIdObj from "../assets/videoid.json";
 
 export default {
   data() {
     return {
       videoIdObj: videoIdObj,
-      tempVideoid: {text: "おぷちゃ3", value: "n9ze3m2w184"},
+      tempVideoid: { text: "おぷちゃ3", value: "n9ze3m2w184" },
       messages: [],
       userid: "",
       search_string: "",
       startdate: "",
       enddate: "",
       lastid: 0,
-      userinfo: {icon: "", nickname: ""}
+      userinfo: { icon: "", nickname: "" },
     };
   },
 
@@ -100,8 +102,11 @@ export default {
           this.messages = [{ time: "", userid: "", message: "no result" }];
           return;
         }
-        window.scroll({top: 0, behavior: 'smooth'})
-        this.messages = j;
+        if (last == 0) {
+          this.messages = j;
+        } else {
+          this.messages = this.messages.concat(j);
+        }
         this.lastid = j[j.length - 1]["id"];
       }
     },
@@ -125,6 +130,7 @@ table {
   margin-right: auto;
   border-collapse: collapse;
   border: solid 3px var(--v-background-lighten5);
+  word-break: break-all;
 }
 
 table th,
