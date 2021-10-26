@@ -5,6 +5,7 @@
         type="string"
         v-model.trim="inputUrl"
         label="OPENREC URL"
+        ref="inputUrl"
         @keydown.enter="playVideo"
         dense
         outlined
@@ -71,6 +72,10 @@ export default {
       messages: [],
       e_message: "",
     };
+  },
+
+  mounted () {
+    this.$refs.inputUrl.focus();
   },
 
   methods: {

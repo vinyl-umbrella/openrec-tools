@@ -7,6 +7,7 @@
           class="url_box"
           v-model.trim="inputUrl"
           label="OPENREC URL"
+          ref="inputUrl"
           @keydown.enter="getComment"
           dense
           outlined
@@ -238,6 +239,10 @@ export default {
     calcAvg() {
       return parseInt(this.info.commentsSpeed / 2);
     },
+  },
+
+  mounted () {
+    this.$refs.inputUrl.focus();
   },
 
   methods: {
