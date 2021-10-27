@@ -243,6 +243,9 @@ export default {
 
   mounted () {
     this.$refs.inputUrl.focus();
+    if (this.inputUrl) {
+      this.getComment();
+    }
   },
 
   methods: {
