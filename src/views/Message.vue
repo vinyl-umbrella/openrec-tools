@@ -99,15 +99,20 @@ export default {
       if (res.ok) {
         let j = await res.json();
         if (j.length == 0) {
-          this.messages = [{ time: "", userid: "", message: "no result" }];
-          return;
-        }
-        if (last == 0) {
-          this.messages = j;
+          let noResult = { time: "", userid: "", message: "no result" };
+          if (last == 0) {
+            this.messages = [noResult];
+          } else {
+            this.messages.push(noResult);
+          }
         } else {
-          this.messages = this.messages.concat(j);
+          if (last == 0) {
+            this.messages = j;
+          } else {
+            this.messages = this.messages.concat(j);
+          }
+          this.lastid = j[j.length - 1]["id"];
         }
-        this.lastid = j[j.length - 1]["id"];
       }
     },
   },
