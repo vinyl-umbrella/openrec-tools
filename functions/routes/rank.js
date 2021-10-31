@@ -42,6 +42,31 @@ function ymlist() {
     return l;
 }
 
+exports.rankAll = async function (req, res) {
+    let limit = 50;
+    if (req.query.limit) {
+        limit = Number(req.query.limit);
+    }
+    let ip = req.header('x-forwarded-for');
+    console.log(ip, "[rank-user] all");
+
+    let conn = await connectDB(functions.config().oci.rankdb);
+    let sql = "SELECT userid, count FROM all_rank ORDER BY count DESC LIMIT ?";
+    try {
+        [results] = await conn.query(sql, [limit]);
+        res.send(results);
+    } catch (e) {
+        if (e.code == 'ER_NO_SUCH_TABLE') {
+            res.status(404).send({});
+        } else {
+            console.log(e);
+            res.status(500).send(e);
+        }
+    } finally {
+        conn.end();
+    }
+}
+
 exports.rankUser = async function (req, res) {
     const userid = req.params.userid;
     let ip = req.header('x-forwarded-for');

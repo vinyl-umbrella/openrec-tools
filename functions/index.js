@@ -15,6 +15,7 @@ app.use(function (req, res, next){
     next();
 })
 
+app.get('/v2/rank/all', routesRank.rankAll);
 app.get('/v2/rank/user/:userid', routesRank.rankUser);
 app.get('/v2/rank/:year/:month', routesRank.rankYM);
 app.post('/v1/messages', routesMsg.msg);

@@ -5,6 +5,12 @@ const request = require('supertest')
 
 
 describe('rank test', () => {
+    it('rank all', async () => {
+        let res = await request(app.api).get('/v2/rank/all');
+        expect(res.statusCode).toBe(200);
+        expect(Object.keys(res.body).length).toBe(50);
+    })
+
     it('rank user', async () => {
         let res = await request(app.api).get('/v2/rank/user/indegnasen');
         expect(res.statusCode).toBe(200);
@@ -26,5 +32,3 @@ describe('rank test', () => {
         expect(res.statusCode).toBe(404);
     })
 })
-
-

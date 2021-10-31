@@ -146,6 +146,7 @@ export default {
     }
     this.tempYm = this.ymObj[this.ymObj.length - 2];
 
+    this.ymObj.push({text: "all", value: "all"})
     // init graph data
     this.createGraphData();
   },
@@ -223,10 +224,17 @@ export default {
     async createGraphData() {
       let ids = [];
       let counts = [];
-      let y = this.tempYm["value"].slice(0, 4);
-      let m = this.tempYm["value"].slice(-2);
+      let rankApi = "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v2/rank"
+      let res;
+      if (this.tempYm["value"] == "all") {
+        res = await fetch(`${rankApi}/all?limit=${this.limit}`);
+        console.log(res);
+      } else {
+        let y = this.tempYm["value"].slice(0, 4);
+        let m = this.tempYm["value"].slice(-2);
 
-      let res = await fetch(`https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v2/rank/${y}/${m}?limit=${this.limit}`);
+        res = await fetch(`${rankApi}/${y}/${m}?limit=${this.limit}`);
+      }
       if (res.status == 200) {
         let j = await res.json();
         for (let data of j) {
