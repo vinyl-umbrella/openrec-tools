@@ -136,13 +136,13 @@ export default {
     let y = 2020;
     let m = 7;
 
-    for (let i = 0; y!=dt.getFullYear() || m!=dt.getMonth()+2; i++) {
-      let ym = y+this.getDoubleDigestNumber(m);
-      this.ymObj.push({text: ym, value: ym});
-      m = m % 12 + 1;
+    for (; y!=dt.getFullYear() || m !=dt.getMonth()+2;) {
       if (m == 12) {
         y++;
       }
+      let ym = y+this.getDoubleDigestNumber(m);
+      this.ymObj.push({text: ym, value: ym});
+      m = (m % 12) + 1;
     }
     this.tempYm = this.ymObj[this.ymObj.length - 2];
 
