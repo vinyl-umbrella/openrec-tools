@@ -1,6 +1,13 @@
 # futon-openchat
+## features
+- masaoroid
+- openrec openchat ranking of number of posts
+- openrec openchat backlog search
+- openrec comment viewer
+- openrec player like niconico
 
-## hosting
+## dev
+### hosting
 ```sh
 # install package
 npm install
