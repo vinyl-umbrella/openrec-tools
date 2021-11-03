@@ -168,6 +168,30 @@
               label="スタンプボタンを表示 ※魔神サブスク限定"
             ></v-checkbox>
             <div class="flexbox">
+              ブラックリストを同期
+              <v-btn
+                @click="syncBL"
+                color="var(--v-background-lighten1)"
+                small
+                depressed
+                style="margin-left: 4px;"
+                >同期</v-btn
+              >
+              <v-btn
+                @click="resetBL"
+                color="var(--v-background-lighten1)"
+                small
+                depressed
+                style="margin-left: 4px;"
+                >リセット</v-btn
+              >
+            </div><br />
+            <v-text-field
+              label="NGワード(実装予定)"
+              outlined
+              dense
+            ></v-text-field>
+            <div class="flexbox">
               <v-text-field
                 v-model.trim="config.nameColor"
                 label="ユーザ名の色 (プレ垢限定)"
@@ -229,7 +253,8 @@ export default {
         maxCommentNum: 1500,
         hideNewcomer: false,
         showStampBtn: false,
-        nameColor: "#00FF00",
+        nameColor: "#201e2f",
+        blacklist: [],
         speesh: false
       }
     };
@@ -246,6 +271,7 @@ export default {
     if (this.inputUrl) {
       this.getComment();
     }
+    this.config.blacklist = localStorage.getItem("blacklist").split(",");
   },
 
   methods: {
@@ -321,6 +347,11 @@ export default {
             // message
             case 0:
               if (j.data.user_key != "") {
+                // blacklist
+                if (self.config.blacklist.includes(j.data.user_key)) {
+                  break;
+                }
+
                 let name = j.data.user_name + " (" + j.data.user_key + ")";
                 if (j.data.user_type == 1 || j.data.user_key == "yocchan-umaimon") {
                   addEvent("chat", name + " " + j.data.message);
@@ -560,6 +591,9 @@ export default {
         let past_comments = await (await fetch(url)).json();
         let prms = new Promise((resolve) => {
           for (let i = 0; i < past_comments.length; i++) {
+            if (self.config.blacklist.includes(past_comments[i].user.id)) {
+              continue;
+            }
             let name =
               past_comments[i].user.nickname +
               " (" +
@@ -668,7 +702,20 @@ export default {
 
     async changeNameColor() {
       this.urlError = await orUtil.updateChatSetting({name_color: this.config.nameColor});
-    }
+    },
+
+    async syncBL() {
+      let j = await orUtil.getBL();
+      let bl = [];
+      for (let data of j.data.items[0].blacklist) {
+        bl.push(data.id);
+      }
+      localStorage.setItem("blacklist", bl);
+    },
+
+    resetBL() {
+      localStorage.setItem("blacklist", [])
+    },
   },
 };
 </script>

@@ -101,4 +101,19 @@ async function updateChatSetting(conf) {
     return status;
 }
 
-export default { getVideoId, getVideoInfo, getWsUrl, parseWsData, postComment, updateChatSetting }
+async function getBL() {
+    let url = "https://apiv5.openrec.tv/api/v5/movies/n9ze3m2w184/detail";
+    let param = {
+        method: "GET",
+        headers: {
+            Accept: "application/json,text/plain,*/*",
+            "Content-Type": "application/json;charset=utf-8",
+            uuid: localStorage.getItem("orUuid"),
+            "access-token": localStorage.getItem("orAccessToken"),
+        }
+    };
+    let j = await (await fetch(url, param)).json();
+    return j;
+}
+
+export default { getVideoId, getVideoInfo, getWsUrl, parseWsData, postComment, updateChatSetting, getBL }
