@@ -271,7 +271,11 @@ export default {
     if (this.inputUrl) {
       this.getComment();
     }
-    this.config.blacklist = localStorage.getItem("blacklist").split(",");
+
+    let l = localStorage.getItem("blacklist");
+    if (l) {
+      this.config.blacklist = l.split(",");
+    }
   },
 
   methods: {
