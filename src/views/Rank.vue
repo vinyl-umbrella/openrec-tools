@@ -137,11 +137,11 @@ export default {
     let m = 7;
 
     for (; y!=dt.getFullYear() || m !=dt.getMonth()+2;) {
+      let ym = y+this.getDoubleDigestNumber(m);
+      this.ymObj.push({text: ym, value: ym});
       if (m == 12) {
         y++;
       }
-      let ym = y+this.getDoubleDigestNumber(m);
-      this.ymObj.push({text: ym, value: ym});
       m = (m % 12) + 1;
     }
     this.tempYm = this.ymObj[this.ymObj.length - 2];
@@ -228,7 +228,6 @@ export default {
       let res;
       if (this.tempYm["value"] == "all") {
         res = await fetch(`${rankApi}/all?limit=${this.limit}`);
-        console.log(res);
       } else {
         let y = this.tempYm["value"].slice(0, 4);
         let m = this.tempYm["value"].slice(-2);

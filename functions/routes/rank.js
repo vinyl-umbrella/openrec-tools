@@ -48,7 +48,7 @@ exports.rankAll = async function (req, res) {
         limit = Number(req.query.limit);
     }
     let ip = req.header('x-forwarded-for');
-    console.log(ip, "[rank-user] all");
+    console.log(ip, "[rank-all]");
 
     let conn = await connectDB(functions.config().oci.rankdb);
     let sql = "SELECT userid, count FROM all_rank ORDER BY count DESC LIMIT ?";
