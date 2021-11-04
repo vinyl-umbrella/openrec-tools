@@ -91,6 +91,7 @@ export default {
 
       sock.addEventListener("message", async function (event) {
         let wsData = await orUtil.parseWsData(event.data);
+        let bl = localStorage.getItem("blacklist");
         if (wsData[0] == "message") {
           let j = JSON.parse(wsData[1]);
           switch (j.type) {
@@ -98,7 +99,10 @@ export default {
             case 0: {
               let msgObj = { type: "normal", text: j.data.message };
               if (j.data.is_muted) {
-                break
+                break;
+              }
+              if (bl.includes(j.data.user_key)) {
+                break;
               }
               if (j.data.yell != null) {
                 msgObj.type = "yell";
