@@ -297,7 +297,7 @@ form div input {
 }
 table {
   width: 90%;
-  min-width: 600px;
+  min-width: 400px;
   margin-top: 10px;
   margin-left: auto;
   margin-right: auto;
