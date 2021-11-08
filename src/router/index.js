@@ -58,6 +58,15 @@ const routes = [
       title: 'Player',
       desc: 'OPENREC.tv ニコ生風プレイヤー'
     }
+  },
+  {
+    path: '/api',
+    name: 'API',
+    component: () => import('../views/API.vue'),
+    meta: {
+      title: 'OPENREC.tv API',
+      desc: 'OPENREC.tv API まとめ'
+    }
   }
 ]
 

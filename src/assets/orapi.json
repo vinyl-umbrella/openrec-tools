@@ -1,0 +1,470 @@
+[
+  {
+    "genre": "配信",
+    "data": [
+      {
+        "url": "https://public.openrec.tv/external/api/v5/movies?is_live=true&onair_status=1&page=1&sort=live_views",
+        "desc": "配信一覧",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "is_live": "bool",
+          "is_upload": "bool",
+          "onair_status": "number",
+          "page": "number",
+          "sort": "\"total_views\" | \"created_at\" | \"-created_at\" | \"schedule_at\" | \"onair_status\" | \"live_views\" | \"total_yells\" | \"-total_yells\" | \"popularity\" | \"published_at\" | \"-published_at\""
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/movies/1o8q43q3yzk",
+        "desc": "枠情報",
+        "method": "GET",
+        "button": true,
+        "param": {}
+      },
+      {
+        "url": "https://apiv5.openrec.tv/api/v5/movies/1o8q43q3yzk/detail",
+        "desc": "枠情報",
+        "method": "GET",
+        "button": true,
+        "param": {}
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/movies/n9ze3m2w184/chats?from_created_at=2021-09-07T03:58:16Z&is_including_system_message=false",
+        "desc": "コメント取得",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "from_created_at": "ISO8601 DATETIME",
+          "to_created_at": "ISO8601 DATETIME",
+          "is_including_system_message": "bool",
+          "limit": "bool"
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/popular-games?page=1",
+        "desc": "人気ゲーム",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "page": "number"
+        }
+      },
+      {
+        "url": "https://apiv5.openrec.tv/api/v5/movies/n9ze3m2w184/chats",
+        "desc": "コメント投稿",
+        "method": "POST",
+        "button": true,
+        "param": {
+          "message": "メッセージ",
+          "quality_type": 0,
+          "league_key": "",
+          "to_user_id": "",
+          "consented_chat_terms": false
+        }
+      },
+      {
+        "url": "wss://chat.openrec.tv/socket.io/?movieId=2372225&EIO=3&transport=websocket",
+        "desc": "コメントサーバ",
+        "method": "WS GET",
+        "button": false,
+        "param": {}
+      }
+    ]
+  },
+  {
+    "genre": "キャプチャ",
+    "data": [
+      {
+        "url": "https://public.openrec.tv/external/api/v5/capture-ranks?period=daily&is_channel_unique=true&page=1",
+        "desc": "人気のキャプチャ",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "period": "\"daily\" | \"weekly\" | \"monthly\"",
+          "date": "\\d{6,8}",
+          "is_channel_unique": "bool",
+          "page": "number"
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/captures?sort=public_at&sort_direction=DESC&page=1",
+        "desc": "キャプチャ一覧",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "channel_id": "channel_id",
+          "movie_id": "{movie_id}",
+          "sort": "\"views\" | \"public_at\" | \"reaction\"",
+          "sort_direction": "\"ASC\" | \"DESC\"",
+          "page": "number"
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/captures/07n7pp28nvl",
+        "desc": "キャプチャ情報",
+        "method": "GET",
+        "button": true,
+        "param": {}
+      },
+      {
+        "url": "https://apiv5.openrec.tv/api/v5/captures/07n7pp28nvl/detail",
+        "desc": "キャプチャ情報",
+        "method": "GET",
+        "button": true,
+        "param": {}
+      },
+      {
+        "url": "https://apiv5.openrec.tv/everyone/api/v5/reactions",
+        "desc": "キャプチャリアクション (require token, random)",
+        "method": "POST",
+        "button": false,
+        "param": {
+          "target_id": "{capture id}",
+          "target_type": "\"capture\"",
+          "reaction_id": "\"arara\" | \"bikkuri\" | \"gg\" | \"hatena\" | \"kakke\" | \"kami\" | \"kansya\" | \"kawaii\" | \"kusa\" | \"music\" | \"nice\" | \"odoroki\" | \"sugo\" | \"tsuyo\" | \"umai\" | \"wakuwaku\" | \"wara\" | \"yaba\""
+        }
+      }
+    ]
+  },
+  {
+    "genre": "動画",
+    "data": [
+      {
+        "url": "https://public.openrec.tv/external/api/v5/popular-movies?popular_type=upload&page=1",
+        "desc": "動画一覧",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "popular_type": "\"archive\" | \"upload\" | \"upload_archive\"",
+          "page": "number"
+        }
+      }
+    ]
+  },
+  {
+    "genre": "エール",
+    "data": [
+      {
+        "url": "https://public.openrec.tv/external/api/v5/yell-ranks?movie_id=1o8q43q3yzk",
+        "desc": "金額順エール",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "movie_id": "{movie_id}",
+          "user_id": "{user_id}",
+          "month": "\\d{6}",
+          "page": "number"
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/yell-logs?movie_id=1o8q43q3yzk",
+        "desc": "時系列順エール",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "movie_id": "{movie_id}",
+          "page": "number"
+        }
+      }
+    ]
+  },
+  {
+    "genre": "チャンネル",
+    "data": [
+      {
+        "url": "https://public.openrec.tv/external/api/v5/popular-channels?page=1",
+        "desc": "人気チャンネル",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "page": "number"
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/channel-ranks?period=monthly&date=&tag=&page=1",
+        "desc": "チャンネルランキング",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "period": "\"hourly\" | \"daily\" | \"weekly\" | \"monthly\"",
+          "date": "\\d{6,10}",
+          "tag": "不明",
+          "page": "number"
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/stats/daily-channels?group=continuous_live_user_top",
+        "desc": "毎日配信チャンネル",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "group": "\"trend_channel_movie\" | \"continuous_live_user_top\" | \"continuous_live_user_list\""
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/channels/indegnasen",
+        "desc": "チャンネル情報",
+        "method": "GET",
+        "button": true,
+        "param": {}
+      },
+      {
+        "url": "https://www.openrec.tv/viewapp/api/v3/get_movie_list?start_date=2015%2F01%2F01&end_date=2021%2F11%2F08&upload_type=0&movie_sort_type=UD&movie_sort_direction=1&game_id=&tag=&recxuser_id=81352753&date_status=all&Uuid={Uuid}&Token={Token}&Random={Random}&page_number=1&list_limit=40&list_offset=0",
+        "desc": "動画一覧",
+        "method": "GET",
+        "button": false,
+        "param": {
+          "start_date": "\\d{4}\\d{2}\\d{2}",
+          "end_date": "\\d{4}\\d{2}\\d{2}",
+          "upload_type": "number",
+          "movie_sort_type": "\"UD\" | \"VC\" | \"\"",
+          "movie_sort_direction": "number",
+          "game_id": "number",
+          "tag": "\"記念日\" | \"雑談\" ",
+          "recxuser_id": "number",
+          "date_status": "",
+          "Uuid": "{get from https://www.openrec.tv/api-tv/user}",
+          "Token": "{get from https://www.openrec.tv/api-tv/user}",
+          "Random": "{get from https://www.openrec.tv/api-tv/user}",
+          "page_number": "number",
+          "list_limit": "number",
+          "list_offset": "number"
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/subs-channels/indegnasen",
+        "desc": "サブスク情報",
+        "method": "GET",
+        "button": true,
+        "param": {}
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/subs-channels/indegnasen/subs-products",
+        "desc": "サブスク情報",
+        "method": "GET",
+        "button": true,
+        "param": {}
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/ppv-events?user_id=palum2&page=1&",
+        "desc": "PPV情報",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "page": "number"
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/users/sumomo_xqx/teams?page=1",
+        "desc": "所属チーム情報",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "page": "number"
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/playlists?create_user_id=indegnasen&playlist_type=movie&page=1",
+        "desc": "プレイリスト一覧",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "create_user_id": "\"user_id\"",
+          "playlist_type": "number",
+          "page": "number"
+        }
+      }
+    ]
+  },
+  {
+    "genre": "ログイン",
+    "data": [
+      {
+        "url": "https://www.openrec.tv/api-tv/user",
+        "desc": "set cookie (uuid, token, random)",
+        "method": "GET",
+        "button": false,
+        "param": {}
+      },
+      {
+        "url": "https://www.openrec.tv/viewapp/v4/mobile/user/login",
+        "desc": "login",
+        "method": "POST",
+        "button": false,
+        "param": {
+          "mail": "\"YOUR EMAIL\"",
+          "password": "\"YOUR PASSWORD\""
+        }
+      }
+    ]
+  },
+  {
+    "genre": "ログインユーザ",
+    "data": [
+      {
+        "url": "https://apiv5.openrec.tv/api/v5/users/me?include_hidden_channels=true",
+        "desc": "ユーザ情報",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "include_hidden_channels": "bool"
+        }
+      },
+      {
+        "url": "https://apiv5.openrec.tv/api/v5/users/me/notifications/count",
+        "desc": "通知カウント",
+        "method": "GET",
+        "button": true,
+        "param": {}
+      },
+      {
+        "url": "https://apiv5.openrec.tv/api/v5/users/me/notifications?offset=0&limit=30&notification_type=normal",
+        "desc": "通知リスト",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "offset": "number",
+          "limit": "number",
+          "notification_type": "\"normal\""
+        }
+      },
+      {
+        "url": "https://apiv5.openrec.tv/api/v5/users/me/timelines/movies?onair_status=1&limit=40",
+        "desc": "タイムライン",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "onair_status": "number",
+          "limit": "number"
+        }
+      },
+      {
+        "url": "https://apiv5.openrec.tv/api/v5/users/me/timeline-movies/comingups?limit=40&offset=0",
+        "desc": "登録チャンネル予約枠",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "limit": "number",
+          "offset": "number"
+        }
+      },
+      {
+        "url": "https://apiv5.openrec.tv/api/v5/users/me/view-history",
+        "desc": "視聴履歴",
+        "method": "GET",
+        "button": true,
+        "param": {}
+      },
+      {
+        "url": "https://apiv5.openrec.tv/api/v5/users/me/playlists?playlist_type=movie&limit=40&offset=0",
+        "desc": "作成プレイリスト",
+        "method": "GET",
+        "button": true,
+        "param": {}
+      },
+      {
+        "url": "https://apiv5.openrec.tv/api/v5/users/me/chat-setting",
+        "desc": "チャット設定を更新",
+        "method": "PUT",
+        "button": false,
+        "param": {
+          "status": 0,
+          "data": {
+            "type": "chat_setting",
+            "items": [
+              {
+                "muted_warned_user": "bool",
+                "muted_fresh_user": "bool",
+                "muted_unauthenticated_user": "bool",
+                "muted_banned_word": "bool",
+                "muted_room_notification": "bool",
+                "adjust_chat_delay": "bool",
+                "name_color": "{colorcode}",
+                "is_fixed_phrase_hidden": "bool",
+                "is_premium_hidden": "bool",
+                "is_official_hidden": "bool",
+                "is_small_size_stamp": "bool",
+                "is_room_notification": "bool",
+                "is_subs_badge_hidden": "bool",
+                "is_subs_duration_hidden": "bool",
+                "limited_unsubs_member_chat": "bool",
+                "limited_continuous_chat": "bool",
+                "continuous_chat_threshold": "number",
+                "limited_unfollower_chat": "bool",
+                "unfollower_chat_threshold": "number",
+                "limited_fresh_user_chat": "bool",
+                "fresh_user_chat_threshold": "number",
+                "limited_temporary_blacklist": "bool",
+                "temporary_blacklist_threshold": "number",
+                "limited_warned_user_chat": "bool",
+                "chat_rule": "rule",
+                "yell_reply_template": null,
+                "enabled_sharing_twitter": "bool"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "genre": "OPENREC info",
+    "data": [
+      {
+        "url": "https://public.openrec.tv/external/api/v5/spotlights?device_type=web",
+        "desc": "スポットライト",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "device_type": "\"web\" | \"ios\" | \"android\""
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/informations?device_type=web&user_type=0&group_key=information_top",
+        "desc": "お知らせ",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "device_type": "\"web\" | \"ios\" | \"android\"",
+          "user_type": "number",
+          "group_key": "\"information_top\""
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/feature-tags",
+        "desc": "配信人気タグ",
+        "method": "GET",
+        "button": true,
+        "param": {}
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/fes-events?status=opened&page=1",
+        "desc": "フェス一覧",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "page": "number",
+          "status": "\"opened\" | \"closed\" | \"scheduled\""
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/fes-events/halloween2021?secret_key=undefined&include_content=true",
+        "desc": "フェス情報",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "secret_key": "不明",
+          "include_content": "bool"
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/fes-events/halloween2021/fes-rankings/GoZHczLZ/fes-user-ranks",
+        "desc": "フェスランク",
+        "method": "GET",
+        "button": true,
+        "param": {}
+      }
+    ]
+  }
+]

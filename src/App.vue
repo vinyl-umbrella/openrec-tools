@@ -5,11 +5,10 @@
         <span>
           <router-link to="/">Home</router-link> |
           <router-link to="/rank">ランキング</router-link> |
+          <router-link to="/message">過去ログ検索</router-link> |
           <router-link to="/chat">コメビュ</router-link> |
-          <router-link to="/message">過去ログ検索</router-link>
-          <router-link to="/stream" style="opacity: 0.05"
-            >コメつき</router-link
-          >
+          <router-link to="/stream">コメつき</router-link> |
+          <router-link to="/api">API</router-link>
         </span>
         <span>
           <img
@@ -18,7 +17,7 @@
             src="./assets/login.png"
             height="24px"
             width="24px"
-            style="position: relative; top:5px"
+            style="position: relative; top: 5px"
             @click="callModal()"
           />
           <router-link to="/contact">Contact</router-link>
@@ -52,7 +51,10 @@ export default {
   },
   methods: {
     updateLoginStatus() {
-      if (localStorage.getItem("orAccessToken") && localStorage.getItem("orUuid")) {
+      if (
+        localStorage.getItem("orAccessToken") &&
+        localStorage.getItem("orUuid")
+      ) {
         this.isLogin = true;
       } else {
         this.isLogin = false;
