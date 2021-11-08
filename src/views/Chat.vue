@@ -49,7 +49,7 @@
 
     <div class="flexbox">
       <div id="comment_box" class="comment_box">
-        <div class="comments" v-for="(comment, index) in comments" :key="index">
+        <div class="comments" v-for="comment in comments" :key="comment.ChatId">
           <div class="user_name">
             <span :style="{ color: comment.Color }">
               {{ comment.Name }}
@@ -399,6 +399,7 @@ export default {
                 }
 
                 let commentData = {
+                  ChatId: j.data.chat_id,
                   Name: name,
                   recxuser_id: j.data.user_id,
                   Color: j.data.user_color,
@@ -627,6 +628,7 @@ export default {
             }
 
             let comment = {
+              ChatId: past_comments[i].id,
               Name: name,
               Color: past_comments[i].chat_setting.name_color,
               recxuser_id: past_comments[i].user.recxuser_id,

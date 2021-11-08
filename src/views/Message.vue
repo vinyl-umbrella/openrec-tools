@@ -16,7 +16,7 @@
           <th>message</th>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in messages" :key="index">
+          <tr v-for="item in messages" :key="item.id">
             <td>{{ item.time | timeFormat }}</td>
             <td>
               <v-tooltip right>
