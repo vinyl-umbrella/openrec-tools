@@ -144,9 +144,10 @@ export default {
       }
       m = (m % 12) + 1;
     }
-    this.tempYm = this.ymObj[this.ymObj.length - 2];
+    this.tempYm = this.ymObj[this.ymObj.length - 1];
 
     this.ymObj.push({text: "all", value: "all"})
+    this.ymObj = this.ymObj.reverse();
     // init graph data
     this.createGraphData();
   },

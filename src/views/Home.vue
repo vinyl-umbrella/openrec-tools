@@ -8,13 +8,18 @@
       </div>
       <div class="masao-face">( ･᷄෴･᷅.)</div>
     </div>
-    <v-btn
-      @click="getMasaoMessage()"
-      small
-      depressed
-      color="var(--v-background-lighten1)"
-      >再生成</v-btn
-    >
+    <span v-if="nowloading">
+      <v-btn loading small depressed color="var(--v-background-lighten1)" />
+    </span>
+    <span v-else>
+      <v-btn
+        @click="getMasaoMessage()"
+        small
+        depressed
+        color="var(--v-background-lighten1)"
+        >再生成</v-btn
+      >
+    </span>
   </div>
 </template>
 
@@ -22,6 +27,7 @@
 export default {
   data() {
     return {
+      nowloading: true,
       message: "loading...",
     };
   },
@@ -34,8 +40,9 @@ export default {
     async getMasaoMessage() {
       let url =
         "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/masaoroid";
-      this.message = "loading....";
+        this.nowloading = true;
       let res = await fetch(url);
+      this.nowloading = false;
       if (res.ok) {
         this.message = await res.text();
       }
