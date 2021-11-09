@@ -1,5 +1,5 @@
 <template>
-  <div class="api">
+  <div>
     <h1>OPENREC.tv API まとめ</h1>
     <div>
       <div v-for="apigenre in apis" :key="apigenre.genre">
@@ -13,8 +13,8 @@
             @click="testfunc(api.method, api.url, api.param)"
             v-if="api.button"
             small
-            depressed
-            color="var(--v-background-lighten1)"
+            outlined
+            color="var(--v-primary-darken2)"
             >取得</v-btn
           >
           <div class="params">
@@ -26,23 +26,22 @@
         </div>
       </div>
     </div>
-    <div id="overlay2" v-show="showModal" @click.self="closeModal()">
-      <div id="content2" style="background-color: var(--v-background-base)">
-        <div>
-          <h3>{{ url }}</h3>
-          <pre>
-            {{ resdata }}
-          </pre>
-        </div>
-      </div>
-    </div>
+    <modal-wrap v-show="showModal" :header="url" @close="closeModal">
+      <pre>
+        {{ resdata }}
+      </pre>
+    </modal-wrap>
   </div>
 </template>
 
 <script>
 import orapi from "../assets/orapi.json";
+import modalWrap from "../components/modalWrap";
 
 export default {
+  components: {
+    modalWrap,
+  },
   data() {
     return {
       apis: orapi,
@@ -83,32 +82,6 @@ export default {
 code {
   font-family: Consolas, Menlo, Monaco, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Meiryo, monospace;
-}
-
-#overlay2 {
-  z-index: 1;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-#content2 {
-  overflow: scroll;
-  z-index: 2;
-  width: 75%;
-  height: 75%;
-  padding: 1em 10% 1em 10%;
-  border-radius: 10px;
-}
-
-.api {
-  margin-left: 2%;
-  margin-right: 2%;
 }
 
 .genre {

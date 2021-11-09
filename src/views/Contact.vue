@@ -1,5 +1,5 @@
 <template>
-  <div class="contact">
+  <div>
     <h2>Contact</h2>
     アマギフ，苦情，その他管理人に伝えたいことは
     <a
@@ -16,9 +16,5 @@
 <style scoped>
 a:hover {
   color: var(--v-secondary-base);
-}
-.contact {
-  margin-left: 2%;
-  margin-right: 2%;
 }
 </style>

@@ -1,58 +1,41 @@
 <template>
-  <div id="overlay" @click.self="$emit('close')">
-    <div id="content" style="background-color: var(--v-background-base);">
-      <p>{{ val.nickname }} ({{ val.id }})</p>
-      <p style="color: var(--v-primary-darken3)">アカウント作成日時: {{ val.created_at }}</p>
-
-      <bar-chart
-        :chart-data="chartData"
-        :options="chartOptions"
-        :height="graphHeight"
-      ></bar-chart>
-      <v-btn @click="$emit('close')" style="background: var(--v-background-lighten2)" small depressed>close</v-btn>
-    </div>
-  </div>
+  <modalWrap :header="val.nickname + '(' + val.id + ')'" @close="closeModal()">
+    <p style="color: var(--v-primary-darken3)">
+      アカウント作成日時: {{ this.parseDate }}
+    </p>
+    <bar-chart
+      :chart-data="chartData"
+      :options="chartOptions"
+      :height="graphHeight"
+    ></bar-chart>
+  </modalWrap>
 </template>
 
 <script>
 import barChart from "./barChart";
+import modalWrap from "./modalWrap";
+
 export default {
-  name: "GraphModal",
+  name: "graphModal",
   props: ["val", "chartData", "chartOptions"],
   components: {
     barChart,
+    modalWrap,
   },
-  data () {
+  data() {
     return {
-      graphHeight: window.innerHeight * 0.25,
-    }
-  }
+      graphHeight: window.innerHeight * 0.4,
+    };
+  },
+  computed: {
+    parseDate() {
+      return this.val.created_at.replace("T", " ").slice(0, -6);
+    },
+  },
+  methods: {
+    closeModal() {
+      this.$emit("close");
+    },
+  },
 };
 </script>
-
-<style>
-#overlay {
-  z-index: 1;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#content {
-  z-index: 2;
-  width: 75%;
-  padding: 1em 10% 1em 10%;
-  text-align: center;
-}
-
-button {
-  background-color: var(--v-background-lighten2);
-  padding: 0.1em 0.5em;
-}
-</style>

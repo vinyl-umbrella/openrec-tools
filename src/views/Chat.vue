@@ -1,5 +1,6 @@
 <template>
-  <div class="chat">
+  <div>
+    <h1>OPENREC.tv コメントビューア</h1>
     <div class="flexbox">
       <div>
         <v-text-field
@@ -16,8 +17,8 @@
             <v-btn
               @click="getComment"
               small
-              depressed
-              color="var(--v-background-lighten1)"
+              outlined
+              color="var(--v-primary-darken2)"
               >接続</v-btn
             >
           </template>
@@ -36,7 +37,9 @@
 
     <div class="stream_data">
       <div class="title" v-show="streamUrl != ''">
-        <a :href="streamUrl" target="_blank" rel="noopener norefferer">{{info.title}}</a>
+        <a :href="streamUrl" target="_blank" rel="noopener norefferer">{{
+          info.title
+        }}</a>
       </div>
       <div class="channel_name">{{ info.channelName }}</div>
 
@@ -100,8 +103,8 @@
         <v-btn
           @click="postInputComment"
           small
-          depressed
-          color="var(--v-background-lighten1)"
+          outlined
+          color="var(--v-primary-darken2)"
           >送信</v-btn
         >
       </template>
@@ -112,120 +115,108 @@
         class="stamp_btn"
         @click="postStamp(2533)"
         small
-        depressed
-        color="var(--v-background-lighten1)"
+        outlined
+        color="var(--v-primary-darken2)"
         >におうな</v-btn
       >
       <v-btn
         class="stamp_btn"
         @click="postStamp(2657)"
         small
-        depressed
-        color="var(--v-background-lighten1)"
+        outlined
+        color="var(--v-primary-darken2)"
         >んこー</v-btn
       >
       <v-btn
         class="stamp_btn"
         @click="postStamp(2658)"
         small
-        depressed
-        color="var(--v-background-lighten1)"
+        outlined
+        color="var(--v-primary-darken2)"
         >KP</v-btn
       >
       <v-btn
         class="stamp_btn"
         @click="postStamp(2659)"
         small
-        depressed
-        color="var(--v-background-lighten1)"
+        outlined
+        color="var(--v-primary-darken2)"
         >シュガー</v-btn
       > </span
     ><br />
     <span>{{ postError }}</span>
 
     <!-- Config modal -->
-    <div id="overlay" v-show="config.showModal" @click.self="closeModal()">
-      <div id="content" style="background-color: var(--v-background-base)">
-        <div>
-          <h2>Config</h2>
-          <v-container fluid>
+    <modalWrap header="Config" v-show="config.showModal" @close="closeModal()">
+      <div>
+        <v-container fluid>
+          <v-checkbox
+            v-model="config.hideNewcomer"
+            label="新規ユーザを非表示"
+          ></v-checkbox>
+          <v-checkbox
+            v-model="config.speesh"
+            label="チャットを読み上げ"
+          ></v-checkbox>
+          <v-checkbox
+            v-model="config.showStampBtn"
+            label="スタンプボタンを表示 ※魔神サブスク限定"
+          ></v-checkbox>
+          <div class="flexbox">
+            ブラックリストを同期
+            <v-btn
+              @click="syncBL"
+              color="var(--v-primary-darken2)"
+              small
+              outlined
+              style="margin-left: 4px"
+              >同期</v-btn
+            >
+            <v-btn
+              @click="resetBL"
+              color="var(--v-primary-darken2)"
+              small
+              outlined
+              style="margin-left: 4px"
+              >リセット</v-btn
+            >
+          </div>
+          <br />
+          <v-text-field
+            label="NGワード(実装予定)"
+            outlined
+            dense
+          ></v-text-field>
+          <div class="flexbox">
             <v-text-field
-              v-model.number="config.maxCommentNum"
-              label="チャット保持件数"
+              v-model.trim="config.nameColor"
+              label="ユーザ名の色 (プレ垢限定)"
               outlined
               dense
+              @keydown.enter="changeNameColor"
             ></v-text-field>
-            <v-checkbox
-              v-model="config.hideNewcomer"
-              label="新規ユーザを非表示"
-            ></v-checkbox>
-            <v-checkbox
-              v-model="config.speesh"
-              label="チャットを読み上げ"
-            ></v-checkbox>
-            <v-checkbox
-              v-model="config.showStampBtn"
-              label="スタンプボタンを表示 ※魔神サブスク限定"
-            ></v-checkbox>
-            <div class="flexbox">
-              ブラックリストを同期
-              <v-btn
-                @click="syncBL"
-                color="var(--v-background-lighten1)"
-                small
-                depressed
-                style="margin-left: 4px;"
-                >同期</v-btn
-              >
-              <v-btn
-                @click="resetBL"
-                color="var(--v-background-lighten1)"
-                small
-                depressed
-                style="margin-left: 4px;"
-                >リセット</v-btn
-              >
-            </div><br />
-            <v-text-field
-              label="NGワード(実装予定)"
+            <v-btn
+              @click="changeNameColor"
+              color="var(--v-primary-darken2)"
               outlined
-              dense
-            ></v-text-field>
-            <div class="flexbox">
-              <v-text-field
-                v-model.trim="config.nameColor"
-                label="ユーザ名の色 (プレ垢限定)"
-                outlined
-                dense
-                @keydown.enter="changeNameColor"
-              ></v-text-field>
-              <v-btn
-                @click="changeNameColor"
-                color="var(--v-background-lighten1)"
-                small
-                depressed
-                style="margin-left: 4px; margin-top: 4px;"
-                >変更</v-btn
-              >
-            </div>
-          </v-container>
-          <v-btn
-            @click="closeModal()"
-            color="var(--v-background-lighten1)"
-            small
-            depressed
-            >close</v-btn
-          >
-        </div>
+              style="margin-left: 4px; margin-top: 4px"
+              >変更</v-btn
+            >
+          </div>
+        </v-container>
       </div>
-    </div>
+    </modalWrap>
   </div>
 </template>
 
 <script>
 import orUtil from "../components/orComment";
+import modalWrap from "../components/modalWrap";
 
 export default {
+  components: {
+    modalWrap,
+  },
   data() {
     return {
       inputUrl: this.$route.query.u,
@@ -246,17 +237,17 @@ export default {
       comments: [],
       events: [],
       wsConnectFlag: false,
+      sock: null,
 
       // config
       config: {
         showModal: false,
-        maxCommentNum: 1500,
         hideNewcomer: false,
         showStampBtn: false,
         nameColor: "#201e2f",
         blacklist: [],
-        speesh: false
-      }
+        speesh: false,
+      },
     };
   },
 
@@ -266,7 +257,7 @@ export default {
     },
   },
 
-  mounted () {
+  mounted() {
     this.$refs.inputUrl.focus();
     if (this.inputUrl) {
       this.getComment();
@@ -276,6 +267,14 @@ export default {
     if (l) {
       this.config.blacklist = l.split(",");
     }
+  },
+
+  beforeRouteLeave(to, from, next) {
+    if (this.sock) {
+      this.sock.close();
+      this.sock = null;
+    }
+    next();
   },
 
   methods: {
@@ -288,7 +287,7 @@ export default {
 
     isBottom(container) {
       return (
-        (container.scrollHeight - container.scrollTop) * 0.95 <
+        (container.scrollHeight - container.scrollTop) * 0.97 <
         container.clientHeight
       );
     },
@@ -299,13 +298,13 @@ export default {
 
     async connectWS(url) {
       let self = this;
-      let sock = new WebSocket(url);
-      sock.addEventListener("open", function () {
+      this.sock = new WebSocket(url);
+      this.sock.onopen = function () {
         console.info("-----CONNECT TO SERVER-----");
         self.wsConnectFlag = true;
-      });
+      };
 
-      sock.addEventListener("message", async function (event) {
+      this.sock.onmessage = async function (event) {
         let wsData = await orUtil.parseWsData(event.data);
         if (wsData[0] == "message") {
           let j = JSON.parse(wsData[1]);
@@ -325,15 +324,6 @@ export default {
             prms.then(() => {
               self.scrollToBottom(document.getElementById("info_box"));
             });
-
-            // let ele = document.getElementById("info_box");
-            // if (self.isBottom(ele)) {
-            //   prms.then(() => {
-            //     self.scrollToBottom(document.getElementById("info_box"));
-            //   })
-            // } else {
-            //   ;
-            // }
           };
 
           let findUserId = (id) => {
@@ -357,7 +347,10 @@ export default {
                 }
 
                 let name = j.data.user_name + " (" + j.data.user_key + ")";
-                if (j.data.user_type == 1 || j.data.user_key == "yocchan-umaimon") {
+                if (
+                  j.data.user_type == 1 ||
+                  j.data.user_key == "yocchan-umaimon"
+                ) {
                   addEvent("chat", name + " " + j.data.message);
                 }
                 if (j.data.yell != null) {
@@ -405,7 +398,7 @@ export default {
                   Color: j.data.user_color,
                   Message: j.data.message,
                   Stamp: "",
-                  Time: j.data.message_dt.slice(-8)
+                  Time: j.data.message_dt.slice(-8),
                 };
                 if (j.data.stamp != null) {
                   commentData.Stamp = j.data.stamp.image_url;
@@ -418,8 +411,7 @@ export default {
                     utter.rate = 1.5;
                     speechSynthesis.speak(utter);
                   }
-                  if (self.comments.length > self.config.maxCommentNum) {
-                    // self.comments = self.comments.slice(-self.config.maxCommentNum);
+                  if (self.comments.length > 2000) {
                     self.comments.shift();
                   }
                 };
@@ -547,25 +539,30 @@ export default {
               console.warn("unknown type:", j);
           }
         }
-      });
+      };
 
       // error
-      sock.addEventListener("error", function (event) {
+      this.sock.onerror = function (event) {
         console.error("ws error:", event);
-      });
+      };
 
       // close
-      sock.addEventListener("close", function () {
+      this.sock.onclose = function () {
         console.info("-----BYE SERVER-----");
         self.wsConnectFlag = false;
-        self.connectWS(url);
-      });
+        if (self.sock) {
+          self.connectWS(url);
+        }
+      };
 
       //なぜ"2"なのかはわからん
-      var keepConnect = function () {
-        sock.send("2");
-      };
-      setInterval(keepConnect, 25000);
+      let keepConn = setInterval(function () {
+        if (!self.sock) {
+          clearInterval(keepConn);
+        } else {
+          self.sock.send("2");
+        }
+      }, 25000);
     },
 
     async getComment() {
@@ -577,7 +574,10 @@ export default {
       self.comments = [];
       if (self.videoId != "") {
         let info = await orUtil.getVideoInfo(self.videoId);
-        if (info.chat_public_type == "member" && !localStorage.getItem("viewSubs")) {
+        if (
+          info.chat_public_type == "member" &&
+          !localStorage.getItem("viewSubs")
+        ) {
           self.urlError = "member only";
           return;
         }
@@ -634,7 +634,7 @@ export default {
               recxuser_id: past_comments[i].user.recxuser_id,
               Message: past_comments[i].message,
               Stamp: "",
-              Time: past_comments[i].messaged_at.slice(11, -6)
+              Time: past_comments[i].messaged_at.slice(11, -6),
             };
             if (past_comments[i].stamp != null) {
               comment.Stamp = past_comments[i].stamp.image_url;
@@ -707,50 +707,30 @@ export default {
     },
 
     async changeNameColor() {
-      this.urlError = await orUtil.updateChatSetting({name_color: this.config.nameColor});
+      this.urlError = await orUtil.updateChatSetting({
+        name_color: this.config.nameColor,
+      });
     },
 
     async syncBL() {
       let j = await orUtil.getBL();
-      let bl = [];
-      for (let data of j.data.items[0].blacklist) {
-        bl.push(data.id);
+      if (j.status >= 0) {
+        let bl = [];
+        for (let data of j.data.items[0].blacklist) {
+          bl.push(data.id);
+        }
+        localStorage.setItem("blacklist", bl);
       }
-      localStorage.setItem("blacklist", bl);
     },
 
     resetBL() {
-      localStorage.setItem("blacklist", [])
+      localStorage.setItem("blacklist", []);
     },
   },
 };
 </script>
 
 <style scoped>
-.chat {
-  margin-left: 2%;
-  margin-right: 2%;
-}
-
-#overlay {
-  z-index: 1;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-#content {
-  z-index: 2;
-  width: 75%;
-  padding: 1em 10% 1em 10%;
-  text-align: center;
-}
-
 a {
   color: var(--v-secondary-base);
 }
@@ -770,7 +750,7 @@ a {
   margin-left: auto;
   margin-right: 5px;
 }
-#configBtn:active {
+#configBtn:hover {
   background-color: var(--v-background-lighten4);
 }
 
@@ -794,7 +774,7 @@ a {
   max-width: 900px;
   border-radius: 3px;
   margin-left: 10px;
-  overflow-y: auto;
+  overflow-y: scroll;
   background-color: var(--v-background-darken1);
 }
 .comment_box {
