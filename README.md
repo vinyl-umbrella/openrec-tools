@@ -5,6 +5,7 @@
 - openrec openchat backlog search
 - openrec comment viewer
 - openrec player like niconico
+- openrec.tv api doc
 
 ## dev
 ### hosting
