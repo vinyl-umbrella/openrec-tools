@@ -9,6 +9,7 @@
           label="OPENREC URL"
           ref="inputUrl"
           @keydown.enter="getComment"
+          hide-details
           dense
           outlined
         >
@@ -95,6 +96,7 @@
       class="post_box"
       label="コメント"
       @keydown.enter="postInputComment"
+      hide-details
       outlined
       dense
     >
@@ -151,17 +153,20 @@
         <v-container fluid>
           <v-checkbox
             v-model="config.hideNewcomer"
+            hide-details
             label="新規ユーザを非表示"
           ></v-checkbox>
           <v-checkbox
             v-model="config.speesh"
+            hide-details
             label="チャットを読み上げ"
           ></v-checkbox>
           <v-checkbox
             v-model="config.showStampBtn"
+            hide-details
             label="スタンプボタンを表示 ※魔神サブスク限定"
           ></v-checkbox>
-          <div class="flexbox">
+          <div class="flexbox" style="padding-top: 10px; padding-bottom: 10px">
             ブラックリストを同期
             <v-btn
               @click="syncBL"
@@ -180,7 +185,6 @@
               >リセット</v-btn
             >
           </div>
-          <br />
           <v-text-field
             label="NGワード(実装予定)"
             outlined
@@ -190,6 +194,7 @@
             <v-text-field
               v-model.trim="config.nameColor"
               label="ユーザ名の色 (プレ垢限定)"
+              hide-details
               outlined
               dense
               @keydown.enter="changeNameColor"

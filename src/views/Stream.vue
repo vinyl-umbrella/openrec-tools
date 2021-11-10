@@ -7,6 +7,7 @@
         label="OPENREC URL"
         ref="inputUrl"
         @keydown.enter="playVideo"
+        hide-details
         dense
         outlined
       ></v-text-field>

@@ -5,6 +5,7 @@
         v-model="tempVideoid"
         :items="videoIdObj"
         label="枠"
+        hide-details
         dense
         outlined
         return-object
@@ -13,6 +14,7 @@
         type="string"
         v-model.trim="userid"
         label="ユーザID(任意)"
+        hide-details
         dense
         outlined
         @keydown.enter="getMessages(0)"
@@ -21,6 +23,7 @@
         type="string"
         v-model="search_string"
         label="検索ワード(任意)"
+        hide-details
         dense
         outlined
         @keydown.enter="getMessages(0)"
@@ -29,6 +32,7 @@
         type="string"
         v-model="startdate"
         label="検索開始日時(任意)"
+        hide-details
         dense
         outlined
         @keydown.enter="getMessages(0)"

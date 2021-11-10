@@ -17,6 +17,8 @@
               min="1"
               v-model.number="limit"
               label="表示人数"
+              suffix="人"
+              hide-details
               dense
               outlined
             ></v-text-field>
@@ -24,6 +26,7 @@
               v-model="tempYm"
               :items="ymObj"
               label="年月"
+              hide-details
               dense
               outlined
               return-object
@@ -269,7 +272,7 @@ export default {
 <style scoped>
 #update-button {
   margin-left: 20px;
-  margin-bottom: 8px;
+  margin-bottom: 14px;
 }
 
 .flex-box {
@@ -285,7 +288,7 @@ export default {
 }
 
 .row {
-  margin-bottom: -30px;
+  margin-bottom: 3px;
 }
 
 .userid {

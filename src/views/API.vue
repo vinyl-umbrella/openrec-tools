@@ -84,7 +84,7 @@ code {
 }
 
 .genre {
-  margin-top: 20px;
+  margin-top: 10px;
   margin-bottom: 10px;
 }
 

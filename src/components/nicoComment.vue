@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import anime from "animejs";
+import anime from "animejs/lib/anime.min.js";
 
 export default {
   name: "NicoComment",
@@ -81,7 +81,7 @@ export default {
           return [rand, rand];
         },
         delay: 1000,
-        duration: 3500,
+        duration: 4000,
         easing: "linear",
         complete: function () {
           self.shownMsg[index].message = "";

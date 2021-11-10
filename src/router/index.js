@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
 
@@ -8,7 +7,7 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home,
+    component: () => import('../views/Home.vue'),
     meta: {
       title: 'masaoroid',
       desc: '布団ちゃんがオプチャで発言した内容を元に作られたAI。masaoroid',
@@ -26,13 +25,13 @@ const routes = [
     }
   },
   {
-    path: '/contact',
-    name: 'Contact',
-    component: () => import('../views/Contact.vue'),
+    path: '/message',
+    name: 'Message',
+    component: () => import('../views/Message.vue'),
     meta: {
-      title: 'Contact',
-      desc: '要望、連絡先などのお問い合わせフォーム。google formからお願いします。',
-      h2: 'Contact'
+      title: 'Explore Messages',
+      desc: '布団ちゃんオプチャ過去ログ検索システム',
+      h2: '布団ちゃん おぷちゃ過去ログ検索システム'
     }
   },
   {
@@ -46,22 +45,12 @@ const routes = [
     }
   },
   {
-    path: '/message',
-    name: 'Message',
-    component: () => import('../views/Message.vue'),
-    meta: {
-      title: 'Explore Messages',
-      desc: '布団ちゃんオプチャ過去ログ検索システム',
-      h2: '布団ちゃん おぷちゃ過去ログ検索システム'
-    }
-  },
-  {
     path: '/stream',
     name: 'Stream',
     component: () => import('../views/Stream.vue'),
     meta: {
       title: 'Player',
-      desc: 'OPENREC.tv ニコ生風プレイヤー',
+      desc: 'OPENREC.tv ニコ生風コメント付きプレイヤー',
       h2: 'OPENREC.tv コメ付きプレイヤー'
     }
   },
@@ -74,7 +63,17 @@ const routes = [
       desc: 'OPENREC.tv API まとめ',
       h2: 'OPENREC.tv API まとめ'
     }
-  }
+  },
+  {
+    path: '/contact',
+    name: 'Contact',
+    component: () => import('../views/Contact.vue'),
+    meta: {
+      title: 'Contact',
+      desc: '要望、連絡先などのお問い合わせフォーム。google formからお願いします。',
+      h2: 'Contact'
+    }
+  },
 ]
 
 const DEFAULT_TITLE = 'futon-openchat'
