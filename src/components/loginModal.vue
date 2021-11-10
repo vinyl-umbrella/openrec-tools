@@ -1,52 +1,55 @@
 <template>
-  <div id="overlay" @click.self="$emit('close')">
-    <div id="content" style="background-color: var(--v-background-base)">
-      <div v-if="!isLogin">
-        <form autocomplete="on">
-          <v-text-field
-            v-model="orUuid"
-            label="uuid"
-            hint="Get from openrec cookie"
-            outlined
-            dense
-          ></v-text-field>
-          <v-text-field
-            v-model="orAccessToken"
-            label="access-token"
-            hint="Get from openrec cookie"
-            type="password"
-            @keydown.enter="orLogin"
-            outlined
-            dense
-          ></v-text-field>
-        </form>
-        <v-btn
-          @click="orLogin()"
-          color="var(--v-background-lighten1)"
-          small
-          depressed
-          >Login</v-btn
-        >
-      </div>
-      <div v-else>
-        <img :src="userInfo.icon" style="border-radius: 50%" />
-        <div>{{ userInfo.nickname }}({{ userInfo.userid }})</div>
-        <br />
-        <v-btn
-          @click="orLogout()"
-          color="var(--v-background-lighten1)"
-          small
-          depressed
-          >Logout</v-btn
-        >
-      </div>
+  <modalWrap header="Login" @close="closeModal()">
+    <div v-if="!isLogin" class="loginmodal">
+      <form autocomplete="on">
+        <v-text-field
+          v-model="orUuid"
+          label="uuid"
+          hint="Get from openrec cookie"
+          outlined
+          dense
+        ></v-text-field>
+        <v-text-field
+          v-model="orAccessToken"
+          label="access-token"
+          hint="Get from openrec cookie"
+          type="password"
+          @keydown.enter="orLogin"
+          outlined
+          dense
+        ></v-text-field>
+      </form>
+      <v-btn
+        @click="orLogin()"
+        color="var(--v-background-lighten1)"
+        small
+        depressed
+        >Login</v-btn
+      >
     </div>
-  </div>
+    <div v-else>
+      <img :src="userInfo.icon" style="border-radius: 50%" />
+      <div>{{ userInfo.nickname }}({{ userInfo.userid }})</div>
+      <br />
+      <v-btn
+        @click="orLogout()"
+        color="var(--v-background-lighten1)"
+        small
+        depressed
+        >Logout</v-btn
+      >
+    </div>
+  </modalWrap>
 </template>
 
 <script>
+import modalWrap from "../components/modalWrap";
+
 export default {
   name: "LoginModal",
+  components: {
+    modalWrap,
+  },
   props: {
     isLogin: {
       type: Boolean,
@@ -61,7 +64,7 @@ export default {
       userInfo: {
         nickname: "",
         userid: "",
-        icon: ""
+        icon: "",
       },
     };
   },
@@ -85,7 +88,10 @@ export default {
     },
 
     async getUserInfo() {
-      if (localStorage.getItem("orAccessToken") && localStorage.getItem("orUuid")) {
+      if (
+        localStorage.getItem("orAccessToken") &&
+        localStorage.getItem("orUuid")
+      ) {
         let param = {
           method: "GET",
           headers: {
@@ -94,7 +100,10 @@ export default {
             "access-token": localStorage.getItem("orAccessToken"),
           },
         };
-        let res = await fetch("https://apiv5.openrec.tv/api/v5/users/me", param);
+        let res = await fetch(
+          "https://apiv5.openrec.tv/api/v5/users/me",
+          param
+        );
         if (res.ok) {
           let j = await res.json();
           j = j.data.items[0];
@@ -104,28 +113,15 @@ export default {
         }
       }
     },
+    closeModal() {
+      this.$emit("close");
+    },
   },
 };
 </script>
 
 <style scope>
-#overlay {
-  z-index: 1;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-#content {
-  z-index: 2;
-  width: 75%;
-  padding: 1em 10% 1em 10%;
+.loginmodal {
   text-align: center;
-  border-radius: 10px;
 }
 </style>

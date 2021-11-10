@@ -1,5 +1,5 @@
 <template>
-  <div class="stream">
+  <div>
     <div class="flexbox">
       <v-text-field
         type="string"
@@ -10,44 +10,34 @@
         dense
         outlined
       ></v-text-field>
-      <v-btn
-        @click="playVideo"
-        small
-        depressed
-        color="var(--v-background-lighten1)"
+      <v-btn @click="playVideo" outlined color="var(--v-primary-darken2)"
         >再生</v-btn
       >
     </div>
     {{ e_message }}
-    <div style="margin: 0 auto; width: 90%">
-      <div class="nico-player">
-        <video ref="video" width="100%" :poster="thumbnail" controls></video>
-        <nicoComment ref="nicoComment" />
-      </div>
-      <div class="flexbox">
-        <v-text-field
-          type="string"
-          label="コメント"
-          v-model.trim="inputComment"
-          @keydown.enter="postInputComment"
-          dense
-          outlined
-        ></v-text-field>
-        <v-btn
-          @click="postInputComment"
-          small
-          depressed
-          color="var(--v-background-lighten1)"
-          >送信</v-btn
-        >
-      </div>
+    <div class="nico-player">
+      <video ref="video" width="100%" :poster="thumbnail" controls></video>
+      <nicoComment ref="nicoComment" />
+    </div>
+    <div class="flexbox">
+      <v-text-field
+        type="string"
+        label="コメント"
+        v-model.trim="inputComment"
+        @keydown.enter="postInputComment"
+        dense
+        outlined
+      ></v-text-field>
+      <v-btn @click="postInputComment" outlined color="var(--v-primary-darken2)"
+        >送信</v-btn
+      >
     </div>
   </div>
 </template>
 
 <script>
 import Hls from "hls.js";
-import orUtil from "../components/orComment";
+import orUtil from "../func/orUtil";
 import NicoComment from "../components/nicoComment";
 
 export default {
@@ -71,25 +61,34 @@ export default {
       thumbnail: "",
       messages: [],
       e_message: "",
+      sock: null,
     };
   },
 
-  mounted () {
+  mounted() {
     this.$refs.inputUrl.focus();
     if (this.inputUrl) {
       this.playVideo();
     }
   },
 
+  beforeRouteLeave(to, from, next) {
+    if (this.sock) {
+      this.sock.close();
+      this.sock = null;
+    }
+    next();
+  },
+
   methods: {
     async connectWS(url) {
       let self = this;
-      let sock = new WebSocket(url);
-      sock.addEventListener("open", function () {
+      this.sock = new WebSocket(url);
+      this.sock.addEventListener("open", function () {
         console.info("-----CONNECT TO SERVER-----");
       });
 
-      sock.addEventListener("message", async function (event) {
+      this.sock.onmessage = async function (event) {
         let wsData = await orUtil.parseWsData(event.data);
         let bl = localStorage.getItem("blacklist");
         if (wsData[0] == "message") {
@@ -101,8 +100,10 @@ export default {
               if (j.data.is_muted) {
                 break;
               }
-              if (bl.includes(j.data.user_key)) {
-                break;
+              if (bl) {
+                if (bl.includes(j.data.user_key)) {
+                  break;
+                }
               }
               if (j.data.yell != null) {
                 msgObj.type = "yell";
@@ -117,27 +118,30 @@ export default {
               break;
             }
             case 3: {
-              sock.close();
+              this.sock.close();
             }
           }
         }
-      });
+      };
 
       // error
-      sock.addEventListener("error", function (event) {
+      this.sock.onerror = function (event) {
         console.error("ws error:", event);
-      });
+      };
 
       // close
-      sock.addEventListener("close", function () {
+      this.sock.onclose = function () {
         console.info("-----BYE SERVER-----");
         // self.connectWS(url);
-      });
-
-      let keepConnect = function () {
-        sock.send("2");
       };
-      setInterval(keepConnect, 25000);
+
+      let keepConn = setInterval(function () {
+        if (!self.sock) {
+          clearInterval(keepConn);
+        } else {
+          self.sock.send("2");
+        }
+      }, 25000);
     },
 
     async playVideo() {
@@ -198,17 +202,11 @@ export default {
 </script>
 
 <style scoped>
-.stream {
-  margin-left: 2%;
-  margin-right: 2%;
-}
-
 .flexbox {
   display: flex;
 }
 .v-btn {
-  margin-left: 10px;
-  margin-top: 6px;
+  margin-top: 2px;
 }
 
 .nico-player {

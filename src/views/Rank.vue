@@ -1,16 +1,5 @@
 <template>
-  <div class="rank">
-    <div class="info">
-      <div>
-        保管庫は
-        <a
-          href="https://drive.google.com/drive/folders/1U77WomTyFEVtFtA4gMQKUJf8gdXRijP8?usp=sharing"
-          target="_blank"
-          rel="noopener norefferer"
-          >ここ</a
-        >
-      </div>
-    </div>
+  <div>
     <bar-chart
       id="mainChart"
       :chart-data="graphData"
@@ -23,26 +12,48 @@
       <div class="flex-items">
         <form>
           <v-row>
-            <v-text-field type="number" min="1" max="1000" v-model.number="limit" label="表示人数" dense outlined></v-text-field>
-            <v-select v-model="tempYm" :items="ymObj" label="年月" dense outlined return-object></v-select>
+            <v-text-field
+              type="number"
+              min="1"
+              v-model.number="limit"
+              label="表示人数"
+              dense
+              outlined
+            ></v-text-field>
+            <v-select
+              v-model="tempYm"
+              :items="ymObj"
+              label="年月"
+              dense
+              outlined
+              return-object
+            ></v-select>
           </v-row>
         </form>
       </div>
-      <v-btn @click="createGraphData()" id="update-button" depressed>更新</v-btn>
+      <v-btn
+        id="update-button"
+        outlined
+        @click="createGraphData()"
+        color="var(--v-primary-darken2)"
+        >更新</v-btn
+      >
     </div>
 
     <div>
       <div class="table_wrap">
         <table>
           <thead>
-            <th width=5%>rank</th>
-            <th width=20%>userid</th>
+            <th width="5%">rank</th>
+            <th width="20%">userid</th>
             <th>count</th>
           </thead>
           <tbody>
             <tr v-for="(item, index) in graphData.labels" :key="index">
               <td>{{ index + 1 }}</td>
-              <td><span @click="clickUser(item)" class="userid">{{ item }}</span></td>
+              <td>
+                <span @click="clickUser(item)" class="userid">{{ item }}</span>
+              </td>
               <td>{{ graphData.datasets[0].data[index] }}</td>
             </tr>
           </tbody>
@@ -62,12 +73,12 @@
 
 <script>
 import barChart from "../components/barChart";
-import GraphModal from "../components/graphModal";
+import graphModal from "../components/graphModal";
 
 export default {
   components: {
     barChart,
-    GraphModal,
+    graphModal,
   },
 
   data() {
@@ -75,7 +86,7 @@ export default {
       // new input value
       limit: 30,
       ymObj: [],
-      tempYm: {text: "", value: ""},
+      tempYm: { text: "", value: "" },
 
       // modal
       showModal: false,
@@ -111,15 +122,15 @@ export default {
             {
               ticks: {
                 fontColor: "#ddd",
-              }
-            }
+              },
+            },
           ],
 
           yAxes: [
             {
               ticks: {
                 beginAtZero: true,
-                fontColor: "#ddd"
+                fontColor: "#ddd",
               },
             },
           ],
@@ -136,9 +147,9 @@ export default {
     let y = 2020;
     let m = 7;
 
-    for (; y!=dt.getFullYear() || m !=dt.getMonth()+2;) {
-      let ym = y+this.getDoubleDigestNumber(m);
-      this.ymObj.push({text: ym, value: ym});
+    for (; y != dt.getFullYear() || m != dt.getMonth() + 2; ) {
+      let ym = y + this.getDoubleDigestNumber(m);
+      this.ymObj.push({ text: ym, value: ym });
       if (m == 12) {
         y++;
       }
@@ -146,7 +157,7 @@ export default {
     }
     this.tempYm = this.ymObj[this.ymObj.length - 1];
 
-    this.ymObj.push({text: "all", value: "all"})
+    this.ymObj.push({ text: "all", value: "all" });
     this.ymObj = this.ymObj.reverse();
     // init graph data
     this.createGraphData();
@@ -154,8 +165,11 @@ export default {
 
   methods: {
     async clickUser(userid) {
-      let orApiUrl = "https://public.openrec.tv/external/api/v5/channels/" + userid;
-      let webappApiUrl = "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v2/rank/user/" + userid;
+      let orApiUrl =
+        "https://public.openrec.tv/external/api/v5/channels/" + userid;
+      let webappApiUrl =
+        "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v2/rank/user/" +
+        userid;
       let tempGraphData = {
         labels: [],
         datasets: [
@@ -165,7 +179,7 @@ export default {
             hoverBackgroundColor: "#03A9F4",
           },
         ],
-      }
+      };
 
       this.showModal = true;
 
@@ -174,7 +188,10 @@ export default {
       this.postData["id"] = "now loading";
       this.postData["created_at"] = "now loading";
 
-      const [res1, res2] = await Promise.all([fetch(orApiUrl), fetch(webappApiUrl)]);
+      const [res1, res2] = await Promise.all([
+        fetch(orApiUrl),
+        fetch(webappApiUrl),
+      ]);
       if (res1.ok) {
         let j = await res1.json();
         this.postData["id"] = j["id"];
@@ -225,7 +242,8 @@ export default {
     async createGraphData() {
       let ids = [];
       let counts = [];
-      let rankApi = "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v2/rank"
+      let rankApi =
+        "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v2/rank";
       let res;
       if (this.tempYm["value"] == "all") {
         res = await fetch(`${rankApi}/all?limit=${this.limit}`);
@@ -245,23 +263,13 @@ export default {
       }
     },
   },
-}
+};
 </script>
 
 <style scoped>
-form div input {
-  margin-bottom: 3px;
-}
-
-
-.rank {
-  margin-left: 2%;
-  margin-right: 2%;
-}
-
-.info {
-  text-align: right;
-  margin-right: 10px;
+#update-button {
+  margin-left: 20px;
+  margin-bottom: 8px;
 }
 
 .flex-box {
@@ -273,17 +281,11 @@ form div input {
 .flex-box .flex-items {
   margin-top: 20px;
   margin-left: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .row {
   margin-bottom: -30px;
-}
-
-#update-button {
-  margin-left: 20px;
-  margin-bottom: 20px;
-  background: var(--v-background-lighten1);
 }
 
 .userid {
@@ -313,7 +315,7 @@ table td {
   padding: 6px;
 }
 
-.v-text-field{
-  max-width: 150px;
+.v-text-field {
+  max-width: 120px;
 }
 </style>

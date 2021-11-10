@@ -1,12 +1,44 @@
 <template>
-  <div class="explore">
-    <h1>おぷちゃ過去ログ検索システム</h1>
+  <div>
     <div class="container">
-      <v-select v-model="tempVideoid" :items="videoIdObj" label="枠" dense outlined return-object ></v-select>
-      <v-text-field type="string" v-model.trim="userid" label="ユーザID(任意)" dense outlined @keydown.enter="getMessages(0)"></v-text-field>
-      <v-text-field type="string" v-model="search_string" label="検索ワード(任意)" dense outlined @keydown.enter="getMessages(0)"></v-text-field>
-      <v-text-field type="string" v-model="startdate" label="検索開始日時(任意)" dense outlined @keydown.enter="getMessages(0)"></v-text-field>
-      <v-btn @click="getMessages(0)" color="var(--v-background-lighten1)" depressed>取得</v-btn>
+      <v-select
+        v-model="tempVideoid"
+        :items="videoIdObj"
+        label="枠"
+        dense
+        outlined
+        return-object
+      ></v-select>
+      <v-text-field
+        type="string"
+        v-model.trim="userid"
+        label="ユーザID(任意)"
+        dense
+        outlined
+        @keydown.enter="getMessages(0)"
+      ></v-text-field>
+      <v-text-field
+        type="string"
+        v-model="search_string"
+        label="検索ワード(任意)"
+        dense
+        outlined
+        @keydown.enter="getMessages(0)"
+      ></v-text-field>
+      <v-text-field
+        type="string"
+        v-model="startdate"
+        label="検索開始日時(任意)"
+        dense
+        outlined
+        @keydown.enter="getMessages(0)"
+      ></v-text-field>
+      <v-btn
+        @click="getMessages(0)"
+        color="var(--v-primary-darken2)"
+        outlined
+        >取得</v-btn
+      >
     </div>
     <div class="table_wrap">
       <table>
@@ -37,7 +69,9 @@
       </table>
     </div>
     <span v-if="messages.length > 49">
-      <v-btn @click="getMessages(lastid)" class="nextbtn" color="#2e2c37">次の50件</v-btn>
+      <v-btn @click="getMessages(lastid)" class="nextbtn" color="#2e2c37"
+        >次の50件</v-btn
+      >
     </span>
     <br /><br /><br />
   </div>
@@ -120,11 +154,6 @@ export default {
 </script>
 
 <style scoped>
-.explore {
-  margin-left: 2%;
-  margin-right: 2%;
-}
-
 .table_wrap {
   overflow: scroll;
 }
@@ -140,7 +169,6 @@ table {
 
 table th,
 table td {
-  /* width: 33%; */
   border: solid 1px var(--v-background-lighten5);
   padding: 6px;
 }

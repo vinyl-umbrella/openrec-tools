@@ -2,34 +2,46 @@
   <v-app :style="{ background: $vuetify.theme.themes.dark.background }">
     <div id="app">
       <div id="nav">
-        <span>
-          <router-link to="/">Home</router-link> |
-          <router-link to="/rank">ランキング</router-link> |
-          <router-link to="/message">過去ログ検索</router-link> |
-          <router-link to="/chat">コメビュ</router-link> |
-          <router-link to="/stream">コメつき</router-link> |
-          <router-link to="/api">API</router-link>
-        </span>
-        <span>
-          <img
-            id="loginBtn"
-            alt="config"
-            src="./assets/login.png"
-            height="24px"
-            width="24px"
-            style="position: relative; top: 5px"
-            @click="callModal()"
-          />
-          <router-link to="/contact">Contact</router-link>
-        </span>
-        <login-modal
-          :isLogin="isLogin"
-          v-if="showModal"
-          @close="closeModal()"
-          @updateLoginStatus="isLogin = $event"
-        />
+        <v-navigation-drawer v-model="drawer" absolute temporary>
+          <v-list-item>
+            <v-list-item-content>
+              <h2>Menu</h2>
+              <router-link to="/">Home</router-link> <br />
+              <router-link to="/rank">ランキング</router-link> <br />
+              <router-link to="/message">過去ログ検索</router-link> <br />
+              <router-link to="/chat">コメビュ</router-link> <br />
+              <router-link to="/stream">コメつき配信</router-link> <br />
+              <router-link to="/api">API</router-link> <br />
+              <br />
+              <router-link to="/contact">Contact</router-link>
+              <span>
+                <img
+                  id="loginBtn"
+                  alt="config"
+                  src="./assets/login.png"
+                  @click="callModal()"
+                />
+              </span>
+            </v-list-item-content>
+          </v-list-item>
+        </v-navigation-drawer>
       </div>
-      <router-view />
+      <login-modal
+        :isLogin="isLogin"
+        v-if="showModal"
+        @close="closeModal()"
+        @updateLoginStatus="isLogin = $event"
+      />
+      <div class="headerbar">
+        <v-btn
+          color="var(--v-primary-darken2)"
+          outlined
+          @click.stop="drawer = !drawer"
+          >Menu</v-btn
+        >
+        <h2 id="pagetitle"></h2>
+      </div>
+      <router-view id="router-view" />
     </div>
   </v-app>
 </template>
@@ -42,6 +54,7 @@ export default {
   },
   data() {
     return {
+      drawer: null,
       isLogin: false,
       showModal: false,
     };
@@ -76,15 +89,9 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-#nav {
-  padding: 20px 0px 10px 0px;
-  display: flex;
-  justify-content: space-between;
-}
-
-#nav a {
-  margin: 0px 10px 0px 10px;
+#nav a,
+#nav span {
+  margin-left: 10px;
   font-weight: bold;
   font-size: 20px;
   color: var(--v-primary-base-lighten1);
@@ -98,8 +105,22 @@ html {
   background-color: var(--v-background-lighten5);
   border-radius: 18px;
   padding: 5px;
+  max-width: 26px;
 }
-#loginBtn:active {
+#loginBtn:hover {
   background-color: var(--v-background-lighten4);
+}
+
+#router-view {
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
+.headerbar {
+  display: flex;
+  padding: 1em 0em 1em 1em;
+}
+.headerbar h2 {
+  padding-left: 1em;
 }
 </style>

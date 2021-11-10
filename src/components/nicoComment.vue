@@ -1,14 +1,24 @@
 <template>
   <div id="nicoComme">
     <div v-for="(m, index) in shownMsg" :key="m.id">
-      <div v-if="m.stamp" :class="'stamp_base comment' + index" style="width: 5vw">
+      <div
+        v-if="m.stamp"
+        :class="'stamp_base comment' + index"
+        style="width: 5vw"
+      >
         <img :src="m.message" width="100%" />
       </div>
-      <div v-else :class="'comment_base comment' + index" :style="updateFontSize">
+      <div
+        v-else
+        :class="'comment_base comment' + index"
+        :style="updateFontSize"
+      >
         <p>{{ m.message }}</p>
       </div>
     </div>
-    <span style="position: absolute; top: 0; opacity: 0.2; font-size: 50%">商用利用禁止 https://futonchan-openchat.web.app/stream</span>
+    <span style="position: absolute; top: 0; opacity: 0.2; font-size: 50%"
+      >商用利用禁止 https://futonchan-openchat.web.app/stream</span
+    >
   </div>
 </template>
 
@@ -34,7 +44,8 @@ export default {
     for (let i = 0; i < 32; i++) {
       this.shownMsg.push({ id: i, message: "", stamp: false });
     }
-    this.videoHeight = (document.getElementById("nicoComme").clientWidth * 9) / 16;
+    this.videoHeight =
+      (document.getElementById("nicoComme").clientWidth * 9) / 16;
   },
   methods: {
     addMsg(msgObj) {
