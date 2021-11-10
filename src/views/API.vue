@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>OPENREC.tv API まとめ</h1>
     <div>
       <div v-for="apigenre in apis" :key="apigenre.genre">
         <h2 class="genre">{{ apigenre.genre }}</h2>

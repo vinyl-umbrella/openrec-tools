@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>OPENREC.tv コメント付きプレイヤー</h1>
     <div class="flexbox">
       <v-text-field
         type="string"
@@ -38,7 +37,7 @@
 
 <script>
 import Hls from "hls.js";
-import orUtil from "../components/orComment";
+import orUtil from "../func/orUtil";
 import NicoComment from "../components/nicoComment";
 
 export default {

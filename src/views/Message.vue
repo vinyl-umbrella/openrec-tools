@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>おぷちゃ過去ログ検索システム</h1>
     <div class="container">
       <v-select
         v-model="tempVideoid"

@@ -15,7 +15,7 @@ export default {
 
 <style scoped>
 #overlay {
-  z-index: 1;
+  z-index: 8;
   position: fixed;
   top: 0;
   left: 0;
@@ -29,7 +29,7 @@ export default {
 
 #content {
   overflow: scroll;
-  z-index: 2;
+  z-index: 9;
   width: 75%;
   height: 75%;
   padding: 1em 5% 1em 5%;

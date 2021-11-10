@@ -11,7 +11,8 @@ const routes = [
     component: Home,
     meta: {
       title: 'masaoroid',
-      desc: '布団ちゃんがオプチャで発言した内容を元に作られたAI。masaoroid'
+      desc: '布団ちゃんがオプチャで発言した内容を元に作られたAI。masaoroid',
+      h2: 'Masaoroid'
     }
   },
   {
@@ -20,7 +21,8 @@ const routes = [
     component: () => import('../views/Rank.vue'),
     meta: {
       title: 'rank',
-      desc: '布団ちゃん オプチャ書き込み数ランキング'
+      desc: '布団ちゃん オプチャ書き込み数ランキング',
+      h2: 'おぷちゃ書き込み数ランキング'
     }
   },
   {
@@ -29,7 +31,8 @@ const routes = [
     component: () => import('../views/Contact.vue'),
     meta: {
       title: 'Contact',
-      desc: '要望、連絡先などのお問い合わせフォーム。google formからお願いします。'
+      desc: '要望、連絡先などのお問い合わせフォーム。google formからお願いします。',
+      h2: 'Contact'
     }
   },
   {
@@ -38,7 +41,8 @@ const routes = [
     component: () => import('../views/Chat.vue'),
     meta: {
       title: 'Chat',
-      desc: 'OPENREC.tv 高機能コメントビューア'
+      desc: 'OPENREC.tv 多機能コメントビューア',
+      h2: 'OPENREC.tv 多機能コメビュ'
     }
   },
   {
@@ -47,7 +51,8 @@ const routes = [
     component: () => import('../views/Message.vue'),
     meta: {
       title: 'Explore Messages',
-      desc: '布団ちゃんオプチャ過去ログ検索システム'
+      desc: '布団ちゃんオプチャ過去ログ検索システム',
+      h2: '布団ちゃん おぷちゃ過去ログ検索システム'
     }
   },
   {
@@ -56,7 +61,8 @@ const routes = [
     component: () => import('../views/Stream.vue'),
     meta: {
       title: 'Player',
-      desc: 'OPENREC.tv ニコ生風プレイヤー'
+      desc: 'OPENREC.tv ニコ生風プレイヤー',
+      h2: 'OPENREC.tv コメ付きプレイヤー'
     }
   },
   {
@@ -65,7 +71,8 @@ const routes = [
     component: () => import('../views/API.vue'),
     meta: {
       title: 'OPENREC.tv API',
-      desc: 'OPENREC.tv API まとめ'
+      desc: 'OPENREC.tv API まとめ',
+      h2: 'OPENREC.tv API まとめ'
     }
   }
 ]
@@ -77,6 +84,7 @@ const router = new VueRouter({
   routes
 })
 router.afterEach((to) => {
+  document.getElementById("pagetitle").innerText = to.meta.h2;
   document.title = to.meta.title + ' - ' + DEFAULT_TITLE || DEFAULT_TITLE;
   document.querySelector("meta[name='description']").setAttribute('content', to.meta.desc);
 })

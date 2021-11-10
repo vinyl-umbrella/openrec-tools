@@ -5,23 +5,23 @@
         <v-navigation-drawer v-model="drawer" absolute temporary>
           <v-list-item>
             <v-list-item-content>
-              <h3>Menu</h3>
+              <h2>Menu</h2>
               <router-link to="/">Home</router-link> <br />
               <router-link to="/rank">ランキング</router-link> <br />
               <router-link to="/message">過去ログ検索</router-link> <br />
               <router-link to="/chat">コメビュ</router-link> <br />
-              <router-link to="/stream">コメつき</router-link> <br />
+              <router-link to="/stream">コメつき配信</router-link> <br />
               <router-link to="/api">API</router-link> <br />
               <br />
+              <router-link to="/contact">Contact</router-link>
               <span>
-                ログイン<img
+                <img
                   id="loginBtn"
                   alt="config"
                   src="./assets/login.png"
                   @click="callModal()"
                 />
               </span>
-              <router-link to="/contact">Contact</router-link>
             </v-list-item-content>
           </v-list-item>
         </v-navigation-drawer>
@@ -32,13 +32,16 @@
         @close="closeModal()"
         @updateLoginStatus="isLogin = $event"
       />
-      <v-btn
-        color="var(--v-primary-darken2)"
-        outlined
-        @click.stop="drawer = !drawer"
-        >Menu</v-btn
-      >
-      <router-view />
+      <div class="headerbar">
+        <v-btn
+          color="var(--v-primary-darken2)"
+          outlined
+          @click.stop="drawer = !drawer"
+          >Menu</v-btn
+        >
+        <h2 id="pagetitle"></h2>
+      </div>
+      <router-view id="router-view" />
     </div>
   </v-app>
 </template>
@@ -86,16 +89,11 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-#app {
-  padding-left: 2%;
-  padding-right: 2%;
-}
-
 #nav a,
 #nav span {
   margin-left: 10px;
   font-weight: bold;
-  font-size: 18px;
+  font-size: 20px;
   color: var(--v-primary-base-lighten1);
 }
 
@@ -111,5 +109,18 @@ html {
 }
 #loginBtn:hover {
   background-color: var(--v-background-lighten4);
+}
+
+#router-view {
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
+.headerbar {
+  display: flex;
+  padding: 1em 0em 1em 1em;
+}
+.headerbar h2 {
+  padding-left: 1em;
 }
 </style>

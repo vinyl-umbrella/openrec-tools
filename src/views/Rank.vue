@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>おぷちゃ書き込み数ランキング</h1>
     <bar-chart
       id="mainChart"
       :chart-data="graphData"

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>OPENREC.tv コメントビューア</h1>
     <div class="flexbox">
       <div>
         <v-text-field
@@ -210,7 +209,7 @@
 </template>
 
 <script>
-import orUtil from "../components/orComment";
+import orUtil from "../func/orUtil";
 import modalWrap from "../components/modalWrap";
 
 export default {
