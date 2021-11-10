@@ -84,7 +84,9 @@ const router = new VueRouter({
   routes
 })
 router.afterEach((to) => {
-  document.getElementById("pagetitle").innerText = to.meta.h2;
+  if (document.getElementById("pagetitle")) {
+    document.getElementById("pagetitle").innerText = to.meta.h2;
+  }
   document.title = to.meta.title + ' - ' + DEFAULT_TITLE || DEFAULT_TITLE;
   document.querySelector("meta[name='description']").setAttribute('content', to.meta.desc);
 })

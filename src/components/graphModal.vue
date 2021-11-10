@@ -24,12 +24,18 @@ export default {
   },
   data() {
     return {
-      graphHeight: window.innerHeight * 0.4,
+      graphHeight: window.innerHeight * 0.75 * 0.3,
     };
   },
   computed: {
     parseDate() {
-      return this.val.created_at.replace("T", " ").slice(0, -6);
+      const regex = /(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})/;
+      let match = this.val.created_at.match(regex);
+      if (match) {
+        return match[1] + " " + match[2];
+      } else {
+        return this.val.created_at;
+      }
     },
   },
   methods: {
