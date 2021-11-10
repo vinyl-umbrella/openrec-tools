@@ -243,7 +243,7 @@ export default {
         showModal: false,
         hideNewcomer: false,
         showStampBtn: false,
-        nameColor: "#201e2f",
+        nameColor: "#201E2F",
         blacklist: [],
         speesh: false,
       },
