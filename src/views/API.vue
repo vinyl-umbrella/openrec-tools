@@ -93,6 +93,7 @@ code {
   border-radius: 10px;
   padding: 5px 0px 5px 10px;
   margin-top: 1em;
+  word-break: break-all;
 }
 
 .params {
