@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import Hls from "hls.js";
+import Hls from "hls.js/dist/hls.light";
 import orUtil from "../func/orUtil";
 import NicoComment from "../components/nicoComment";
 
