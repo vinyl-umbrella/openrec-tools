@@ -41,6 +41,7 @@
         @click="getMessages(0)"
         color="var(--v-primary-darken2)"
         outlined
+        :loading="isLoading"
         >取得</v-btn
       >
     </div>
@@ -73,7 +74,12 @@
       </table>
     </div>
     <span v-if="messages.length > 49">
-      <v-btn @click="getMessages(lastid)" class="nextbtn" color="#2e2c37"
+      <v-btn
+        @click="getMessages(lastid)"
+        class="nextbtn"
+        color="var(--v-primary-darken2)"
+        outlined
+        :loading="isLoading"
         >次の50件</v-btn
       >
     </span>
@@ -95,6 +101,7 @@ export default {
       startdate: "",
       enddate: "",
       lastid: 0,
+      isLoading: false,
       userinfo: { icon: "", nickname: "" },
     };
   },
@@ -126,6 +133,7 @@ export default {
         border: last,
       };
 
+      this.isLoading = true;
       let res = await fetch(url, {
         method: "POST",
         headers: {
@@ -133,6 +141,7 @@ export default {
         },
         body: JSON.stringify(postdata),
       });
+      this.isLoading = false;
 
       if (res.ok) {
         let j = await res.json();
