@@ -116,4 +116,19 @@ async function getBL() {
     return j;
 }
 
-export default { getVideoId, getVideoInfo, getWsUrl, parseWsData, postComment, updateChatSetting, getBL }
+async function getNGwords() {
+    let url = "https://apiv5.openrec.tv/api/v5/users/me/banned-words"
+    let param = {
+        method: "GET",
+        headers: {
+            Accept: "application/json,text/plain,*/*",
+            "Content-Type": "application/json;charset=utf-8",
+            uuid: localStorage.getItem("orUuid"),
+            "access-token": localStorage.getItem("orAccessToken"),
+        }
+    };
+    let j = await (await fetch(url, param)).json();
+    return j;
+}
+
+export default { getVideoId, getVideoInfo, getWsUrl, parseWsData, postComment, updateChatSetting, getBL, getNGwords }
