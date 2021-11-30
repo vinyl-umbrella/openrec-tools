@@ -185,11 +185,25 @@
               >リセット</v-btn
             >
           </div>
-          <v-text-field
-            label="NGワード(実装予定)"
-            outlined
-            dense
-          ></v-text-field>
+          <div class="flexbox" style="padding-top: 10px; padding-bottom: 10px">
+            NGワードを同期
+            <v-btn
+              @click="syncNGwords"
+              color="var(--v-primary-darken2)"
+              small
+              outlined
+              style="margin-left: 4px"
+              >同期</v-btn
+            >
+            <v-btn
+              @click="resetNGwords"
+              color="var(--v-primary-darken2)"
+              small
+              outlined
+              style="margin-left: 4px"
+              >リセット</v-btn
+            >
+          </div>
           <div class="flexbox">
             <v-text-field
               v-model.trim="config.nameColor"
@@ -729,6 +743,21 @@ export default {
 
     resetBL() {
       localStorage.setItem("blacklist", []);
+    },
+
+    async syncNGwords() {
+      let j = await orUtil.getNGwords();
+      if (j.status >= 0) {
+        let words = [];
+        for (let data of j.data.items) {
+          words.push(data.word);
+        }
+        localStorage.setItem("ngwords", words);
+      }
+    },
+
+    resetNGwords() {
+      localStorage.setItem("ngwords", []);
     },
   },
 };
