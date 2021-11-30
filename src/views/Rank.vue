@@ -150,10 +150,10 @@ export default {
     let y = 2020;
     let m = 7;
 
-    for (; y != dt.getFullYear() || m != dt.getMonth() + 2; ) {
+    for (; y !== dt.getFullYear() || m !== (dt.getMonth() + 2) % 12; ) {
       let ym = y + this.getDoubleDigestNumber(m);
       this.ymObj.push({ text: ym, value: ym });
-      if (m == 12) {
+      if (m === 1) {
         y++;
       }
       m = (m % 12) + 1;
