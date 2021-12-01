@@ -264,6 +264,7 @@ export default {
         showStampBtn: false,
         nameColor: "#201E2F",
         blacklist: [],
+        ngwords: [],
         speesh: false,
       },
     };
@@ -284,6 +285,10 @@ export default {
     let l = localStorage.getItem("blacklist");
     if (l) {
       this.config.blacklist = l.split(",");
+    }
+    l = localStorage.getItem("ngwords");
+    if (l) {
+      console.log(this.config.ngwords);
     }
   },
 
@@ -361,6 +366,10 @@ export default {
               if (j.data.user_key != "") {
                 // blacklist
                 if (self.config.blacklist.includes(j.data.user_key)) {
+                  break;
+                }
+                // ngwords
+                if(self.config.ngwords.filter(word => j.data.message.indexOf(word) !== -1).length !== 0) {
                   break;
                 }
 
@@ -617,6 +626,9 @@ export default {
             if (self.config.blacklist.includes(past_comments[i].user.id)) {
               continue;
             }
+            if(self.config.ngwords.filter(word => past_comments[i].message.indexOf(word) !== -1).length !== 0) {
+              continue;
+            }
             let name =
               past_comments[i].user.nickname +
               " (" +
@@ -738,11 +750,13 @@ export default {
           bl.push(data.id);
         }
         localStorage.setItem("blacklist", bl);
+        this.config.blacklist = bl;
       }
     },
 
     resetBL() {
       localStorage.setItem("blacklist", []);
+      this.config.blacklist = [];
     },
 
     async syncNGwords() {
@@ -753,11 +767,13 @@ export default {
           words.push(data.word);
         }
         localStorage.setItem("ngwords", words);
+        this.config.ngwords = words;
       }
     },
 
     resetNGwords() {
       localStorage.setItem("ngwords", []);
+      this.config.ngwords = [];
     },
   },
 };
