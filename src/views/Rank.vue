@@ -149,11 +149,18 @@ export default {
     let dt = new Date();
     let y = 2020;
     let m = 7;
+    let deadline = [];
+    if(dt.getMonth() === 11) {
+      deadline.push(dt.getFullYear() + 1);
+    } else {
+      deadline.push(dt.getFullYear());
+    }
+    deadline.push((dt.getMonth() + 2) % 12);
 
-    for (; y !== dt.getFullYear() || m !== (dt.getMonth() + 2) % 12; ) {
+    for (; y !== deadline[0] || m !== deadline[1]; ) {
       let ym = y + this.getDoubleDigestNumber(m);
       this.ymObj.push({ text: ym, value: ym });
-      if (m === 1) {
+      if (m === 12) {
         y++;
       }
       m = (m % 12) + 1;
