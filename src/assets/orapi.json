@@ -466,5 +466,38 @@
         "param": {}
       }
     ]
+  },
+  {
+    "genre": "検索",
+    "data": [
+      {
+        "url": "https://public.openrec.tv/external/api/v5/search-users?search_query=布団&channel_only=false",
+        "desc": "ユーザ検索",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "search_query": "{検索文字列}",
+          "channel_only": "bool"
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/search-games?search_query=NieR",
+        "desc": "ゲーム検索",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "search_query": "{検索文字列}"
+        }
+      },
+      {
+        "url": "https://public.openrec.tv/external/api/v5/search-movies?search_query=スマブラ",
+        "desc": "配信・動画検索",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "search_query": "{検索文字列}"
+        }
+      }
+    ]
   }
 ]
