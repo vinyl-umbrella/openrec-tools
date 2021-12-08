@@ -64,6 +64,24 @@
         }
       },
       {
+        "url": "https://public.openrec.tv/external/api/v5/movies/e5rkn2kd4rv/comments?to_comment_id=137020",
+        "desc": "過去配信に付けられたコメント取得",
+        "method": "GET",
+        "button": true,
+        "param": {
+          "to_comment_id": "number"
+        }
+      },
+      {
+        "url": "https://apiv5.openrec.tv/api/v5/movies/e5rkn2kd4rv/comments",
+        "desc": "過去の配信にコメント投稿",
+        "method": "POST",
+        "button": true,
+        "param": {
+          "message": "メッセージ"
+        }
+      },
+      {
         "url": "wss://chat.openrec.tv/socket.io/?movieId=2372225&EIO=3&transport=websocket",
         "desc": "コメントサーバ",
         "method": "WS GET",
