@@ -10,7 +10,7 @@ const routes = [
     component: () => import('../views/Home.vue'),
     meta: {
       title: 'masaoroid',
-      desc: '布団ちゃんがオプチャで発言した内容を元に作られたAI。masaoroid',
+      desc: '布団ちゃんがオープンチャット(おぷちゃ)で発言した内容を元に作られたAI、masaoroid',
       h2: 'Masaoroid'
     }
   },
@@ -20,7 +20,7 @@ const routes = [
     component: () => import('../views/Rank.vue'),
     meta: {
       title: 'rank',
-      desc: '布団ちゃん オプチャ書き込み数ランキング',
+      desc: '布団ちゃん オープンチャット(おぷちゃ)書き込み数ランキング',
       h2: 'おぷちゃ書き込み数ランキング'
     }
   },
@@ -30,7 +30,7 @@ const routes = [
     component: () => import('../views/Message.vue'),
     meta: {
       title: 'Explore Messages',
-      desc: '布団ちゃんオプチャ過去ログ検索システム',
+      desc: '布団ちゃんオープンチャット(おぷちゃ)過去ログ検索システム',
       h2: '布団ちゃん おぷちゃ過去ログ検索システム'
     }
   },
@@ -76,7 +76,7 @@ const routes = [
   },
 ]
 
-const DEFAULT_TITLE = 'futon-openchat'
+const DEFAULT_TITLE = 'futonchan-tools'
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
