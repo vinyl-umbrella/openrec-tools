@@ -403,7 +403,7 @@ export default {
                   name = name + "[Staff]";
                 }
                 if (j.data.is_muted) {
-                  name = name + "[Muted]";
+                  name = name + "[Manuke]";
                 }
 
                 let result = j.data.message.match(
@@ -654,7 +654,7 @@ export default {
               name = name + "[Staff]";
             }
             if (past_comments[i].is_muted) {
-              name = name + "[Muted]";
+              name = name + "[Manuke]";
             }
 
             let comment = {
