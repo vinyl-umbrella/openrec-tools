@@ -373,7 +373,7 @@ export default {
                   break;
                 }
 
-                let name = j.data.user_name + " (" + j.data.user_key + ")";
+                let name = `${j.data.user_name} (${j.data.user_key})`;
                 if (
                   j.data.user_type == 1 ||
                   j.data.user_key == "yocchan-umaimon"
@@ -387,23 +387,22 @@ export default {
                   );
                 }
                 if (j.data.badges.length != 0) {
-                  name =
-                    name + "[Sub" + j.data.badges[0].subscription.months + "]";
+                  name = `${name}[Lv.${j.data.badges[0].subscription.months}]`;
                 }
                 if (j.data.is_premium) {
-                  name = name + "[P]";
+                  name = `${name}[P]`;
                 }
                 if (j.data.is_fresh) {
-                  name = name + "[Fresh]";
+                  name = `${name}[Fresh]`;
                   if (self.config.hideNewcomer) {
                     break;
                   }
                 }
                 if (j.data.is_moderator) {
-                  name = name + "[Staff]";
+                  name = `${name}[Staff]`;
                 }
                 if (j.data.is_muted) {
-                  name = name + "[Manuke]";
+                  name = `${name}[Manuke]`;
                 }
 
                 let result = j.data.message.match(
@@ -629,32 +628,24 @@ export default {
             if(self.config.ngwords.filter(word => past_comments[i].message.indexOf(word) !== -1).length !== 0) {
               continue;
             }
-            let name =
-              past_comments[i].user.nickname +
-              " (" +
-              past_comments[i].user.id +
-              ")";
+            let name = `${past_comments[i].user.nickname} (${past_comments[i].user.id})`;
             if (past_comments[i].badges.length != 0) {
-              name =
-                name +
-                "[Sub" +
-                past_comments[i].badges[0].subscription.months +
-                "]";
+              name = `${name}[Lv.${past_comments[i].badges[0].subscription.months}]`;
             }
             if (past_comments[i].user.is_premium) {
-              name = name + "[P]";
+              name = `${name}[P]`;
             }
             if (past_comments[i].user.is_fresh) {
-              name = name + "[Fresh]";
+              name = `${name}[Fresh]`;
               if (self.config.hideNewcomer) {
                 continue;
               }
             }
             if (past_comments[i].is_moderating) {
-              name = name + "[Staff]";
+              name = `${name}[Staff]`;
             }
             if (past_comments[i].is_muted) {
-              name = name + "[Manuke]";
+              name = `${name}[Manuke]`;
             }
 
             let comment = {
