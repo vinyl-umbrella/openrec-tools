@@ -1,4 +1,4 @@
-# futon-openchat
+# openrec-tools
 ## features
 - masaoroid
 - openrec openchat ranking of number of posts
