@@ -14,15 +14,16 @@
       class="p-button-outlined"
       @click="getMasaoMessage()"
     />
-    <Toast />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { useToast } from "primevue/usetoast";
 
-let nowloading = ref(true);
-let message = ref("loading...");
+const nowloading = ref(true);
+const message = ref("loading...");
+const toast = useToast();
 
 const getMasaoMessage = async () => {
   let url =
@@ -33,7 +34,7 @@ const getMasaoMessage = async () => {
   if (res.ok) {
     message.value = await res.text();
   } else {
-    this.$toast.add({
+    toast.add({
       severity: "error",
       summary: "Failed",
       detail: "Failed to get msg",

@@ -7,6 +7,8 @@ import Button from "primevue/button";
 import Toast from "primevue/toast";
 import ToastService from "primevue/toastservice";
 import Sidebar from "primevue/sidebar";
+import InputText from "primevue/inputtext";
+import Dropdown from "primevue/dropdown";
 
 // import "primevue/resources/themes/arya-blue/theme.css";
 import "@/style/theme.css";
@@ -21,5 +23,7 @@ app.use(ToastService);
 app.component("Button", Button);
 app.component("Toast", Toast);
 app.component("Sidebar", Sidebar);
+app.component("InputText", InputText);
+app.component("Dropdown", Dropdown);
 
 app.mount("#app");
