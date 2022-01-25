@@ -1,6 +1,6 @@
 :root {
     --surface-a:#44424e;
-    --surface-b:#292830;
+    --surface-b:#2f2e35;
     --surface-c:rgba(255, 255, 255, 0.03);
     --surface-d:#383838;
     --text-color:rgba(255, 255, 255, 0.87);
@@ -3837,9 +3837,6 @@
     border: 1px solid #383838;
     box-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.2), 0px 24px 38px 3px rgba(0, 0, 0, 0.14), 0px 9px 46px 8px rgba(0, 0, 0, 0.12);
   }
-  .p-sidebar .p-sidebar-header {
-    padding: 1rem;
-  }
   .p-sidebar .p-sidebar-header .p-sidebar-close,
   .p-sidebar .p-sidebar-header .p-sidebar-icon {
     width: 2rem;
@@ -3867,6 +3864,8 @@
   }
   .p-sidebar .p-sidebar-content {
     padding: 1rem;
+    line-height: 1.5;
+    font-size: 1.25rem;
   }
 
   .p-tooltip .p-tooltip-text {

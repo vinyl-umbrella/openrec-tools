@@ -41,7 +41,7 @@
         @click="getMessages(0)"
       />
     </div>
-    <div class="table_wrap">
+    <div class="table-wrap">
       <table>
         <thead>
           <th width="20%">datetime</th>
@@ -151,7 +151,7 @@ const getMessages = async (last) => {
   width: calc(100vw / 6);
 }
 
-.table_wrap {
+.table-wrap {
   overflow-x: scroll;
 }
 table {

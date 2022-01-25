@@ -4,9 +4,13 @@
     <span>てすと</span>
     <Sidebar v-model:visible="menu">
       <h3>Menu</h3>
-      <router-link to="/">Home</router-link>
+      <router-link to="/">Masaoroid</router-link>
+      <br />
+      <router-link to="rank">ランキング</router-link>
       <br />
       <router-link to="/message">過去ログ検索</router-link>
+      <br />
+      <router-link to="/api">OPENREC API</router-link>
       <br />
       <router-link to="/contact">Contact</router-link>
       <br />
@@ -17,6 +21,7 @@
 </template>
 
 <script setup>
+import Sidebar from "primevue/sidebar";
 import { ref } from "vue";
 
 const menu = ref(false);
@@ -47,5 +52,9 @@ body {
 #router-view {
   padding-left: 2%;
   padding-right: 2%;
+}
+
+a {
+  color: var(--text-color);
 }
 </style>

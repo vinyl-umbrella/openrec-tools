@@ -9,6 +9,7 @@
     "report": "vue-cli-service build --report"
   },
   "dependencies": {
+    "chart.js": "^3.7.0",
     "core-js": "^3.6.5",
     "primeicons": "^5.0.0",
     "primevue": "^3.11.0",
