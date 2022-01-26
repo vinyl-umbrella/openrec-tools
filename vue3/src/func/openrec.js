@@ -37,6 +37,11 @@ async function getVideoInfo(videoId) {
   }
 }
 
+async function getUserInfo(userid) {
+  let apiUrl = `https://public.openrec.tv/external/api/v5/channels/${userid}`;
+  return await (await fetch(apiUrl)).json();
+}
+
 function getWsUrl(mid) {
   return `wss://chat.openrec.tv/socket.io/?movieId=${mid}&EIO=3&transport=websocket`;
 }
@@ -214,6 +219,7 @@ export default {
   getVideoInfo,
   getWsUrl,
   getComments,
+  getUserInfo,
   parseWsData,
   postComment,
   updateChatSetting,

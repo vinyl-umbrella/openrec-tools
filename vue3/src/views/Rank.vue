@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Chart type="bar" :data="sampledata" :options="chartOptions" />
+    <Chart type="bar" :data="graphData" :options="chartOptions" />
     <br />
 
     <div>
@@ -29,20 +29,35 @@
           <th>count</th>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in sampledata.labels" :key="index">
+          <tr v-for="(item, index) in graphData.labels" :key="index">
             <td>{{ index + 1 }}</td>
-            <td>{{ item }}</td>
-            <td>{{ sampledata.datasets[0].data[index] }}</td>
+            <td
+              @click="showUserCard(item)"
+              style="text-decoration: underline; cursor: pointer"
+            >
+              {{ item }}
+            </td>
+            <td>{{ graphData.datasets[0].data[index] }}</td>
           </tr>
         </tbody>
       </table>
     </div>
+    <Dialog
+      v-model:visible="showModal"
+      :modal="true"
+      :dismissableMask="true"
+      header="ユーザ情報"
+    >
+      <UserCardVue :userid="modalUserid" />
+    </Dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import Chart from "primevue/chart";
+import Dialog from "primevue/dialog";
+import UserCardVue from "../components/UserCard.vue";
 import InputNumber from "primevue/inputnumber";
 import { useToast } from "primevue/usetoast";
 
@@ -50,7 +65,9 @@ const limit = ref(30);
 const selectedSpan = ref(null);
 const spanArr = ref([]);
 const nowloading = ref(false);
-const sampledata = ref({
+const showModal = ref(false);
+const modalUserid = ref("");
+const graphData = ref({
   labels: [],
   datasets: [
     {
@@ -118,8 +135,8 @@ const getRank = async () => {
       tempIds.push(data["userid"]);
       tempCount.push(data["count"]);
     }
-    sampledata.value.labels = tempIds;
-    sampledata.value.datasets[0].data = tempCount;
+    graphData.value.labels = tempIds;
+    graphData.value.datasets[0].data = tempCount;
   } else {
     toast.add({
       severity: "error",
@@ -129,6 +146,11 @@ const getRank = async () => {
     });
   }
   nowloading.value = false;
+};
+
+const showUserCard = (userid) => {
+  showModal.value = true;
+  modalUserid.value = userid;
 };
 </script>
 

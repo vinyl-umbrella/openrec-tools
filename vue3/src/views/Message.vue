@@ -23,11 +23,11 @@
           placeholder="検索ワード"
           @keydown.enter="getMessages(0)"
         />
-        <InputText
-          type="text"
-          v-model="startDate"
+        <Calendar
+          v-model="dt"
+          dateFormat="yy-mm-dd"
+          :showTime="true"
           placeholder="検索開始日時"
-          @keydown.enter="getMessages(0)"
         />
         <Button
           :loading="nowloading"
@@ -48,7 +48,12 @@
         <tbody>
           <tr v-for="item in messages" :key="item.id">
             <td>{{ timeFormat(item.time) }}</td>
-            <td>{{ item.userid }}</td>
+            <td
+              @click="showUserCard(item.userid)"
+              style="text-decoration: underline; cursor: pointer"
+            >
+              {{ item.userid }}
+            </td>
             <td>{{ item.message }}</td>
           </tr>
         </tbody>
@@ -60,24 +65,37 @@
         :loading="nowloading"
         @click="getMessages(lastid)"
       />
+      <Dialog
+        v-model:visible="showModal"
+        :modal="true"
+        :dismissableMask="true"
+        header="ユーザ情報"
+      >
+        <UserCardVue :userid="modalUserid" />
+      </Dialog>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import Calendar from "primevue/calendar";
+import Dialog from "primevue/dialog";
 import { useToast } from "primevue/usetoast";
+import UserCardVue from "@/components/UserCard.vue";
 import vid from "@/assets/vid.json";
 
 const vidArr = ref(vid);
 const selectedVid = ref({ text: "おぷちゃ3", value: "n9ze3m2w184" });
 const userid = ref(null);
 const searchString = ref(null);
-const startDate = ref(null);
+const dt = ref(null);
 const nowloading = ref(false);
 const messages = ref([]);
 const lastid = ref(0);
 const toast = useToast();
+const showModal = ref(false);
+const modalUserid = ref("");
 
 const timeFormat = (t) => {
   const regex = /(\d\d\d\d-\d\d-\d\d)T(\d\d:\d\d:\d\d).*/i;
@@ -91,9 +109,15 @@ const getMessages = async (last) => {
     videoid: selectedVid.value.value,
     userid: userid.value,
     search_string: searchString.value,
-    startdate: startDate.value,
+    startdate: dt.value,
     border: last,
   };
+  if (dt.value) {
+    let copiedDate = dt.value;
+    copiedDate.setHours(copiedDate.getHours() + 9);
+    copiedDate.setSeconds(0);
+    postdata.startdate = copiedDate.toISOString().slice(0, -5);
+  }
 
   nowloading.value = true;
   let res = await fetch(url, {
@@ -130,6 +154,11 @@ const getMessages = async (last) => {
       life: 3000,
     });
   }
+};
+
+const showUserCard = (userid) => {
+  showModal.value = true;
+  modalUserid.value = userid;
 };
 </script>
 
