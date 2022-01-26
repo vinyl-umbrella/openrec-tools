@@ -2,34 +2,30 @@
   <div>
     <Chart type="bar" :data="sampledata" :options="chartOptions" />
     <br />
-    <div class="container">
-      <span class="p-float-label">
-        <InputNumber v-model="limit" suffix="人" />
-        <label>表示人数</label>
-      </span>
-      <span class="p-float-label">
+
+    <div>
+      <div class="p-inputgroup">
+        <InputNumber v-model="limit" suffix="人" @keydown.enter="getRank" />
         <Dropdown
           v-model="selectedSpan"
           :options="spanArr"
           placeholder="年月"
           filterLocale="ja"
         />
-        <label>年月</label>
-      </span>
-
-      <Button
-        :loading="nowloading"
-        label="更新"
-        class="p-button-outlined"
-        @click="getRank"
-      />
+        <Button
+          :loading="nowloading"
+          label="更新"
+          class="p-button-outlined"
+          @click="getRank"
+        />
+      </div>
     </div>
 
     <div class="table-wrap">
       <table>
         <thead>
-          <th width="5%">rank</th>
-          <th width="25%">userid</th>
+          <th width="10%">rank</th>
+          <th>userid</th>
           <th>count</th>
         </thead>
         <tbody>
@@ -141,20 +137,6 @@ const getRank = async () => {
   position: relative;
   height: 40vh;
   width: 90vw;
-}
-.container {
-  display: flex;
-  margin-bottom: 20px;
-}
-
-.container .p-dropdown {
-  width: 150px;
-}
-.container > span {
-  margin-right: 5px;
-}
-.container span span input {
-  width: 150px;
 }
 
 .table-wrap {

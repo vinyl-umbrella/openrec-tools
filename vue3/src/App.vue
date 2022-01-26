@@ -10,6 +10,8 @@
       <br />
       <router-link to="/message">過去ログ検索</router-link>
       <br />
+      <router-link to="/chat">コメビュ</router-link>
+      <br />
       <router-link to="/api">OPENREC API</router-link>
       <br />
       <router-link to="/contact">Contact</router-link>

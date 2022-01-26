@@ -1,46 +1,43 @@
 <template>
   <div>
-    <div class="container">
-      <Dropdown
-        v-model="selectedVid"
-        :options="vidArr"
-        optionLabel="text"
-        dataKey="value"
-        placeholder="枠"
-        :filter="true"
-        filterLocale="ja"
-      />
-      <span class="p-float-label">
+    <div>
+      <div class="p-inputgroup">
+        <Dropdown
+          v-model="selectedVid"
+          :options="vidArr"
+          optionLabel="text"
+          dataKey="value"
+          placeholder="枠"
+          :filter="true"
+          filterLocale="ja"
+        />
         <InputText
           type="text"
           v-model="userid"
+          placeholder="ユーザID"
           @keydown.enter="getMessages(0)"
         />
-        <label>ユーザID</label>
-      </span>
-      <span class="p-float-label">
         <InputText
           type="text"
           v-model="searchString"
+          placeholder="検索ワード"
           @keydown.enter="getMessages(0)"
         />
-        <label>検索ワード</label>
-      </span>
-      <span class="p-float-label">
         <InputText
           type="text"
           v-model="startDate"
+          placeholder="検索開始日時"
           @keydown.enter="getMessages(0)"
         />
-        <label>検索開始日時</label>
-      </span>
-      <Button
-        :loading="nowloading"
-        label="取得"
-        class="p-button-outlined"
-        @click="getMessages(0)"
-      />
+        <Button
+          :loading="nowloading"
+          label="取得"
+          class="p-button-outlined"
+          @click="getMessages(0)"
+        />
+      </div>
     </div>
+
     <div class="table-wrap">
       <table>
         <thead>
@@ -137,20 +134,6 @@ const getMessages = async (last) => {
 </script>
 
 <style scoped>
-.container {
-  display: flex;
-  margin-bottom: 20px;
-}
-
-.container > div {
-  width: 250px;
-  margin-right: 5px;
-}
-.p-float-label > input {
-  margin-right: 5px;
-  width: calc(100vw / 6);
-}
-
 .table-wrap {
   overflow-x: scroll;
 }
