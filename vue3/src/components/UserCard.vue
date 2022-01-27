@@ -4,10 +4,20 @@
       <Chart type="bar" :data="graphData" :options="chartOptions" />
     </template>
     <template #title>
-      <img :src="userInfo.icon" style="height: 1em; margin-right: 5px" />
-      {{ userInfo.name }}
+      <a
+        :href="`https://www.openrec.tv/user/${userInfo.id}`"
+        target="_blank"
+        rel="noopener norefferer"
+      >
+        <img :src="userInfo.icon" style="height: 1em; margin-right: 5px" />
+        {{ userInfo.name }}
+      </a>
     </template>
     <template #subtitle>{{ userInfo.id }}</template>
+    <template #content>
+      <div>登録日: {{ userInfo.date }}</div>
+      <div>{{ userInfo.introduction }}</div>
+    </template>
   </Card>
 </template>
 
@@ -24,6 +34,8 @@ const userInfo = ref({
   id: "",
   name: "",
   icon: "",
+  date: "",
+  introduction: "",
 });
 const graphData = ref({
   labels: [],
@@ -46,6 +58,9 @@ onMounted(async () => {
   let info = await openrec.getUserInfo(props.userid);
   userInfo.value.id = info.id;
   userInfo.value.name = info.name;
+  userInfo.value.date = info.registered_at.replace("T", " ").slice(0, -6);
+  userInfo.value.introduction = info.introduction;
+
   if (info.l_icon_image_url) {
     userInfo.value.icon = info.l_icon_image_url;
   } else {
@@ -72,7 +87,6 @@ onMounted(async () => {
 .p-chart {
   position: relative;
   height: 30vh;
-  min-width: 50vw;
 }
 
 .p-card-title {

@@ -31,11 +31,13 @@
         <tbody>
           <tr v-for="(item, index) in graphData.labels" :key="index">
             <td>{{ index + 1 }}</td>
-            <td
-              @click="showUserCard(item)"
-              style="text-decoration: underline; cursor: pointer"
-            >
-              {{ item }}
+            <td>
+              <span
+                @click="showUserCard(item)"
+                style="text-decoration: underline; cursor: pointer"
+              >
+                {{ item }}
+              </span>
             </td>
             <td>{{ graphData.datasets[0].data[index] }}</td>
           </tr>
@@ -163,18 +165,5 @@ const showUserCard = (userid) => {
 
 .table-wrap {
   overflow-x: scroll;
-}
-table {
-  width: 100%;
-  min-width: 300px;
-  border-collapse: collapse;
-  border: solid 3px var(--primary-color);
-  word-break: break-all;
-}
-
-table th,
-table td {
-  border: solid 1px var(--primary-color);
-  padding: 6px;
 }
 </style>

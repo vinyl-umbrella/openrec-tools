@@ -48,32 +48,34 @@
         <tbody>
           <tr v-for="item in messages" :key="item.id">
             <td>{{ timeFormat(item.time) }}</td>
-            <td
-              @click="showUserCard(item.userid)"
-              style="text-decoration: underline; cursor: pointer"
-            >
-              {{ item.userid }}
+            <td>
+              <span
+                @click="showUserCard(item.userid)"
+                style="text-decoration: underline; cursor: pointer"
+              >
+                {{ item.userid }}
+              </span>
             </td>
             <td>{{ item.message }}</td>
           </tr>
         </tbody>
       </table>
-      <Button
-        class="nextbtn p-button-outlined"
-        label="次の50件"
-        v-if="messages.length > 49"
-        :loading="nowloading"
-        @click="getMessages(lastid)"
-      />
-      <Dialog
-        v-model:visible="showModal"
-        :modal="true"
-        :dismissableMask="true"
-        header="ユーザ情報"
-      >
-        <UserCardVue :userid="modalUserid" />
-      </Dialog>
     </div>
+    <Button
+      class="nextbtn p-button-outlined"
+      label="次の50件"
+      v-if="messages.length > 49"
+      :loading="nowloading"
+      @click="getMessages(lastid)"
+    />
+    <Dialog
+      v-model:visible="showModal"
+      :modal="true"
+      :dismissableMask="true"
+      header="ユーザ情報"
+    >
+      <UserCardVue :userid="modalUserid" />
+    </Dialog>
   </div>
 </template>
 
@@ -166,19 +168,7 @@ const showUserCard = (userid) => {
 .table-wrap {
   overflow-x: scroll;
 }
-table {
-  width: 100%;
-  min-width: 300px;
-  border-collapse: collapse;
-  border: solid 3px var(--primary-color);
-  word-break: break-all;
-}
 
-table th,
-table td {
-  border: solid 1px var(--primary-color);
-  padding: 6px;
-}
 .nextbtn {
   float: right;
   margin-top: 10px;

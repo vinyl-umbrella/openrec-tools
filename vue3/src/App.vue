@@ -1,21 +1,16 @@
 <template>
   <div id="nav">
     <Button @click="menu = true" icon="pi pi-list" />
-    <span>てすと</span>
+    <h2 id="pagetitle"></h2>
     <Sidebar v-model:visible="menu">
-      <h3>Menu</h3>
-      <router-link to="/">Masaoroid</router-link>
-      <br />
-      <router-link to="rank">ランキング</router-link>
-      <br />
-      <router-link to="/message">過去ログ検索</router-link>
-      <br />
-      <router-link to="/chat">コメビュ</router-link>
-      <br />
-      <router-link to="/api">OPENREC API</router-link>
-      <br />
-      <router-link to="/contact">Contact</router-link>
-      <br />
+      <h3 style="margin: 0">Menu</h3>
+      <router-link to="/">Masaoroid</router-link><br />
+      <router-link to="rank">ランキング</router-link><br />
+      <router-link to="/message">過去ログ検索</router-link><br />
+      <router-link to="/chat">コメビュ</router-link><br />
+      <router-link to="/stream">コメつき配信</router-link><br />
+      <router-link to="/api">OPENREC API</router-link><br />
+      <router-link to="/contact">問い合わせ</router-link>
     </Sidebar>
   </div>
   <router-view id="router-view" />
@@ -47,8 +42,15 @@ body {
 }
 
 #nav {
-  margin: 2%;
+  display: flex;
+  margin-top: 2%;
+  margin-left: 2%;
+  margin-bottom: 2%;
   text-align: left;
+}
+#nav > h2 {
+  margin: 0;
+  padding-left: 1em;
 }
 
 #router-view {
@@ -58,5 +60,20 @@ body {
 
 a {
   color: var(--text-color);
+}
+
+table {
+  width: 100%;
+  min-width: 300px;
+  border-collapse: collapse;
+  border: solid 3px var(--primary-color);
+  word-break: break-all;
+  margin-top: 10px;
+}
+
+table th,
+table td {
+  border: solid 1px var(--primary-color);
+  padding: 6px;
 }
 </style>

@@ -54,9 +54,9 @@
         </div>
       </SplitterPanel>
       <SplitterPanel :size="40">
-        <div v-for="event in events" :key="event.id">
+        <div class="info" v-for="(event, index) in events" :key="index">
           <div>
-            {{ event.message }}
+            {{ event }}
           </div>
         </div>
       </SplitterPanel>
@@ -120,7 +120,9 @@ const connectWs = (wss) => {
 
           // scroll
           setTimeout(() => {
-            document.getElementById("comment-box").scrollIntoView(false);
+            let ele = document.getElementById("comment-box");
+            // console.log(ele.scrollHeight - ele.clientHeight, ele.scrollTop);
+            ele.scrollIntoView({ behavior: "smooth", block: "end" });
           }, 0);
 
           calcSpeed();
@@ -129,6 +131,43 @@ const connectWs = (wss) => {
         case 1:
           streamInfo.value.view = msg.live_viewers;
           break;
+
+        // stream start/end
+        case 3:
+          events.value.push("[stream] 終了");
+          break;
+        case 5:
+          events.value.push("[stream] 開始");
+          break;
+
+        // ban 追加/削除
+        case 6:
+          events.value.push(`[ban] 追加 ${msg.owner_to_banned_user_id}`);
+          break;
+        case 7:
+          events.value.push(`[ban] 解除 ${msg.owner_to_banned_user_id}`);
+          break;
+
+        // staff 追加/削除
+        case 8:
+          events.value.push(`[staff] 追加 ${msg.owner_to_moderator_user_id}`);
+          break;
+        case 9:
+          events.value.push(`[staff] 解除 ${msg.owner_to_moderator_user_id}`);
+          break;
+
+        // case 10:
+        //   break;
+        case 11:
+          events.value.push(`[info] ${msg.system_message.type} ${msg.message}`);
+          break;
+
+        case 27:
+          events.value.push(`[info] ${msg.message}`);
+          break;
+
+        default:
+          events.value.push(msg);
       }
     }
   };
@@ -181,7 +220,8 @@ const calcAvg = () => {
   overflow-y: scroll;
 }
 
-.comments {
+.comments,
+.info {
   margin: 0.5em;
   background-color: var(--surface-a);
   padding: 3px;
