@@ -31,6 +31,7 @@ async function getVideoInfo(videoId) {
       mid: j.movie_id,
       title: j.title,
       name: j.channel.name,
+      publicType: j.chat_public_type,
     };
   } else {
     throw videoId + " " + res.statusText;
@@ -51,7 +52,14 @@ function parseWsData(data) {
     data = JSON.parse(data.slice(2));
     data[1] = JSON.parse(data[1]);
     if (data[1].type === 0) {
-      data[1].data = commentFormatter("ws", data[1].data);
+      if (
+        data[1].data.user_key !== "" &&
+        checkBL(data[1].data.user_key, data[1].data.message)
+      ) {
+        data[1].data = commentFormatter("ws", data[1].data);
+      } else {
+        return [];
+      }
     }
     return data;
   }
@@ -65,9 +73,27 @@ async function getComments(vid) {
   let commentData = [];
 
   for (let comment of comments) {
-    commentData.push(commentFormatter("rest", comment));
+    if (checkBL(comment.user.id, comment.message)) {
+      commentData.push(commentFormatter("rest", comment));
+    }
   }
   return commentData;
+}
+
+function checkBL(userid, msg) {
+  let result = true;
+  let bl = localStorage.getItem("blacklist");
+  let ngwords = localStorage.getItem("ngwords");
+  if (bl && bl.split(",").includes(userid)) {
+    result = false;
+  } else if (
+    ngwords &&
+    ngwords != "" &&
+    ngwords.split(",").filter((word) => msg.indexOf(word) !== -1).length !== 0
+  ) {
+    result = false;
+  }
+  return result;
 }
 
 function commentFormatter(mode, comment) {
@@ -78,6 +104,8 @@ function commentFormatter(mode, comment) {
     recxuser_id: 0,
     message: comment.message,
     stamp: null,
+    capture: null,
+    yell: null,
     time: "",
   };
   if (mode == "rest") {
@@ -113,10 +141,21 @@ function commentFormatter(mode, comment) {
     c.id = comment.chat_id;
     c.color = comment.user_color;
     c.recxuser_id = comment.openrec_user_id;
-    c.time = comment.message_dt.slice(-8);
+    c.time = comment.cre_dt.slice(-8);
+
+    // stamp, capture, yell
     if (comment.stamp) {
       c.stamp = comment.stamp.image_url;
+    } else if (comment.capture) {
+      c.capture = {
+        id: comment.capture.capture.id,
+        title: comment.capture.capture.title,
+      };
+    } else if (comment.yell) {
+      c.yell = comment.yell.yells;
     }
+
+    // name
     let name = `${comment.user_name} (${comment.user_key})`;
     if (comment.badges.length !== 0) {
       name += `[Lv.${comment.badges[0].subscription.months}]`;
@@ -161,58 +200,10 @@ async function postComment(videoId, inputComment) {
     },
     body: JSON.stringify(data),
   };
-  let res = await fetch(url, param);
-  if (!res.ok) {
-    throw (await res.json()).message;
-  }
-}
-
-async function updateChatSetting(conf) {
-  let url = "https://apiv5.openrec.tv/api/v5/users/me/chat-setting";
-  let param = {
-    method: "PUT",
-    headers: {
-      Accept: "application/json,text/plain,*/*",
-      "Content-Type": "application/json;charset=utf-8",
-      uuid: localStorage.getItem("orUuid"),
-      "access-token": localStorage.getItem("orAccessToken"),
-    },
-    body: JSON.stringify(conf),
-  };
-  let res = await fetch(url, param);
-  if (!res.ok) {
-    throw (await res.json()).message;
-  }
-}
-
-async function getBL() {
-  let url = "https://apiv5.openrec.tv/api/v5/movies/n9ze3m2w184/detail";
-  let param = {
-    method: "GET",
-    headers: {
-      Accept: "application/json,text/plain,*/*",
-      "Content-Type": "application/json;charset=utf-8",
-      uuid: localStorage.getItem("orUuid"),
-      "access-token": localStorage.getItem("orAccessToken"),
-    },
-  };
   let j = await (await fetch(url, param)).json();
-  return j;
-}
-
-async function getNGwords() {
-  let url = "https://apiv5.openrec.tv/api/v5/users/me/banned-words";
-  let param = {
-    method: "GET",
-    headers: {
-      Accept: "application/json,text/plain,*/*",
-      "Content-Type": "application/json;charset=utf-8",
-      uuid: localStorage.getItem("orUuid"),
-      "access-token": localStorage.getItem("orAccessToken"),
-    },
-  };
-  let j = await (await fetch(url, param)).json();
-  return j;
+  if (j.status != 0) {
+    throw j.message;
+  }
 }
 
 export default {
@@ -222,7 +213,4 @@ export default {
   getUserInfo,
   parseWsData,
   postComment,
-  updateChatSetting,
-  getBL,
-  getNGwords,
 };

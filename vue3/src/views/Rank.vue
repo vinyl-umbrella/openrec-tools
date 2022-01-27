@@ -58,7 +58,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import Chart from "primevue/chart";
-import Dialog from "primevue/dialog";
 import UserCardVue from "../components/UserCard.vue";
 import InputNumber from "primevue/inputnumber";
 import { useToast } from "primevue/usetoast";

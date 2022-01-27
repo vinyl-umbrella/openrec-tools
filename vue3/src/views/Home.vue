@@ -71,7 +71,7 @@ onMounted(() => {
   border: solid 5px var(--primary-color);
   padding: 16px;
   min-width: 240px;
-  max-width: 100%;
+  width: 50%;
   text-align: center;
   border-radius: 5px;
 }

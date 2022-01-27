@@ -47,9 +47,9 @@ const routes = [
     name: "Stream",
     component: () => import("@/views/Stream.vue"),
     meta: {
-      title: "stream",
-      desc: "OPENREC.tv 多機能コメントビューア",
-      h2: "OPENREC.tv 多機能コメビュ",
+      title: "Player",
+      desc: "OPENREC.tv ニコ生風コメント付きプレイヤー",
+      h2: "OPENREC.tv コメ付きプレイヤー",
     },
   },
   {
@@ -57,9 +57,9 @@ const routes = [
     name: "Api",
     component: () => import("@/views/Api.vue"),
     meta: {
-      title: "Player",
-      desc: "OPENREC.tv ニコ生風コメント付きプレイヤー",
-      h2: "OPENREC.tv コメ付きプレイヤー",
+      title: "OPENREC.tv API",
+      desc: "OPENREC.tv API まとめ",
+      h2: "OPENREC.tv API まとめ",
     },
   },
   {

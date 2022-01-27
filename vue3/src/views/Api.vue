@@ -46,7 +46,6 @@
 <script setup>
 import { ref } from "vue";
 import Card from "primevue/card";
-import Dialog from "primevue/dialog";
 import openrecApi from "@/assets/openrecAPI.json";
 
 const apis = ref(openrecApi);

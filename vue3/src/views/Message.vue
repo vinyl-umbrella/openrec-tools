@@ -82,7 +82,6 @@
 <script setup>
 import { ref } from "vue";
 import Calendar from "primevue/calendar";
-import Dialog from "primevue/dialog";
 import { useToast } from "primevue/usetoast";
 import UserCardVue from "@/components/UserCard.vue";
 import vid from "@/assets/vid.json";
