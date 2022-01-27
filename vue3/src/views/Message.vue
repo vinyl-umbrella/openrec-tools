@@ -94,9 +94,9 @@ const dt = ref(null);
 const nowloading = ref(false);
 const messages = ref([]);
 const lastid = ref(0);
-const toast = useToast();
 const showModal = ref(false);
 const modalUserid = ref("");
+const toast = useToast();
 
 const timeFormat = (t) => {
   const regex = /(\d\d\d\d-\d\d-\d\d)T(\d\d:\d\d:\d\d).*/i;

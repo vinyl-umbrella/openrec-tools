@@ -18,8 +18,8 @@
 </template>
 
 <script setup>
-import Sidebar from "primevue/sidebar";
 import { ref } from "vue";
+import Sidebar from "primevue/sidebar";
 
 const menu = ref(false);
 </script>

@@ -49,8 +49,8 @@ import Card from "primevue/card";
 import openrecApi from "@/assets/openrecAPI.json";
 
 const apis = ref(openrecApi);
-const showModal = ref(false);
 const jsonData = ref({});
+const showModal = ref(false);
 
 const getApi = async (method, url, p) => {
   let param = {

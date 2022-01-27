@@ -21,9 +21,13 @@
 import { ref, onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
 
-const nowloading = ref(true);
 const message = ref("loading...");
+const nowloading = ref(true);
 const toast = useToast();
+
+onMounted(() => {
+  getMasaoMessage();
+});
 
 const getMasaoMessage = async () => {
   let url =
@@ -42,10 +46,6 @@ const getMasaoMessage = async () => {
     });
   }
 };
-
-onMounted(() => {
-  getMasaoMessage();
-});
 </script>
 
 <style scoped>

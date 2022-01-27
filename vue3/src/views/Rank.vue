@@ -58,13 +58,13 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import Chart from "primevue/chart";
-import UserCardVue from "../components/UserCard.vue";
 import InputNumber from "primevue/inputnumber";
 import { useToast } from "primevue/usetoast";
+import UserCardVue from "../components/UserCard.vue";
 
 const limit = ref(30);
-const selectedSpan = ref(null);
 const spanArr = ref([]);
+const selectedSpan = ref(null);
 const nowloading = ref(false);
 const showModal = ref(false);
 const modalUserid = ref("");

@@ -73,6 +73,10 @@ const userInfo = ref({
   name: "",
 });
 
+onMounted(() => {
+  getMyInfo();
+});
+
 const login = () => {
   localStorage.setItem("orAccessToken", token.value);
   localStorage.setItem("orUuid", uuid.value);
@@ -179,10 +183,6 @@ const getNGwords = async () => {
 const resetNGwords = () => {
   localStorage.setItem("ngwords", []);
 };
-
-onMounted(() => {
-  getMyInfo();
-});
 </script>
 
 <style scoped>
