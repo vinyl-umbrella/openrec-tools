@@ -29,7 +29,11 @@
         同接: {{ streamInfo.view }} コメ速: {{ calcAvg() }}/min
       </div>
       <div>
-        <Button icon="pi pi-cog" class="p-button-rounded" @click="showConfig" />
+        <Button
+          icon="pi pi-cog"
+          class="p-button-rounded p-button-outlined"
+          @click="showConfig"
+        />
       </div>
     </div>
 
