@@ -5,7 +5,12 @@
 
     <div>
       <div class="p-inputgroup">
-        <InputNumber v-model="limit" suffix="人" @keydown.enter="getRank" />
+        <InputNumber
+          v-model="limit"
+          :min="0"
+          suffix="人"
+          @keydown.enter="getRank"
+        />
         <Dropdown
           v-model="selectedSpan"
           :options="spanArr"
@@ -80,8 +85,28 @@ const graphData = ref({
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
-  legend: {
-    display: false,
+  plugins: {
+    legend: {
+      display: false,
+    },
+  },
+  scales: {
+    x: {
+      ticks: {
+        color: "#ddd",
+      },
+      grid: {
+        display: false,
+      },
+    },
+    y: {
+      ticks: {
+        color: "#ddd",
+      },
+      grid: {
+        color: "#666",
+      },
+    },
   },
 });
 const toast = useToast();

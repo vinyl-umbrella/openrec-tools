@@ -40,7 +40,12 @@ async function getVideoInfo(videoId) {
 
 async function getUserInfo(userid) {
   let apiUrl = `https://public.openrec.tv/external/api/v5/channels/${userid}`;
-  return await (await fetch(apiUrl)).json();
+  let res = await fetch(apiUrl);
+  if (res.ok) {
+    return await res.json();
+  } else {
+    throw `${userid} is not found.`;
+  }
 }
 
 function getWsUrl(mid) {
@@ -140,7 +145,7 @@ function commentFormatter(mode, comment) {
   } else if (mode === "ws") {
     c.id = comment.chat_id;
     c.color = comment.user_color;
-    c.recxuser_id = comment.openrec_user_id;
+    c.recxuser_id = comment.user_id;
     c.time = comment.cre_dt.slice(-8);
 
     // stamp, capture, yell

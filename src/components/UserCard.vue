@@ -12,6 +12,13 @@
         <img :src="userInfo.icon" style="height: 1em; margin-right: 5px" />
         {{ userInfo.name }}
       </a>
+      <a
+        v-if="userInfo.twitter"
+        class="pi pi-twitter"
+        :href="`https://twitter.com/${userInfo.twitter}`"
+        target="_blank"
+        rel="noopener norefferer"
+      />
     </template>
     <template #subtitle>{{ userInfo.id }}</template>
     <template #content>
@@ -26,6 +33,7 @@ import { defineProps, onMounted, ref } from "vue";
 import Card from "primevue/card";
 import Chart from "primevue/chart";
 import openrec from "@/func/openrec";
+import { useToast } from "primevue/usetoast";
 
 const props = defineProps({
   userid: String,
@@ -34,6 +42,7 @@ const userInfo = ref({
   id: "",
   name: "",
   icon: "",
+  twitter: null,
   date: "",
   introduction: "",
 });
@@ -49,24 +58,57 @@ const graphData = ref({
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
-  legend: {
-    display: false,
+  plugins: {
+    legend: {
+      display: false,
+    },
+  },
+  scales: {
+    x: {
+      ticks: {
+        color: "#ddd",
+      },
+      grid: {
+        display: false,
+      },
+    },
+    y: {
+      ticks: {
+        color: "#ddd",
+      },
+      grid: {
+        color: "#666",
+      },
+    },
   },
 });
+const toast = useToast();
 
 onMounted(async () => {
-  let info = await openrec.getUserInfo(props.userid);
-  userInfo.value.id = info.id;
-  userInfo.value.name = info.name;
-  userInfo.value.date = info.registered_at.replace("T", " ").slice(0, -6);
-  userInfo.value.introduction = info.introduction;
+  try {
+    let info = await openrec.getUserInfo(props.userid);
+    userInfo.value.id = info.id;
+    userInfo.value.name = info.name;
+    userInfo.value.twitter = info.twitter_screen_name;
+    userInfo.value.date = info.registered_at.replace("T", " ").slice(0, -6);
+    userInfo.value.introduction = info.introduction;
 
-  if (info.l_icon_image_url) {
-    userInfo.value.icon = info.l_icon_image_url;
-  } else {
-    userInfo.value.icon =
-      "https://www.openrec.tv/viewapp/images/v4/default/profile.png";
+    if (info.icon_image_url) {
+      userInfo.value.icon = info.icon_image_url;
+    } else {
+      userInfo.value.icon =
+        "https://www.openrec.tv/viewapp/images/v4/default/profile.png";
+    }
+  } catch (e) {
+    toast.add({
+      severity: "error",
+      summary: "Failed",
+      detail: e,
+      life: 3000,
+    });
+    userInfo.value.id = props.userid;
   }
+
   let openchatApi = `https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v2/rank/user/${props.userid}`;
   let res = await fetch(openchatApi);
   if (res.ok) {
