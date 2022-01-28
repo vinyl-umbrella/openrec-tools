@@ -1,19 +1,13 @@
 <template>
   <div>
-    <div>
-      <div class="p-inputgroup">
-        <InputText
-          type="text"
-          v-model="inputUrl"
-          placeholder="URL"
-          @keydown.enter="getPastComment"
-        />
-        <Button
-          label="接続"
-          class="p-button-outlined"
-          @click="getPastComment"
-        />
-      </div>
+    <div class="p-inputgroup">
+      <InputText
+        type="text"
+        v-model="inputUrl"
+        placeholder="URL"
+        @keydown.enter="getPastComment"
+      />
+      <Button label="接続" class="p-button-outlined" @click="getPastComment" />
     </div>
 
     <div
@@ -32,7 +26,7 @@
         <Button
           icon="pi pi-cog"
           class="p-button-rounded p-button-outlined"
-          @click="showConfig"
+          @click="showModal = true"
         />
       </div>
     </div>
@@ -44,57 +38,44 @@
         background-color: var(--surface-b);
       "
     >
-      <SplitterPanel :size="60">
-        <div id="comment-box">
-          <div class="comments" v-for="comment in comments" :key="comment.id">
-            <div class="user-name">
-              <span :style="{ color: comment.color }">
-                {{ comment.name }}
-              </span>
-              <span>
-                {{ comment.time }}
-              </span>
-            </div>
-            <span v-if="comment.message">
-              {{ comment.message }}
-            </span>
-            <span v-if="comment.stamp">
-              <img :src="comment.stamp" width="64" />
-            </span>
+      <SplitterPanel :size="60" id="comment-box">
+        <div class="comments" v-for="comment in comments" :key="comment.id">
+          <div class="user-name">
+            <span :style="{ color: comment.color }">{{ comment.name }}</span>
+            <span>{{ comment.time }}</span>
           </div>
+          <span v-if="comment.message">{{ comment.message }}</span>
+          <span v-else-if="comment.stamp">
+            <img :src="comment.stamp" width="64" />
+          </span>
         </div>
       </SplitterPanel>
-      <SplitterPanel :size="40">
-        <div id="info-box">
-          <div class="info" v-for="(event, index) in events" :key="index">
-            {{ event.date }} [{{ event.type }}]
-            <span v-if="event.url">
-              <a :href="event.url" target="_blank" rel="noopener norefferer">
-                {{ event.url }}
-              </a>
-            </span>
-            <span v-else>
+      <SplitterPanel :size="40" id="info-box">
+        <div class="info" v-for="(event, index) in events" :key="index">
+          {{ event.date }}
+          <span style="font-weight: bolder">[{{ event.type }}]</span>
+          <span v-if="event.url">
+            <a :href="event.url" target="_blank" rel="noopener norefferer">
               {{ event.message }}
-            </span>
-          </div>
+            </a>
+          </span>
+          <span v-else>{{ event.message }}</span>
         </div>
       </SplitterPanel>
     </Splitter>
 
-    <div>
-      <div class="p-inputgroup">
-        <InputText
-          type="text"
-          v-model="inputComment"
-          placeholder="コメント"
-          @keydown.enter="postComment"
-        />
-        <Button
-          :label="String(inputComment.length) + '/100 送信'"
-          class="p-button-outlined"
-          @click="postComment"
-        />
-      </div>
+    <div class="p-inputgroup">
+      <InputText
+        type="text"
+        v-model="inputComment"
+        placeholder="コメント"
+        @keydown.enter="postComment"
+      />
+      <Button
+        :label="String(inputComment.length) + '/100 送信'"
+        class="p-button-outlined"
+        @click="postComment"
+      />
     </div>
     <Dialog
       v-model:visible="showModal"
@@ -123,14 +104,19 @@ const streamInfo = ref({
   title: "title",
   name: "streamer",
   view: 0,
-  speed: 123,
+  speed: 0,
 });
 const comments = ref([]);
 const events = ref([]);
 const showModal = ref(false);
 const toast = useToast();
 
+let commentBox;
+let infoBox;
+
 onMounted(() => {
+  commentBox = document.getElementById("comment-box");
+  infoBox = document.getElementById("info-box");
   const route = useRoute();
   if (route.query.u) {
     inputUrl.value = route.query.u;
@@ -140,6 +126,7 @@ onMounted(() => {
 
 const connectWs = (wss) => {
   let sock = new WebSocket(wss);
+  const urlRegex = /https?:\/\/[a-zA-Z0-9.\-_@:/~?%&;=+#',()*!]+/;
   sock.onmessage = (e) => {
     let data = openrec.parseWsData(e.data);
     if (data[0] === "message") {
@@ -150,21 +137,38 @@ const connectWs = (wss) => {
           if (msg.yell) {
             pushEvent("yell", `${msg.name} ${msg.yell}Pt ${msg.message}`);
           } else if (msg.capture) {
-            pushEvent("capture", [msg.name, msg.capture.id, msg.capture.title]);
+            pushEvent("capture", [
+              `${msg.name} ${msg.capture.title}`,
+              `https://www.openrec.tv/capture/${msg.capture.id}`,
+            ]);
+          }
+
+          {
+            let result = msg.message.match(urlRegex);
+            if (result !== null) {
+              pushEvent("url", [`${msg.name} ${msg.message}`, result[0]]);
+            }
           }
 
           comments.value.push(msg);
-          if (comments.value.length > 2000) {
+          if (comments.value.length > 160) {
             comments.value.shift();
           }
 
           // scroll
           setTimeout(() => {
-            let ele = document.getElementById("comment-box");
-            // console.log(ele.scrollHeight - ele.clientHeight, ele.scrollTop);
-            ele.scrollIntoView({ behavior: "smooth", block: "end" });
+            if (
+              commentBox.scrollHeight -
+                commentBox.clientHeight -
+                commentBox.scrollTop <
+              200
+            ) {
+              commentBox.lastElementChild.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+              });
+            }
           }, 0);
-
           calcSpeed();
           break;
         // viewers
@@ -175,6 +179,7 @@ const connectWs = (wss) => {
         // stream start/end
         case 3:
           pushEvent("stream", "終了");
+          sock.close();
           break;
         case 5:
           pushEvent("stream", "開始");
@@ -182,18 +187,24 @@ const connectWs = (wss) => {
 
         // ban 追加/削除
         case 6:
-          pushEvent("ban", `追加 ${msg.owner_to_banned_user_id}`);
+          pushEvent("ban", `追加 ${findUserid(msg.owner_to_banned_user_id)}`);
           break;
         case 7:
-          pushEvent("ban", `解除 ${msg.owner_to_banned_user_id}`);
+          pushEvent("ban", `解除 ${findUserid(msg.owner_to_banned_user_id)}`);
           break;
 
         // staff 追加/削除
         case 8:
-          pushEvent("staff", `追加 ${msg.owner_to_moderator_user_id}`);
+          pushEvent(
+            "staff",
+            `追加 ${findUserid(msg.owner_to_moderator_user_id)}`
+          );
           break;
         case 9:
-          pushEvent("staff", `解除 ${msg.owner_to_moderator_user_id}`);
+          pushEvent(
+            "staff",
+            `解除 ${findUserid(msg.owner_to_moderator_user_id)}`
+          );
           break;
 
         case 10:
@@ -223,9 +234,24 @@ const connectWs = (wss) => {
           break;
 
         default:
-          console.log(msg);
+          console.log(data[1]);
       }
     }
+  };
+
+  sock.onclose = (e) => {
+    console.log(e.code);
+  };
+
+  const findUserid = (id) => {
+    let name = `unknown(${id})`;
+    for (let i = comments.value.length - 1; i >= 0; i--) {
+      if (id === comments.value[i].recxuser_id) {
+        name = comments.value[i].name;
+        break;
+      }
+    }
+    return name;
   };
 
   setInterval(() => {
@@ -243,19 +269,22 @@ const pushEvent = (type, msg) => {
     url: null,
     message: msg,
   };
-  if (type === "capture") {
-    data.message = `${msg[0]} ${msg[2]}`;
-    data.url = `https://www.openrec.tv/capture/${msg[1]}`;
+  if (type === "capture" || type === "url") {
+    data.message = msg[0];
+    data.url = msg[1];
     events.value.push(data);
   } else {
     events.value.push(data);
   }
 
   // scroll
-  setTimeout(() => {
-    let ele = document.getElementById("info-box");
-    ele.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, 0);
+  if (infoBox.scrollHeight - infoBox.clientHeight - infoBox.scrollTop < 200) {
+    infoBox.scrollTop = infoBox.scrollHeight;
+    infoBox.lastElementChild.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+    });
+  }
 };
 
 const getPastComment = async () => {
@@ -272,7 +301,10 @@ const getPastComment = async () => {
     comments.value = await openrec.getComments(vid.value);
 
     setTimeout(() => {
-      document.getElementById("comment-box").scrollIntoView(false);
+      commentBox.lastElementChild.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     }, 0);
     connectWs(openrec.getWsUrl(info.mid));
   } catch (e) {
@@ -312,10 +344,6 @@ const calcSpeed = () => {
 
 const calcAvg = () => {
   return parseInt(streamInfo.value.speed / 2);
-};
-
-const showConfig = () => {
-  showModal.value = true;
 };
 </script>
 
