@@ -89,7 +89,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
@@ -113,6 +113,7 @@ const toast = useToast();
 
 let commentBox;
 let infoBox;
+let sock = null;
 
 onMounted(() => {
   commentBox = document.getElementById("comment-box");
@@ -124,8 +125,14 @@ onMounted(() => {
   }
 });
 
+onBeforeUnmount(() => {
+  if (sock) {
+    sock.close();
+  }
+});
+
 const connectWs = (wss) => {
-  let sock = new WebSocket(wss);
+  sock = new WebSocket(wss);
   const urlRegex = /https?:\/\/[a-zA-Z0-9.\-_@:/~?%&;=+#',()*!]+/;
   sock.onmessage = (e) => {
     let data = openrec.parseWsData(e.data);
@@ -151,7 +158,7 @@ const connectWs = (wss) => {
           }
 
           comments.value.push(msg);
-          if (comments.value.length > 160) {
+          if (comments.value.length > 2000) {
             comments.value.shift();
           }
 
@@ -254,7 +261,10 @@ const connectWs = (wss) => {
     return name;
   };
 
-  setInterval(() => {
+  let intervalId = setInterval(() => {
+    if (!sock) {
+      clearInterval(intervalId);
+    }
     sock.send("2");
   }, 25000);
 };
@@ -288,6 +298,15 @@ const pushEvent = (type, msg) => {
 };
 
 const getPastComment = async () => {
+  if (sock) {
+    toast.add({
+      severity: "warn",
+      summary: "Warn",
+      detail: "Already connected to chat server. Please reload page.",
+      life: 3000,
+    });
+    return;
+  }
   try {
     let info = await openrec.getVideoInfo(inputUrl.value);
     vid.value = info.vid;
