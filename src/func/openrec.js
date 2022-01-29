@@ -32,6 +32,8 @@ async function getVideoInfo(videoId) {
       title: j.title,
       name: j.channel.name,
       publicType: j.chat_public_type,
+      thumbnail_url: j.l_thumbnail_url,
+      media: j.media.url,
     };
   } else {
     throw videoId + " " + res.statusText;
