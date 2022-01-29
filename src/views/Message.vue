@@ -1,204 +1,175 @@
 <template>
   <div>
-    <div class="container">
-      <v-select
-        v-model="tempVideoid"
-        :items="videoIdObj"
-        label="枠"
-        hide-details
-        dense
-        outlined
-        return-object
-      ></v-select>
-      <v-text-field
-        type="string"
-        v-model.trim="userid"
-        label="ユーザID(任意)"
-        hide-details
-        dense
-        outlined
-        @keydown.enter="getMessages(0)"
-      ></v-text-field>
-      <v-text-field
-        type="string"
-        v-model="search_string"
-        label="検索ワード(任意)"
-        hide-details
-        dense
-        outlined
-        @keydown.enter="getMessages(0)"
-      ></v-text-field>
-      <v-text-field
-        type="string"
-        v-model="startdate"
-        label="検索開始日時(任意)"
-        hide-details
-        dense
-        outlined
-        @keydown.enter="getMessages(0)"
-      ></v-text-field>
-      <v-btn
-        @click="getMessages(0)"
-        color="var(--v-primary-darken2)"
-        outlined
-        :loading="isLoading"
-        >取得</v-btn
-      >
+    <div>
+      <div class="p-inputgroup">
+        <Dropdown
+          v-model="selectedVid"
+          :options="vidArr"
+          optionLabel="text"
+          dataKey="value"
+          placeholder="枠"
+          :filter="true"
+          filterLocale="ja"
+        />
+        <InputText
+          type="text"
+          v-model="userid"
+          placeholder="ユーザID"
+          @keydown.enter="getMessages(0)"
+        />
+        <InputText
+          type="text"
+          v-model="searchString"
+          placeholder="検索ワード"
+          @keydown.enter="getMessages(0)"
+        />
+        <Calendar
+          v-model="dt"
+          dateFormat="yy-mm-dd"
+          :showTime="true"
+          placeholder="検索開始日時"
+        />
+        <Button
+          :loading="nowloading"
+          label="取得"
+          class="p-button-outlined"
+          @click="getMessages(0)"
+        />
+      </div>
     </div>
-    <div class="table_wrap">
+
+    <div class="table-wrap">
       <table>
         <thead>
-          <th width="20%">time</th>
+          <th width="20%">datetime</th>
           <th width="20%">userid</th>
           <th>message</th>
         </thead>
         <tbody>
           <tr v-for="item in messages" :key="item.id">
-            <td>{{ item.time | timeFormat }}</td>
+            <td>{{ timeFormat(item.time) }}</td>
             <td>
-              <v-tooltip right>
-                <template v-slot:activator="{ on }">
-                  <span v-on="on" v-on:mouseover="getUserData(item.userid)">
-                    {{ item.userid }}
-                  </span>
-                </template>
-                <div>
-                  <img :src="userinfo.icon" width="35px" />
-                  <span>{{ userinfo.nickname }}({{ item.userid }})</span>
-                </div>
-              </v-tooltip>
+              <span
+                @click="showUserCard(item.userid)"
+                style="text-decoration: underline; cursor: pointer"
+              >
+                {{ item.userid }}
+              </span>
             </td>
             <td>{{ item.message }}</td>
           </tr>
         </tbody>
       </table>
     </div>
-    <span v-if="messages.length > 49">
-      <v-btn
-        @click="getMessages(lastid)"
-        class="nextbtn"
-        color="var(--v-primary-darken2)"
-        outlined
-        :loading="isLoading"
-        >次の50件</v-btn
-      >
-    </span>
-    <br /><br /><br />
+    <Button
+      class="nextbtn p-button-outlined"
+      label="次の50件"
+      v-if="messages.length > 49"
+      :loading="nowloading"
+      @click="getMessages(lastid)"
+    />
+    <Dialog
+      v-model:visible="showModal"
+      :modal="true"
+      :dismissableMask="true"
+      header="ユーザ情報"
+    >
+      <UserCardVue :userid="modalUserid" />
+    </Dialog>
   </div>
 </template>
 
-<script>
-import videoIdObj from "../assets/videoid.json";
+<script setup>
+import { ref } from "vue";
+import Calendar from "primevue/calendar";
+import { useToast } from "primevue/usetoast";
+import UserCardVue from "@/components/UserCard.vue";
+import vid from "@/assets/vid.json";
 
-export default {
-  data() {
-    return {
-      videoIdObj: videoIdObj,
-      tempVideoid: { text: "おぷちゃ3", value: "n9ze3m2w184" },
-      messages: [],
-      userid: "",
-      search_string: "",
-      startdate: "",
-      enddate: "",
-      lastid: 0,
-      isLoading: false,
-      userinfo: { icon: "", nickname: "" },
-    };
-  },
+const vidArr = ref(vid);
+const selectedVid = ref({ text: "おぷちゃ3", value: "n9ze3m2w184" });
+const userid = ref(null);
+const searchString = ref(null);
+const dt = ref(null);
+const nowloading = ref(false);
+const messages = ref([]);
+const lastid = ref(0);
+const showModal = ref(false);
+const modalUserid = ref("");
+const toast = useToast();
 
-  filters: {
-    timeFormat: function (t) {
-      const regex = /(\d\d\d\d-\d\d-\d\d)T(\d\d:\d\d:\d\d).*/i;
-      return t.replace(regex, "$1 $2");
+const timeFormat = (t) => {
+  const regex = /(\d\d\d\d-\d\d-\d\d)T(\d\d:\d\d:\d\d).*/i;
+  return t.replace(regex, "$1 $2");
+};
+
+const getMessages = async (last) => {
+  const url =
+    "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v1/messages";
+  let postdata = {
+    videoid: selectedVid.value.value,
+    userid: userid.value,
+    search_string: searchString.value,
+    startdate: dt.value,
+    border: last,
+  };
+  if (dt.value) {
+    let copiedDate = dt.value;
+    copiedDate.setHours(copiedDate.getHours() + 9);
+    copiedDate.setSeconds(0);
+    postdata.startdate = copiedDate.toISOString().slice(0, -5);
+  }
+
+  nowloading.value = true;
+  let res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json; charset=UTF-8",
     },
-  },
+    body: JSON.stringify(postdata),
+  });
+  nowloading.value = false;
 
-  methods: {
-    async getUserData(userid) {
-      let url = `https://public.openrec.tv/external/api/v5/channels/${userid}`;
-      let j = await (await fetch(url)).json();
-      this.userinfo.icon = j.l_icon_image_url;
-      this.userinfo.nickname = j.nickname;
-    },
-
-    async getMessages(last) {
-      const url =
-        "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v1/messages";
-      let postdata = {
-        videoid: this.tempVideoid["value"],
-        userid: this.userid,
-        search_string: this.search_string,
-        startdate: this.startdate,
-        enddate: this.enddate,
-        border: last,
-      };
-
-      this.isLoading = true;
-      let res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-        },
-        body: JSON.stringify(postdata),
+  if (res.ok) {
+    let j = await res.json();
+    if (j.length == 0) {
+      toast.add({
+        severity: "info",
+        summary: "Failed",
+        detail: "No result",
+        life: 3000,
       });
-      this.isLoading = false;
-
-      if (res.ok) {
-        let j = await res.json();
-        if (j.length == 0) {
-          let noResult = { time: "", userid: "", message: "no result" };
-          if (last == 0) {
-            this.messages = [noResult];
-          } else {
-            this.messages.push(noResult);
-          }
-        } else {
-          if (last == 0) {
-            this.messages = j;
-          } else {
-            this.messages = this.messages.concat(j);
-          }
-          this.lastid = j[j.length - 1]["id"];
-        }
+    } else {
+      if (last == 0) {
+        messages.value = j;
+      } else {
+        messages.value = messages.value.concat(j);
       }
-    },
-  },
+      lastid.value = j[j.length - 1]["id"];
+    }
+  } else {
+    toast.add({
+      severity: "error",
+      summary: "Failed",
+      detail: "Failed to get msg",
+      life: 3000,
+    });
+  }
+};
+
+const showUserCard = (userid) => {
+  showModal.value = true;
+  modalUserid.value = userid;
 };
 </script>
 
 <style scoped>
-.table_wrap {
-  overflow: scroll;
-}
-table {
-  width: 90%;
-  min-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-  border-collapse: collapse;
-  border: solid 3px var(--v-background-lighten5);
-  word-break: break-all;
-}
-
-table th,
-table td {
-  border: solid 1px var(--v-background-lighten5);
-  padding: 6px;
-}
-
-.container {
-  display: flex;
-  margin-left: 0;
-}
-
-.v-text-field {
-  margin-right: 6px;
-  max-width: 300px;
+.table-wrap {
+  overflow-x: scroll;
 }
 
 .nextbtn {
   float: right;
   margin-top: 10px;
-  margin-right: 5%;
 }
 </style>

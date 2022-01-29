@@ -1,49 +1,51 @@
 <template>
   <div class="masaoroid">
     <h1>Masaoroid</h1>
-    <div class="masao">
-      <div class="masao-message">
+    <div>
+      <div class="masao-msg">
         <p>{{ message }}</p>
         <p class="warn">※本人の発言ではありません</p>
       </div>
       <div class="masao-face">( ･᷄෴･᷅.)</div>
     </div>
-    <v-btn
+    <Button
       :loading="nowloading"
-      outlined
-      color="var(--v-secondary-darken1)"
+      label="再生成"
+      aria-label="再生成"
+      class="p-button-outlined"
       @click="getMasaoMessage()"
-      >再生成</v-btn
-    >
+    />
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      nowloading: true,
-      message: "loading...",
-    };
-  },
+<script setup>
+import { ref, onMounted } from "vue";
+import { useToast } from "primevue/usetoast";
 
-  mounted() {
-    this.getMasaoMessage();
-  },
+const message = ref("loading...");
+const nowloading = ref(true);
+const toast = useToast();
 
-  methods: {
-    async getMasaoMessage() {
-      let url =
-        "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/masaoroid";
-      this.nowloading = true;
-      let res = await fetch(url);
-      this.nowloading = false;
-      if (res.ok) {
-        this.error = "";
-        this.message = await res.text();
-      }
-    },
-  },
+onMounted(() => {
+  getMasaoMessage();
+});
+
+const getMasaoMessage = async () => {
+  let url =
+    "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/masaoroid";
+  nowloading.value = true;
+  let res = await fetch(url);
+  nowloading.value = false;
+  if (res.ok) {
+    message.value = await res.text();
+  } else {
+    toast.add({
+      severity: "error",
+      summary: "Failed",
+      detail: "Failed to get msg",
+      life: 3000,
+    });
+  }
 };
 </script>
 
@@ -59,37 +61,35 @@ export default {
   text-align: center;
 }
 
-.masao {
+.masaoroid > div {
   font-size: 30px;
-  text-align: center;
 }
 
-.masao-message {
+.masao-msg {
   position: relative;
   display: inline-block;
   background-color: transparent;
-  border: solid 5px var(--v-secondary-darken2);
+  border: solid 5px var(--primary-color);
   padding: 16px;
   min-width: 240px;
-  max-width: 100%;
+  width: 50%;
   text-align: center;
   border-radius: 5px;
 }
-.masao-message::before {
+.masao-msg::before {
   content: "";
   position: absolute;
   border: solid 12px transparent;
-  border-top: solid 12px var(--v-secondary-darken2);
+  border-top: solid 12px var(--primary-color);
   top: 100%;
   left: 50%;
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
 }
-.masao-message p {
+.masao-msg p {
   margin: 0;
-  padding: 0;
 }
-.masao-message .warn {
+.masao-msg .warn {
   font-size: 10px;
   text-align: left;
 }

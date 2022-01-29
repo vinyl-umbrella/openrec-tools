@@ -1,18 +1,14 @@
 <template>
   <div id="nicoComme">
-    <div v-for="(m, index) in shownMsg" :key="m.id">
+    <div v-for="(m, index) in messages" :key="m.id">
       <div
         v-if="m.stamp"
-        :class="'stamp_base comment' + index"
+        :class="'stamp-base comment' + index"
         style="width: 5vw"
       >
         <img :src="m.message" width="100%" />
       </div>
-      <div
-        v-else
-        :class="'comment_base comment' + index"
-        :style="updateFontSize"
-      >
+      <div v-else :class="'comment-base comment' + index" :style="fontSize">
         <p>{{ m.message }}</p>
       </div>
     </div>
@@ -22,78 +18,67 @@
   </div>
 </template>
 
-<script>
-import anime from "animejs/lib/anime.min.js";
+<script setup>
+import { defineExpose, onMounted, ref } from "vue";
+import anime from "animejs";
 
-export default {
-  name: "NicoComment",
-  computed: {
-    updateFontSize() {
-      return {
-        "--videoHeight": this.videoHeight + "px",
-      };
-    },
-  },
-  data() {
-    return {
-      videoHeight: 600,
-      shownMsg: [],
-    };
-  },
-  mounted() {
-    for (let i = 0; i < 32; i++) {
-      this.shownMsg.push({ id: i, message: "", stamp: false });
+const messages = ref([]);
+const fontSize = ref(0);
+let videoHeight = 600;
+
+onMounted(() => {
+  for (let i = 0; i < 32; i++) {
+    messages.value.push({ id: i, message: "", stamp: false });
+  }
+  videoHeight = (document.getElementById("nicoComme").clientWidth * 9) / 16;
+  fontSize.value = { "--videoHeight": videoHeight + "px" };
+});
+
+const addMsg = (msgObj) => {
+  let classname = "";
+  // check empty
+  let index = messages.value.findIndex((item) => item.message == "");
+  if (index !== -1) {
+    messages.value[index].stamp = false;
+    if (msgObj.type == "yell") {
+      // 色付け
+    } else if (msgObj.type == "stamp") {
+      messages.value[index].stamp = true;
     }
-    this.videoHeight =
-      (document.getElementById("nicoComme").clientWidth * 9) / 16;
-  },
-  methods: {
-    addMsg(msgObj) {
-      let classname = "";
-      // 空きチェック
-      let index = this.shownMsg.findIndex((item) => item.message == "");
-      if (index !== -1) {
-        this.shownMsg[index].stamp = false;
-        if (msgObj.type == "yell") {
-          // 色付け
-        } else if (msgObj.type == "stamp") {
-          this.shownMsg[index].stamp = true;
-        }
-        this.shownMsg[index].message = msgObj.text;
-        classname = ".comment" + String(index);
-        this.flowComment(index, classname);
-      }
-    },
-
-    flowComment(index, classname) {
-      let self = this;
-      let len = self.shownMsg[index].message.length;
-      if (this.shownMsg[index].stamp) {
-        len = 5;
-      }
-      anime({
-        targets: classname,
-        translateX: function () {
-          return [document.getElementById("nicoComme").clientWidth, -len * 35];
-        },
-        translateY: function () {
-          let rand = anime.random(0, self.videoHeight - 120);
-          return [rand, rand];
-        },
-        delay: 1000,
-        duration: 4000,
-        easing: "linear",
-        complete: function () {
-          self.shownMsg[index].message = "";
-        },
-      });
-    },
-  },
+    messages.value[index].message = msgObj.text;
+    classname = ".comment" + String(index);
+    flowComment(index, classname);
+  }
 };
+
+const flowComment = (index, classname) => {
+  let len = messages.value[index].message.length;
+  if (messages.value[index].stamp) {
+    len = 5;
+  }
+  anime({
+    targets: classname,
+    translateX: function () {
+      return [document.getElementById("nicoComme").clientWidth, -len * 35];
+    },
+    translateY: function () {
+      let rand = anime.random(0, videoHeight - 120);
+      return [rand, rand];
+    },
+    delay: 1000,
+    duration: 4000,
+    easing: "linear",
+    complete: () => {
+      messages.value[index].message = "";
+    },
+  });
+};
+
+defineExpose({ addMsg });
 </script>
 
 <style scoped>
-.comment_base {
+.comment-base {
   position: absolute;
   top: 0;
   font-size: calc(var(--videoHeight) / 20);
@@ -106,7 +91,7 @@ export default {
   opacity: 0.85;
 }
 
-.stamp_base {
+.stamp-base {
   position: absolute;
   top: 0;
   white-space: nowrap;

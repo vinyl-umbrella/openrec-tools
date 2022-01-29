@@ -1,217 +1,207 @@
 <template>
   <div>
-    <div class="flexbox">
-      <v-text-field
-        type="string"
-        v-model.trim="inputUrl"
-        label="OPENREC URL"
-        ref="inputUrl"
+    <div class="p-inputgroup">
+      <InputText
+        type="text"
+        v-model="inputUrl"
+        placeholder="URL"
         @keydown.enter="playVideo"
-        hide-details
-        dense
-        outlined
-      ></v-text-field>
-      <v-btn @click="playVideo" outlined color="var(--v-primary-darken2)"
-        >再生</v-btn
-      >
+      />
+      <Button label="接続" class="p-button-outlined" @click="playVideo" />
     </div>
-    {{ e_message }}
+
+    <div
+      style="display: flex; align-items: center; justify-content: space-between"
+    >
+      <div>
+        <div style="font-size: larger">
+          <a :href="inputUrl" target="_blank" rel="noopener norefferer">
+            {{ streamInfo.title }}
+          </a>
+          @{{ streamInfo.name }}
+        </div>
+      </div>
+      <div>
+        <Button
+          icon="pi pi-cog"
+          class="p-button-rounded p-button-outlined"
+          aria-label="config"
+          @click="showModal = true"
+        />
+      </div>
+    </div>
+
     <div class="nico-player">
-      <video ref="video" width="100%" :poster="thumbnail" controls></video>
-      <nicoComment ref="nicoComment" />
+      <video id="video" :poster="thumbnail" controls></video>
+      <nicoCommentVue ref="nicoComment" />
     </div>
-    <div class="flexbox">
-      <v-text-field
-        type="string"
-        label="コメント"
-        v-model.trim="inputComment"
-        @keydown.enter="postInputComment"
-        dense
-        outlined
-      ></v-text-field>
-      <v-btn @click="postInputComment" outlined color="var(--v-primary-darken2)"
-        >送信</v-btn
-      >
+
+    <div class="p-inputgroup">
+      <InputText
+        type="text"
+        v-model="inputComment"
+        placeholder="コメント"
+        @keydown.enter="postComment"
+      />
+      <Button label="送信" class="p-button-outlined" @click="postComment" />
     </div>
+
+    <Dialog
+      v-model:visible="showModal"
+      :modal="true"
+      :dismissableMask="true"
+      header="設定"
+    >
+      <configModalVue />
+    </Dialog>
   </div>
 </template>
 
-<script>
+<script setup>
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import Hls from "hls.js/dist/hls.light";
-import orUtil from "../func/orUtil";
-import NicoComment from "../components/nicoComment";
+import { useRoute } from "vue-router";
+import { useToast } from "primevue/usetoast";
+import openrec from "@/func/openrec";
+import configModalVue from "../components/configModal.vue";
+import nicoCommentVue from "../components/nicoComment.vue";
 
-export default {
-  components: {
-    NicoComment,
-  },
+const inputUrl = ref(useRoute().query.u);
+const vid = ref(null);
+const streamInfo = ref({
+  title: "title",
+  name: "streamer",
+});
+const inputComment = ref(null);
+const nicoComment = ref(null);
+const thumbnail = ref(null);
+const showModal = ref(false);
+const toast = useToast();
 
-  data() {
-    return {
-      config: {
-        fragLoadingTimeOut: 3000,
-        fragLoadingMaxRetry: 10,
-        fragLoadingMaxRetryTimeout: 3000,
-        liveBackBufferLength: 1800,
-        maxBufferSize: 256 * 1000 * 1000,
-      },
-      hls: new Hls(this.config),
-      inputUrl: this.$route.query.u,
-      videoId: "",
-      inputComment: "",
-      thumbnail: "",
-      messages: [],
-      e_message: "",
-      sock: null,
-    };
-  },
+let hls;
+let sock;
 
-  mounted() {
-    this.$refs.inputUrl.focus();
-    if (this.inputUrl) {
-      this.playVideo();
+onMounted(() => {
+  hls = new Hls({
+    fragLoadingTimeOut: 3000,
+    fragLoadingMaxRetry: 10,
+    fragLoadingMaxRetryTimeout: 3000,
+    liveBackBufferLength: 1800,
+    maxBufferSize: 256 * 1000 * 1000,
+  });
+  if (inputUrl.value) {
+    playVideo();
+  }
+});
+
+onBeforeUnmount(() => {
+  if (hls) {
+    hls.destroy();
+  }
+  if (sock) {
+    sock.close();
+  }
+});
+
+const connectWs = async (url) => {
+  sock = new WebSocket(url);
+  sock.onmessage = (e) => {
+    let data = openrec.parseWsData(e.data);
+    if (data[0] === "message") {
+      let msg = data[1].data;
+      let msgData = { type: "normal", text: msg.message };
+      if (data[1].type === 0) {
+        if (msg.yell) {
+          msgData.type = "yell";
+          msgData.text = `[${msg.name}] ${msg.yell}Pt ${msg.message}`;
+        } else if (msg.capture) {
+          msgData.type = "capture";
+        } else if (msg.stamp) {
+          msgData.type = "stamp";
+          msgData.text = msg.stamp;
+        }
+        nicoComment.value.addMsg(msgData);
+      } else if (data[1].type === 3) {
+        sock.close();
+      }
     }
-  },
+  };
 
-  beforeRouteLeave(to, from, next) {
-    if (this.sock) {
-      this.sock.close();
-      this.sock = null;
+  let intervalId = setInterval(() => {
+    if (!sock) {
+      clearInterval(intervalId);
     }
-    next();
-  },
+    sock.send("2");
+  }, 25000);
+};
 
-  methods: {
-    async connectWS(url) {
-      let self = this;
-      this.sock = new WebSocket(url);
-      this.sock.addEventListener("open", function () {
-        console.info("-----CONNECT TO SERVER-----");
+const playVideo = async () => {
+  if (sock) {
+    toast.add({
+      severity: "warn",
+      summary: "Warn",
+      detail: "Already connected to chat server. Please reload page.",
+      life: 3000,
+    });
+    return;
+  }
+  try {
+    let info = await openrec.getVideoInfo(inputUrl.value);
+    let stream;
+    vid.value = info.vid;
+    streamInfo.value.title = info.title;
+    streamInfo.value.name = info.name;
+    inputUrl.value = `https://www.openrec.tv/live/${vid.value}`;
+    if (info.publicType === "member" && !localStorage.getItem("viewSubs")) {
+      throw "member only";
+    }
+    thumbnail.value = info.thumbnail_url;
+    if (info.media) {
+      stream = info.media;
+    } else {
+      throw "no media file";
+    }
+    connectWs(openrec.getWsUrl(info.mid));
+
+    let video = document.getElementById("video");
+    hls.loadSource(stream);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MANIFEST_PARSED, function () {
+      video.play();
+    });
+  } catch (e) {
+    toast.add({
+      severity: "error",
+      summary: "Failed",
+      detail: e,
+      life: 3000,
+    });
+  }
+};
+
+const postComment = async () => {
+  if (vid.value && inputComment.value !== "") {
+    try {
+      await openrec.postComment(vid.value, inputComment.value);
+      inputComment.value = "";
+    } catch (e) {
+      toast.add({
+        severity: "error",
+        summary: "Failed",
+        detail: e,
+        life: 3000,
       });
-
-      this.sock.onmessage = async function (event) {
-        let wsData = await orUtil.parseWsData(event.data);
-        let bl = localStorage.getItem("blacklist");
-        if (wsData[0] == "message") {
-          let j = JSON.parse(wsData[1]);
-          switch (j.type) {
-            // message
-            case 0: {
-              let msgObj = { type: "normal", text: j.data.message };
-              if (j.data.is_muted) {
-                break;
-              }
-              if (bl) {
-                if (bl.includes(j.data.user_key)) {
-                  break;
-                }
-              }
-              if (j.data.yell != null) {
-                msgObj.type = "yell";
-                msgObj.text = `[${j.data.user_name}] ${j.data.yell.yells}円 ${j.data.message}`;
-              } else if (j.data.stamp != null) {
-                msgObj.type = "stamp";
-                msgObj.text = j.data.stamp.image_url;
-              } else if (j.data.capture != null) {
-                msgObj.type = "capture";
-              }
-              self.$refs.nicoComment.addMsg(msgObj);
-              break;
-            }
-            case 3: {
-              this.sock.close();
-            }
-          }
-        }
-      };
-
-      // error
-      this.sock.onerror = function (event) {
-        console.error("ws error:", event);
-      };
-
-      // close
-      this.sock.onclose = function () {
-        console.info("-----BYE SERVER-----");
-        // self.connectWS(url);
-      };
-
-      let keepConn = setInterval(function () {
-        if (!self.sock) {
-          clearInterval(keepConn);
-        } else {
-          self.sock.send("2");
-        }
-      }, 25000);
-    },
-
-    async playVideo() {
-      this.stopVideo();
-      let stream = "";
-      this.videoId = orUtil.getVideoId(this.inputUrl);
-      try {
-        let info = await orUtil.getVideoInfo(this.videoId);
-        if (
-          info.chat_public_type == "member" &&
-          !localStorage.getItem("viewSubs")
-        ) {
-          this.e_message = "member only";
-          return;
-        }
-        this.videoId = info.id;
-        this.thumbnail = info.l_thumbnail_url;
-        if (!info.media.url) {
-          this.e_message = "media file not found";
-        } else {
-          stream = info.media.url;
-        }
-      } catch (e) {
-        this.e_message = `failed to fetch "${this.inputUrl}"`;
-        return;
-      }
-
-      let wsurl = await orUtil.getWsUrl(this.videoId);
-      this.connectWS(wsurl);
-      if (stream) {
-        this.e_message = "";
-        let hls = this.hls;
-        let video = this.$refs["video"];
-        hls.loadSource(stream);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function () {
-          video.play();
-        });
-      }
-    },
-
-    stopVideo() {
-      this.hls.destroy();
-      this.hls = new Hls(this.config);
-    },
-
-    async postInputComment() {
-      if (this.videoId != "" && this.inputComment != "") {
-        let e_msg = await orUtil.postComment(this.videoId, this.inputComment);
-        this.inputComment = "";
-        if (e_msg != "") {
-          console.warn(e_msg);
-        }
-      }
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style scoped>
-.flexbox {
-  display: flex;
-}
-.v-btn {
-  margin-top: 2px;
-}
-
 .nico-player {
   position: relative;
   overflow: hidden;
+}
+video {
+  width: 100%;
 }
 </style>

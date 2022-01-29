@@ -1,858 +1,387 @@
 <template>
   <div>
-    <div class="flexbox">
+    <div class="p-inputgroup">
+      <InputText
+        type="text"
+        v-model="inputUrl"
+        placeholder="URL"
+        @keydown.enter="getPastComment"
+      />
+      <Button label="接続" class="p-button-outlined" @click="getPastComment" />
+    </div>
+
+    <div
+      style="display: flex; align-items: center; justify-content: space-between"
+    >
       <div>
-        <v-text-field
-          type="string"
-          class="url_box"
-          v-model.trim="inputUrl"
-          label="OPENREC URL"
-          ref="inputUrl"
-          @keydown.enter="getComment"
-          hide-details
-          dense
-          outlined
-        >
-          <template v-slot:append-outer>
-            <v-btn
-              @click="getComment"
-              small
-              outlined
-              color="var(--v-primary-darken2)"
-              >接続</v-btn
-            >
-          </template>
-        </v-text-field>
-        <span v-show="urlError != ''"> {{ urlError }}</span>
+        <div style="font-size: larger">
+          <a :href="inputUrl" target="_blank" rel="noopener norefferer">
+            {{ streamInfo.title }}
+          </a>
+          @{{ streamInfo.name }}
+        </div>
+        同接: {{ streamInfo.view }} コメ速: {{ calcAvg() }}/min
       </div>
-      <img
-        id="configBtn"
-        alt="config"
-        src="../assets/conf.png"
-        height="28px"
-        width="28px"
-        @click="callModal()"
+      <div>
+        <Button
+          icon="pi pi-cog"
+          class="p-button-rounded p-button-outlined"
+          aria-label="config"
+          @click="showModal = true"
+        />
+      </div>
+    </div>
+
+    <Splitter
+      style="
+        height: 70vh;
+        border: 1px var(--primary-color) solid;
+        background-color: var(--surface-b);
+      "
+    >
+      <SplitterPanel :size="60" id="comment-box">
+        <div class="comments" v-for="comment in comments" :key="comment.id">
+          <div class="user-name">
+            <span :style="{ color: comment.color }">{{ comment.name }}</span>
+            <span>{{ comment.time }}</span>
+          </div>
+          <span v-if="comment.message">{{ comment.message }}</span>
+          <span v-else-if="comment.stamp">
+            <img :src="comment.stamp" width="64" />
+          </span>
+        </div>
+      </SplitterPanel>
+      <SplitterPanel :size="40" id="info-box">
+        <div class="info" v-for="(event, index) in events" :key="index">
+          {{ event.date }}
+          <span style="font-weight: bolder">[{{ event.type }}]</span>
+          <span v-if="event.url">
+            <a :href="event.url" target="_blank" rel="noopener norefferer">
+              {{ event.message }}
+            </a>
+          </span>
+          <span v-else>{{ event.message }}</span>
+        </div>
+      </SplitterPanel>
+    </Splitter>
+
+    <div class="p-inputgroup">
+      <InputText
+        type="text"
+        v-model="inputComment"
+        placeholder="コメント"
+        @keydown.enter="postComment"
+      />
+      <Button
+        :label="String(inputComment.length) + '/100 送信'"
+        class="p-button-outlined"
+        @click="postComment"
       />
     </div>
-
-    <div class="stream_data">
-      <div class="title" v-show="streamUrl != ''">
-        <a :href="streamUrl" target="_blank" rel="noopener norefferer">{{
-          info.title
-        }}</a>
-      </div>
-      <div class="channel_name">{{ info.channelName }}</div>
-
-      <div>
-        <span>同接: {{ info.viewers }}&nbsp;</span>
-        <span>最大同接: {{ info.maxViewers }}&nbsp;</span>
-        <span>コメ速: {{ calcAvg }}/min</span>
-      </div>
-    </div>
-
-    <div class="flexbox">
-      <div id="comment_box" class="comment_box">
-        <div class="comments" v-for="comment in comments" :key="comment.ChatId">
-          <div class="user_name">
-            <span :style="{ color: comment.Color }">
-              {{ comment.Name }}
-            </span>
-            <span>
-              {{ comment.Time }}
-            </span>
-          </div>
-          <span class="message" v-if="comment.Message != ''">{{
-            comment.Message
-          }}</span>
-          <span v-if="comment.Stamp != ''">
-            <img :src="comment.Stamp" width="64px" />
-          </span>
-        </div>
-      </div>
-
-      <div id="info_box" class="info_box">
-        <div class="infos" v-for="(event, index) in events" :key="index">
-          <span>{{ event.date }}&nbsp;</span>
-          <span>[{{ event.type }}]&nbsp;</span>
-          <span v-if="event.type == 'URL'">
-            <span>{{ event.content[0] }}</span>
-            <a
-              :href="event.content[1]"
-              target="_blank"
-              rel="noopener norefferer"
-              >{{ event.content[1] }}</a
-            >
-            <span>{{ event.content[2] }}</span>
-          </span>
-          <span v-else>
-            {{ event.content }}
-          </span>
-        </div>
-      </div>
-    </div>
-    <v-text-field
-      type="string"
-      v-model="inputComment"
-      class="post_box"
-      label="コメント"
-      @keydown.enter="postInputComment"
-      hide-details
-      outlined
-      dense
+    <Dialog
+      v-model:visible="showModal"
+      :modal="true"
+      :dismissableMask="true"
+      header="設定"
     >
-      <template v-slot:append-outer>
-        <v-btn
-          @click="postInputComment"
-          small
-          outlined
-          color="var(--v-primary-darken2)"
-          >送信</v-btn
-        >
-      </template>
-    </v-text-field>
-    <span v-show="config.showStampBtn">
-      Stamps:
-      <v-btn
-        class="stamp_btn"
-        @click="postStamp(2533)"
-        small
-        outlined
-        color="var(--v-primary-darken2)"
-        >におうな</v-btn
-      >
-      <v-btn
-        class="stamp_btn"
-        @click="postStamp(2657)"
-        small
-        outlined
-        color="var(--v-primary-darken2)"
-        >んこー</v-btn
-      >
-      <v-btn
-        class="stamp_btn"
-        @click="postStamp(2658)"
-        small
-        outlined
-        color="var(--v-primary-darken2)"
-        >KP</v-btn
-      >
-      <v-btn
-        class="stamp_btn"
-        @click="postStamp(2659)"
-        small
-        outlined
-        color="var(--v-primary-darken2)"
-        >シュガー</v-btn
-      > </span
-    ><br />
-    <span>{{ postError }}</span>
-
-    <!-- Config modal -->
-    <modalWrap header="Config" v-show="config.showModal" @close="closeModal()">
-      <div>
-        <v-container fluid>
-          <v-checkbox
-            v-model="config.hideNewcomer"
-            hide-details
-            label="新規ユーザを非表示"
-          ></v-checkbox>
-          <v-checkbox
-            v-model="config.speesh"
-            hide-details
-            label="チャットを読み上げ"
-          ></v-checkbox>
-          <v-checkbox
-            v-model="config.showStampBtn"
-            hide-details
-            label="スタンプボタンを表示 ※魔神サブスク限定"
-          ></v-checkbox>
-          <div class="flexbox" style="padding-top: 10px; padding-bottom: 10px">
-            ブラックリストを同期
-            <v-btn
-              @click="syncBL"
-              color="var(--v-primary-darken2)"
-              small
-              outlined
-              style="margin-left: 4px"
-              >同期</v-btn
-            >
-            <v-btn
-              @click="resetBL"
-              color="var(--v-primary-darken2)"
-              small
-              outlined
-              style="margin-left: 4px"
-              >リセット</v-btn
-            >
-          </div>
-          <div class="flexbox" style="padding-top: 10px; padding-bottom: 10px">
-            NGワードを同期
-            <v-btn
-              @click="syncNGwords"
-              color="var(--v-primary-darken2)"
-              small
-              outlined
-              style="margin-left: 4px"
-              >同期</v-btn
-            >
-            <v-btn
-              @click="resetNGwords"
-              color="var(--v-primary-darken2)"
-              small
-              outlined
-              style="margin-left: 4px"
-              >リセット</v-btn
-            >
-          </div>
-          <div class="flexbox">
-            <v-text-field
-              v-model.trim="config.nameColor"
-              label="ユーザ名の色 (プレ垢限定)"
-              hide-details
-              outlined
-              dense
-              @keydown.enter="changeNameColor"
-            ></v-text-field>
-            <v-btn
-              @click="changeNameColor"
-              color="var(--v-primary-darken2)"
-              outlined
-              style="margin-left: 4px; margin-top: 4px"
-              >変更</v-btn
-            >
-          </div>
-        </v-container>
-      </div>
-    </modalWrap>
+      <configModalVue />
+    </Dialog>
   </div>
 </template>
 
-<script>
-import orUtil from "../func/orUtil";
-import modalWrap from "../components/modalWrap";
+<script setup>
+import { onBeforeUnmount, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import Splitter from "primevue/splitter";
+import SplitterPanel from "primevue/splitterpanel";
+import { useToast } from "primevue/usetoast";
+import configModalVue from "@/components/configModal.vue";
+import openrec from "@/func/openrec";
 
-export default {
-  components: {
-    modalWrap,
-  },
-  data() {
-    return {
-      inputUrl: this.$route.query.u,
-      streamUrl: "",
-      urlError: "",
-      inputComment: "",
-      postError: "",
+const vid = ref(null);
+const inputUrl = ref(useRoute().query.u);
+const inputComment = ref("");
+const streamInfo = ref({
+  title: "title",
+  name: "streamer",
+  view: 0,
+  speed: 0,
+});
+const comments = ref([]);
+const events = ref([]);
+const showModal = ref(false);
+const toast = useToast();
 
-      info: {
-        title: "",
-        channelName: "",
-        viewers: 0,
-        maxViewers: 0,
-        commentsSpeed: 0,
-      },
+let commentBox;
+let infoBox;
+let sock = null;
 
-      videoId: "",
-      comments: [],
-      events: [],
-      wsConnectFlag: false,
-      sock: null,
+onMounted(() => {
+  commentBox = document.getElementById("comment-box");
+  infoBox = document.getElementById("info-box");
+  if (inputUrl.value) {
+    getPastComment();
+  }
+});
 
-      // config
-      config: {
-        showModal: false,
-        hideNewcomer: false,
-        showStampBtn: false,
-        nameColor: "#201E2F",
-        blacklist: [],
-        ngwords: [],
-        speesh: false,
-      },
-    };
-  },
+onBeforeUnmount(() => {
+  if (sock) {
+    sock.close();
+  }
+});
 
-  computed: {
-    calcAvg() {
-      return parseInt(this.info.commentsSpeed / 2);
-    },
-  },
-
-  mounted() {
-    this.$refs.inputUrl.focus();
-    if (this.inputUrl) {
-      this.getComment();
-    }
-
-    let l = localStorage.getItem("blacklist");
-    if (l) {
-      this.config.blacklist = l.split(",");
-    }
-    l = localStorage.getItem("ngwords");
-    if (l) {
-      console.log(this.config.ngwords);
-    }
-  },
-
-  beforeRouteLeave(to, from, next) {
-    if (this.sock) {
-      this.sock.close();
-      this.sock = null;
-    }
-    next();
-  },
-
-  methods: {
-    callModal() {
-      this.config.showModal = true;
-    },
-    closeModal() {
-      this.config.showModal = false;
-    },
-
-    isBottom(container) {
-      return (
-        (container.scrollHeight - container.scrollTop) * 0.97 <
-        container.clientHeight
-      );
-    },
-
-    scrollToBottom(container) {
-      container.scrollTop = container.scrollHeight;
-    },
-
-    async connectWS(url) {
-      let self = this;
-      this.sock = new WebSocket(url);
-      this.sock.onopen = function () {
-        console.info("-----CONNECT TO SERVER-----");
-        self.wsConnectFlag = true;
-      };
-
-      this.sock.onmessage = async function (event) {
-        let wsData = await orUtil.parseWsData(event.data);
-        if (wsData[0] == "message") {
-          let j = JSON.parse(wsData[1]);
-
-          let addEvent = (type, content) => {
-            let prms = new Promise((resolve) => {
-              let now = new Date();
-              now.setHours(now.getHours() + 9);
-              now = now.toISOString().replace("T", " ").replace("Z", " ");
-              self.events.push({
-                date: now,
-                type: type,
-                content: content,
-              });
-              resolve();
-            });
-            prms.then(() => {
-              self.scrollToBottom(document.getElementById("info_box"));
-            });
-          };
-
-          let findUserId = (id) => {
-            let name = "unknown(" + id + ")";
-            for (let i = self.comments.length - 1; i >= 0; i--) {
-              if (id == self.comments[i].recxuser_id) {
-                name = self.comments[i].Name;
-                break;
-              }
-            }
-            return name;
-          };
-
-          switch (j.type) {
-            // message
-            case 0:
-              if (j.data.user_key != "") {
-                // blacklist
-                if (self.config.blacklist.includes(j.data.user_key)) {
-                  break;
-                }
-                // ngwords
-                if(self.config.ngwords.filter(word => j.data.message.indexOf(word) !== -1).length !== 0) {
-                  break;
-                }
-
-                let name = `${j.data.user_name} (${j.data.user_key})`;
-                if (
-                  j.data.user_type == 1 ||
-                  j.data.user_key == "yocchan-umaimon"
-                ) {
-                  addEvent("chat", name + " " + j.data.message);
-                }
-                if (j.data.yell != null) {
-                  addEvent(
-                    "yell",
-                    name + " " + j.data.yell.yells + " " + j.data.message
-                  );
-                }
-                if (j.data.badges.length != 0) {
-                  name = `${name}[Lv.${j.data.badges[0].subscription.months}]`;
-                }
-                if (j.data.is_premium) {
-                  name = `${name}[P]`;
-                }
-                if (j.data.is_fresh) {
-                  name = `${name}[Fresh]`;
-                  if (self.config.hideNewcomer) {
-                    break;
-                  }
-                }
-                if (j.data.is_moderator) {
-                  name = `${name}[Staff]`;
-                }
-                if (j.data.is_muted) {
-                  name = `${name}[Manuke]`;
-                }
-
-                let result = j.data.message.match(
-                  /https?:\/\/[a-zA-Z0-9.\-_@:/~?%&;=+#',()*!]+/
-                );
-                if (result != null) {
-                  let a = [
-                    j.data.message.slice(0, result["index"]),
-                    result[0],
-                    j.data.message.slice(result["index"] + result[0].length),
-                  ];
-                  addEvent("URL", a);
-                }
-
-                let commentData = {
-                  ChatId: j.data.chat_id,
-                  Name: name,
-                  recxuser_id: j.data.user_id,
-                  Color: j.data.user_color,
-                  Message: j.data.message,
-                  Stamp: "",
-                  Time: j.data.message_dt.slice(-8),
-                };
-                if (j.data.stamp != null) {
-                  commentData.Stamp = j.data.stamp.image_url;
-                }
-
-                let addComment = (data) => {
-                  self.comments.push(data);
-                  if (self.config.speesh) {
-                    let utter = new SpeechSynthesisUtterance(data.Message);
-                    utter.rate = 1.5;
-                    speechSynthesis.speak(utter);
-                  }
-                  if (self.comments.length > 2000) {
-                    self.comments.shift();
-                  }
-                };
-
-                // 自動スクロール
-                let comment_box = document.getElementById("comment_box");
-                if (self.isBottom(comment_box)) {
-                  let prms = new Promise((resolve) => {
-                    addComment(commentData);
-                    resolve();
-                  });
-                  prms.then(() => {
-                    self.scrollToBottom(comment_box);
-                  });
-                } else {
-                  addComment(commentData);
-                }
-
-                self.calc_speed();
-              }
-              break;
-
-            // 同接
-            case 1:
-              self.info.viewers = j.data.live_viewers;
-              if (self.info.maxViewers < self.info.viewers) {
-                self.info.maxViewers = self.info.viewers;
-              }
-              break;
-
-            // 配信終了
-            case 3:
-              addEvent("stream", "finished");
-              break;
-
-            // 配信開始
-            case 5:
-              addEvent("stream", "start");
-              break;
-
-            // block
-            case 6:
-              addEvent(
-                "ban",
-                "ban " + findUserId(j.data.owner_to_banned_user_id)
-              );
-              break;
-
-            // block 解除
-            case 7:
-              addEvent(
-                "ban",
-                "unban " + findUserId(j.data.owner_to_banned_user_id)
-              );
-              break;
-
-            // スタッフ権限付与
-            case 8:
-              addEvent(
-                "staff",
-                "add staff " + findUserId(j.data.owner_to_moderator_user_id)
-              );
-              break;
-
-            // スタッフ権限解除
-            case 9:
-              addEvent(
-                "staff",
-                "remove staff " + findUserId(j.data.owner_to_moderator_user_id)
-              );
-              break;
-
-            // わからん refresh?
-            case 10:
-              if (j.data.need_refresh != null) {
-                console.log(j.data);
-              }
-              break;
-
-            // ゲーム変更，タイトル変更
-            case 11:
-              addEvent(
-                "info",
-                j.data.system_message.type + " " + j.data.message
-              );
-              break;
-
-            // 12, 13, 15 テロップ．後で解析する
-            case 12:
-              break;
-            case 13:
-              break;
-            case 15:
-              break;
-
-            // サブスク入会
-            case 27:
-              addEvent("info", j.data.message);
-              break;
-
-            // アンケート開始
-            case 29:
-              addEvent("vote", "[start] " + j.data.title);
-              j.data.votes.forEach((elem) => {
-                addEvent("vote", elem.text);
-              });
-              break;
-
-            // アンケートの途中経過
-            case 30:
-              break;
-
-            // アンケート結果
-            case 31:
-              addEvent("vote", "[fin] " + j.data.title);
-              j.data.votes.forEach((elem) => {
-                addEvent(
-                  "vote",
-                  elem.text + elem.count + "票 " + elem.ratio + "%"
-                );
-              });
-              break;
-
-            default:
-              console.warn("unknown type:", j);
+const connectWs = (wss) => {
+  sock = new WebSocket(wss);
+  const urlRegex = /https?:\/\/[a-zA-Z0-9.\-_@:/~?%&;=+#',()*!]+/;
+  sock.onmessage = (e) => {
+    let data = openrec.parseWsData(e.data);
+    if (data[0] === "message") {
+      let msg = data[1].data;
+      switch (data[1].type) {
+        // msg
+        case 0:
+          if (msg.yell) {
+            pushEvent("yell", `${msg.name} ${msg.yell}Pt ${msg.message}`);
+          } else if (msg.capture) {
+            pushEvent("capture", [
+              `${msg.name} ${msg.capture.title}`,
+              `https://www.openrec.tv/capture/${msg.capture.id}`,
+            ]);
           }
-        }
-      };
 
-      // error
-      this.sock.onerror = function (event) {
-        console.error("ws error:", event);
-      };
-
-      // close
-      this.sock.onclose = function () {
-        console.info("-----BYE SERVER-----");
-        self.wsConnectFlag = false;
-        if (self.sock) {
-          self.connectWS(url);
-        }
-      };
-
-      //なぜ"2"なのかはわからん
-      let keepConn = setInterval(function () {
-        if (!self.sock) {
-          clearInterval(keepConn);
-        } else {
-          self.sock.send("2");
-        }
-      }, 25000);
-    },
-
-    async getComment() {
-      let self = this;
-      self.info.viewers = 0;
-      self.info.maxViewers = 0;
-      self.videoId = orUtil.getVideoId(self.inputUrl);
-
-      self.comments = [];
-      if (self.videoId != "") {
-        let info = await orUtil.getVideoInfo(self.videoId);
-        if (
-          info.chat_public_type == "member" &&
-          !localStorage.getItem("viewSubs")
-        ) {
-          self.urlError = "member only";
-          return;
-        }
-        self.videoId = info.id;
-        if (info.onair_status == 0 || info.onair_status == 1) {
-          self.streamUrl = `https://www.openrec.tv/live/${self.videoId}`;
-          self.info.title = info.title;
-          self.info.channelName = info.channel.nickname;
-        } else {
-          self.urlError = "not on air now";
-        }
-
-        let now = new Date().toISOString();
-        let url = `https://public.openrec.tv/external/api/v5/movies/${self.videoId}/chats?to_created_at=${now}&limit=150`;
-
-        let past_comments = await (await fetch(url)).json();
-        let prms = new Promise((resolve) => {
-          for (let i = 0; i < past_comments.length; i++) {
-            if (self.config.blacklist.includes(past_comments[i].user.id)) {
-              continue;
+          {
+            let result = msg.message.match(urlRegex);
+            if (result !== null) {
+              pushEvent("url", [`${msg.name} ${msg.message}`, result[0]]);
             }
-            if(self.config.ngwords.filter(word => past_comments[i].message.indexOf(word) !== -1).length !== 0) {
-              continue;
-            }
-            let name = `${past_comments[i].user.nickname} (${past_comments[i].user.id})`;
-            if (past_comments[i].badges.length != 0) {
-              name = `${name}[Lv.${past_comments[i].badges[0].subscription.months}]`;
-            }
-            if (past_comments[i].user.is_premium) {
-              name = `${name}[P]`;
-            }
-            if (past_comments[i].user.is_fresh) {
-              name = `${name}[Fresh]`;
-              if (self.config.hideNewcomer) {
-                continue;
-              }
-            }
-            if (past_comments[i].is_moderating) {
-              name = `${name}[Staff]`;
-            }
-            if (past_comments[i].is_muted) {
-              name = `${name}[Manuke]`;
-            }
-
-            let comment = {
-              ChatId: past_comments[i].id,
-              Name: name,
-              Color: past_comments[i].chat_setting.name_color,
-              recxuser_id: past_comments[i].user.recxuser_id,
-              Message: past_comments[i].message,
-              Stamp: "",
-              Time: past_comments[i].messaged_at.slice(11, -6),
-            };
-            if (past_comments[i].stamp != null) {
-              comment.Stamp = past_comments[i].stamp.image_url;
-            }
-            self.comments.push(comment);
           }
-          resolve();
-        });
 
-        prms.then(() => {
-          self.scrollToBottom(document.getElementById("comment_box"));
-        });
+          comments.value.push(msg);
+          if (comments.value.length > 2000) {
+            comments.value.shift();
+          }
 
-        let wsurl = await orUtil.getWsUrl(self.videoId);
-        if (!self.wsConnectFlag) {
-          self.connectWS(wsurl);
-        }
+          // scroll
+          setTimeout(() => {
+            if (
+              commentBox.scrollHeight -
+                commentBox.clientHeight -
+                commentBox.scrollTop <
+              200
+            ) {
+              commentBox.lastElementChild.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+              });
+            }
+          }, 0);
+          calcSpeed();
+          break;
+        // viewers
+        case 1:
+          streamInfo.value.view = msg.live_viewers;
+          break;
+
+        // stream start/end
+        case 3:
+          pushEvent("stream", "終了");
+          sock.close();
+          break;
+        case 5:
+          pushEvent("stream", "開始");
+          break;
+
+        // ban 追加/削除
+        case 6:
+          pushEvent("ban", `追加 ${findUserid(msg.owner_to_banned_user_id)}`);
+          break;
+        case 7:
+          pushEvent("ban", `解除 ${findUserid(msg.owner_to_banned_user_id)}`);
+          break;
+
+        // staff 追加/削除
+        case 8:
+          pushEvent(
+            "staff",
+            `追加 ${findUserid(msg.owner_to_moderator_user_id)}`
+          );
+          break;
+        case 9:
+          pushEvent(
+            "staff",
+            `解除 ${findUserid(msg.owner_to_moderator_user_id)}`
+          );
+          break;
+
+        case 10:
+          break;
+
+        case 11:
+          pushEvent("info", `${msg.system_message.type} ${msg.message}`);
+          break;
+
+        case 27:
+          pushEvent("info", `${msg.message}`);
+          break;
+
+        // vote start
+        case 29:
+          pushEvent("vote", `[start] ${msg.title}`);
+          msg.votes.forEach((ele) => {
+            pushEvent("vote", ele.text);
+          });
+          break;
+
+        case 31:
+          pushEvent("vote", `[end] ${msg.title}`);
+          msg.votes.forEach((ele) => {
+            pushEvent("vote", `${ele.text} ${ele.count}票 ${ele.ratio}%`);
+          });
+          break;
+
+        default:
+          console.log(data[1]);
       }
-    },
+    }
+  };
 
-    async postInputComment() {
-      if (this.videoId != "" && this.inputComment != "") {
-        let m = await orUtil.postComment(this.videoId, this.inputComment);
-        this.inputComment = "";
-        this.postError = m;
+  sock.onclose = (e) => {
+    console.log(e.code);
+  };
+
+  const findUserid = (id) => {
+    let name = `unknown(${id})`;
+    for (let i = comments.value.length - 1; i >= 0; i--) {
+      if (id === comments.value[i].recxuser_id) {
+        name = comments.value[i].name;
+        break;
       }
-    },
+    }
+    return name;
+  };
 
-    async postStamp(stamp_id) {
-      if (this.videoId != "") {
-        let url =
-          "https://apiv5.openrec.tv/api/v5/movies/" + this.videoId + "/chats";
-        let data = {
-          stamp_id: stamp_id,
-          consented_chat_terms: false,
-          message: this.inputComment,
-          quality_type: 2,
-          messaged_at: "",
-          league_key: "",
-          to_user_id: "",
-        };
-        let param = {
-          method: "POST",
-          headers: {
-            Accept: "application/json,text/plain,*/*",
-            "Content-Type": "application/json;charset=utf-8",
-            uuid: localStorage.getItem("orUuid"),
-            "access-token": localStorage.getItem("orAccessToken"),
-          },
-          body: JSON.stringify(data),
-        };
+  let intervalId = setInterval(() => {
+    if (!sock) {
+      clearInterval(intervalId);
+    }
+    sock.send("2");
+  }, 25000);
+};
 
-        let j = await (await fetch(url, param)).json();
-        this.inputComment = "";
-        if (j.status != 0) {
-          this.postError = j.message;
-        } else {
-          this.postError = "";
-        }
-      }
-    },
+const pushEvent = (type, msg) => {
+  let now = new Date();
+  now.setHours(now.getHours() + 9);
+  now = now.toISOString().replace("T", " ").replace("Z", " ").slice(0, -5);
+  let data = {
+    date: now,
+    type: type,
+    url: null,
+    message: msg,
+  };
+  if (type === "capture" || type === "url") {
+    data.message = msg[0];
+    data.url = msg[1];
+    events.value.push(data);
+  } else {
+    events.value.push(data);
+  }
 
-    calc_speed() {
-      let self = this;
-      var sub = function () {
-        self.info.commentsSpeed -= 1;
-      };
-      self.info.commentsSpeed += 1;
-      setTimeout(sub, 120000);
-    },
+  // scroll
+  if (infoBox.scrollHeight - infoBox.clientHeight - infoBox.scrollTop < 200) {
+    infoBox.scrollTop = infoBox.scrollHeight;
+    infoBox.lastElementChild.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+    });
+  }
+};
 
-    async changeNameColor() {
-      this.urlError = await orUtil.updateChatSetting({
-        name_color: this.config.nameColor,
+const getPastComment = async () => {
+  if (sock) {
+    toast.add({
+      severity: "warn",
+      summary: "Warn",
+      detail: "Already connected to chat server. Please reload page.",
+      life: 3000,
+    });
+    return;
+  }
+  try {
+    let info = await openrec.getVideoInfo(inputUrl.value);
+    vid.value = info.vid;
+
+    inputUrl.value = `https://www.openrec.tv/live/${vid.value}`;
+    streamInfo.value.title = info.title;
+    streamInfo.value.name = info.name;
+    if (info.publicType === "member" && !localStorage.getItem("viewSubs")) {
+      throw "member only";
+    }
+    comments.value = await openrec.getComments(vid.value);
+
+    setTimeout(() => {
+      commentBox.lastElementChild.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
       });
-    },
+    }, 0);
+    connectWs(openrec.getWsUrl(info.mid));
+  } catch (e) {
+    toast.add({
+      severity: "error",
+      summary: "Failed",
+      detail: e,
+      life: 3000,
+    });
+    return;
+  }
+};
 
-    async syncBL() {
-      let j = await orUtil.getBL();
-      if (j.status >= 0) {
-        let bl = [];
-        for (let data of j.data.items[0].blacklist) {
-          bl.push(data.id);
-        }
-        localStorage.setItem("blacklist", bl);
-        this.config.blacklist = bl;
-      }
-    },
+const postComment = async () => {
+  if (vid.value && inputComment.value !== "") {
+    try {
+      await openrec.postComment(vid.value, inputComment.value);
+      inputComment.value = "";
+    } catch (e) {
+      toast.add({
+        severity: "error",
+        summary: "Failed",
+        detail: e,
+        life: 3000,
+      });
+    }
+  }
+};
 
-    resetBL() {
-      localStorage.setItem("blacklist", []);
-      this.config.blacklist = [];
-    },
+const calcSpeed = () => {
+  var sub = function () {
+    streamInfo.value.speed -= 1;
+  };
+  streamInfo.value.speed += 1;
+  setTimeout(sub, 120000);
+};
 
-    async syncNGwords() {
-      let j = await orUtil.getNGwords();
-      if (j.status >= 0) {
-        let words = [];
-        for (let data of j.data.items) {
-          words.push(data.word);
-        }
-        localStorage.setItem("ngwords", words);
-        this.config.ngwords = words;
-      }
-    },
-
-    resetNGwords() {
-      localStorage.setItem("ngwords", []);
-      this.config.ngwords = [];
-    },
-  },
+const calcAvg = () => {
+  return parseInt(streamInfo.value.speed / 2);
 };
 </script>
 
-<style scoped>
-a {
-  color: var(--v-secondary-base);
-}
-
-.stream_data {
-  border-top: dotted 2px var(--v-background-lighten3);
-  border-bottom: dotted 2px var(--v-background-lighten3);
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-
-#configBtn {
-  background-color: var(--v-background-lighten5);
-  border-radius: 18px;
-  padding: 5px;
-  margin-top: 2px;
-  margin-left: auto;
-  margin-right: 5px;
-}
-#configBtn:hover {
-  background-color: var(--v-background-lighten4);
-}
-
-.title a {
-  font-size: 24px;
-}
-
-.channel_name {
-  font-size: 20px;
-}
-
-.flexbox {
-  display: flex;
-}
-
-.info_box,
-.comment_box {
-  border: 2px solid var(--v-background-lighten5);
-  height: 68vh;
-  min-height: 50px;
-  max-width: 900px;
-  border-radius: 3px;
-  margin-left: 10px;
+<style>
+.p-splitter-panel {
   overflow-y: scroll;
-  background-color: var(--v-background-darken1);
-}
-.comment_box {
-  width: 65vw;
-}
-.info_box {
-  width: 30vw;
 }
 
-.infos,
-.comments {
-  margin: 0.8em;
-  background-color: var(--v-background-base);
-  color: var(--v-primary-base);
-  padding: 0.3em 8px;
-  border-radius: 7px;
+.comments,
+.info {
+  margin: 0.5em;
+  background-color: var(--surface-a);
+  padding: 3px;
+  border-radius: 3px;
   word-break: break-all;
 }
 
-.user_name {
+.user-name {
   font-size: smaller;
   display: flex;
   justify-content: space-between;
-}
-
-.url_box {
-  width: 40vw;
-  max-width: 500px;
-}
-.post_box {
-  margin-top: 20px;
-  margin-left: 10px;
-  min-width: 250px;
-  width: 40vw;
-}
-
-.stamp_btn {
-  margin-top: 5px;
-  margin-left: 10px;
 }
 </style>

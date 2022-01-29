@@ -1,331 +1,193 @@
 <template>
   <div>
-    <bar-chart
-      id="mainChart"
-      :chart-data="graphData"
-      :options="options"
-      :height="chartHeight"
-      :width="chartWidth"
-    ></bar-chart>
-
-    <div class="flex-box">
-      <div class="flex-items">
-        <form>
-          <v-row>
-            <v-text-field
-              type="number"
-              min="1"
-              v-model.number="limit"
-              label="表示人数"
-              suffix="人"
-              hide-details
-              dense
-              outlined
-            ></v-text-field>
-            <v-select
-              v-model="tempYm"
-              :items="ymObj"
-              label="年月"
-              hide-details
-              dense
-              outlined
-              return-object
-            ></v-select>
-          </v-row>
-        </form>
-      </div>
-      <v-btn
-        id="update-button"
-        outlined
-        @click="createGraphData()"
-        color="var(--v-primary-darken2)"
-        >更新</v-btn
-      >
-    </div>
+    <Chart type="bar" :data="graphData" :options="chartOptions" />
+    <br />
 
     <div>
-      <div class="table_wrap">
-        <table>
-          <thead>
-            <th width="5%">rank</th>
-            <th width="20%">userid</th>
-            <th>count</th>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in graphData.labels" :key="index">
-              <td>{{ index + 1 }}</td>
-              <td>
-                <span @click="clickUser(item)" class="userid">{{ item }}</span>
-              </td>
-              <td>{{ graphData.datasets[0].data[index] }}</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="p-inputgroup">
+        <InputNumber
+          v-model="limit"
+          :min="0"
+          suffix="人"
+          @keydown.enter="getRank"
+        />
+        <Dropdown
+          v-model="selectedSpan"
+          :options="spanArr"
+          placeholder="年月"
+          filterLocale="ja"
+        />
+        <Button
+          :loading="nowloading"
+          label="更新"
+          class="p-button-outlined"
+          @click="getRank"
+        />
       </div>
-
-      <graphModal
-        :val="postData"
-        :chartData="modalGraphData"
-        :chartOptions="options"
-        v-show="showModal"
-        @close="closeModal()"
-      />
     </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <th width="10%">rank</th>
+          <th>userid</th>
+          <th>count</th>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in graphData.labels" :key="index">
+            <td>{{ index + 1 }}</td>
+            <td>
+              <span
+                @click="showUserCard(item)"
+                style="text-decoration: underline; cursor: pointer"
+              >
+                {{ item }}
+              </span>
+            </td>
+            <td>{{ graphData.datasets[0].data[index] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <Dialog
+      v-model:visible="showModal"
+      :modal="true"
+      :dismissableMask="true"
+      header="ユーザ情報"
+    >
+      <UserCardVue :userid="modalUserid" />
+    </Dialog>
   </div>
 </template>
 
-<script>
-import barChart from "../components/barChart";
-import graphModal from "../components/graphModal";
+<script setup>
+import { ref, onMounted } from "vue";
+import Chart from "primevue/chart";
+import InputNumber from "primevue/inputnumber";
+import { useToast } from "primevue/usetoast";
+import UserCardVue from "../components/UserCard.vue";
 
-export default {
-  components: {
-    barChart,
-    graphModal,
+const limit = ref(30);
+const spanArr = ref([]);
+const selectedSpan = ref(null);
+const nowloading = ref(false);
+const showModal = ref(false);
+const modalUserid = ref("");
+const graphData = ref({
+  labels: [],
+  datasets: [
+    {
+      backgroundColor: "#42A5F5",
+      data: [],
+    },
+  ],
+});
+const chartOptions = ref({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false,
+    },
   },
-
-  data() {
-    return {
-      // new input value
-      limit: 30,
-      ymObj: [],
-      tempYm: { text: "", value: "" },
-
-      // modal
-      showModal: false,
-      postData: {
-        id: "",
-        nickname: "",
-        created_at: "",
+  scales: {
+    x: {
+      ticks: {
+        color: "#ddd",
       },
-      modalGraphData: {
-        labels: [],
-        datasets: [
-          {
-            data: [],
-          },
-        ],
+      grid: {
+        display: false,
       },
-
-      // グラフの描画に使用するデータ
-      graphData: {
-        labels: [],
-        datasets: [
-          {
-            data: [],
-          },
-        ],
+    },
+    y: {
+      ticks: {
+        color: "#ddd",
       },
-      options: {
-        legend: {
-          display: false,
-        },
-        scales: {
-          xAxes: [
-            {
-              ticks: {
-                fontColor: "#ddd",
-              },
-            },
-          ],
-
-          yAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-                fontColor: "#ddd",
-              },
-            },
-          ],
-        },
+      grid: {
+        color: "#666",
       },
-      chartHeight: window.innerHeight * 0.3,
-      chartWidth: window.innerWidth * 0.8,
-    };
+    },
   },
+});
+const toast = useToast();
 
-  mounted() {
-    // create ym list
-    let dt = new Date();
-    let y = 2020;
-    let m = 7;
-    let deadline = [];
-    if(dt.getMonth() === 11) {
-      deadline.push(dt.getFullYear() + 1);
-    } else {
-      deadline.push(dt.getFullYear());
+onMounted(() => {
+  const getDoubleDigestNumber = (num) => {
+    return ("0" + num).slice(-2);
+  };
+
+  let dt = new Date();
+  let y = 2020;
+  let m = 7;
+  let deadline = [];
+  if (dt.getMonth() === 11) {
+    deadline.push(dt.getFullYear() + 1);
+  } else {
+    deadline.push(dt.getFullYear());
+  }
+  deadline.push((dt.getMonth() + 2) % 12);
+
+  for (; y !== deadline[0] || m !== deadline[1]; ) {
+    let ym = y + getDoubleDigestNumber(m);
+    spanArr.value.push(ym);
+    if (m === 12) {
+      y++;
     }
-    deadline.push((dt.getMonth() + 2) % 12);
+    m = (m % 12) + 1;
+  }
+  spanArr.value.push("all");
+  spanArr.value = spanArr.value.reverse();
+  selectedSpan.value = spanArr.value[1];
+  getRank();
+});
 
-    for (; y !== deadline[0] || m !== deadline[1]; ) {
-      let ym = y + this.getDoubleDigestNumber(m);
-      this.ymObj.push({ text: ym, value: ym });
-      if (m === 12) {
-        y++;
-      }
-      m = (m % 12) + 1;
+const getRank = async () => {
+  let rankApi =
+    "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v2/rank";
+  let res;
+  nowloading.value = true;
+  if (selectedSpan.value == "all") {
+    res = await fetch(`${rankApi}/all?limit=${limit.value}`);
+  } else {
+    let y = selectedSpan.value.slice(0, 4);
+    let m = selectedSpan.value.slice(-2);
+    res = await fetch(`${rankApi}/${y}/${m}?limit=${limit.value}`);
+  }
+  if (res.ok) {
+    let j = await res.json();
+    let tempIds = [];
+    let tempCount = [];
+    for (let data of j) {
+      tempIds.push(data["userid"]);
+      tempCount.push(data["count"]);
     }
-    this.tempYm = this.ymObj[this.ymObj.length - 1];
+    graphData.value.labels = tempIds;
+    graphData.value.datasets[0].data = tempCount;
+  } else {
+    toast.add({
+      severity: "error",
+      summary: "Failed",
+      detail: res.status + ": Failed to get msg",
+      life: 3000,
+    });
+  }
+  nowloading.value = false;
+};
 
-    this.ymObj.push({ text: "all", value: "all" });
-    this.ymObj = this.ymObj.reverse();
-    // init graph data
-    this.createGraphData();
-  },
-
-  methods: {
-    async clickUser(userid) {
-      let orApiUrl =
-        "https://public.openrec.tv/external/api/v5/channels/" + userid;
-      let webappApiUrl =
-        "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v2/rank/user/" +
-        userid;
-      let tempGraphData = {
-        labels: [],
-        datasets: [
-          {
-            data: [],
-            backgroundColor: "#0288D1",
-            hoverBackgroundColor: "#03A9F4",
-          },
-        ],
-      };
-
-      this.showModal = true;
-
-      // while fetching
-      this.postData["nickname"] = "now loading";
-      this.postData["id"] = "now loading";
-      this.postData["created_at"] = "now loading";
-
-      const [res1, res2] = await Promise.all([
-        fetch(orApiUrl),
-        fetch(webappApiUrl),
-      ]);
-      if (res1.ok) {
-        let j = await res1.json();
-        this.postData["id"] = j["id"];
-        this.postData["nickname"] = j["nickname"];
-        this.postData["created_at"] = j["registered_at"];
-      } else {
-        this.postData["id"] = userid;
-        this.postData["nickname"] = "";
-        this.postData["created_at"] = "account not found";
-      }
-
-      if (res2.ok) {
-        let data = await res2.json();
-
-        tempGraphData["labels"] = Object.keys(data);
-        for (let i of tempGraphData["labels"]) {
-          tempGraphData["datasets"][0]["data"].push(data[i]);
-        }
-      }
-
-      // obj を丸ごと変更するとグラフに反映される
-      this.modalGraphData = tempGraphData;
-    },
-
-    closeModal() {
-      this.showModal = false;
-    },
-
-    // ラベルとそのデータを用いてグラフを更新
-    updataGraph(label, data) {
-      this.graphData = {
-        labels: label,
-        datasets: [
-          {
-            data: data,
-            backgroundColor: "#0288D1",
-            hoverBackgroundColor: "#03A9F4",
-          },
-        ],
-      };
-    },
-
-    // 数字を0付き2桁の文字列に変換
-    getDoubleDigestNumber(num) {
-      return ("0" + num).slice(-2);
-    },
-
-    async createGraphData() {
-      let ids = [];
-      let counts = [];
-      let rankApi =
-        "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v2/rank";
-      let res;
-      if (this.tempYm["value"] == "all") {
-        res = await fetch(`${rankApi}/all?limit=${this.limit}`);
-      } else {
-        let y = this.tempYm["value"].slice(0, 4);
-        let m = this.tempYm["value"].slice(-2);
-
-        res = await fetch(`${rankApi}/${y}/${m}?limit=${this.limit}`);
-      }
-      if (res.status == 200) {
-        let j = await res.json();
-        for (let data of j) {
-          ids.push(data["userid"]);
-          counts.push(data["count"]);
-        }
-        this.updataGraph(ids, counts);
-      }
-    },
-  },
+const showUserCard = (userid) => {
+  showModal.value = true;
+  modalUserid.value = userid;
 };
 </script>
 
 <style scoped>
-#update-button {
-  margin-left: 20px;
-  margin-bottom: 14px;
+.p-chart {
+  position: relative;
+  height: 40vh;
+  width: 90vw;
 }
 
-.flex-box {
-  display: flex;
-  align-items: flex-end;
-  border-top: dotted 2px var(--v-background-lighten3);
-  border-bottom: dotted 2px var(--v-background-lighten3);
-}
-.flex-box .flex-items {
-  margin-top: 20px;
-  margin-left: 10px;
-  margin-bottom: 10px;
-}
-
-.row {
-  margin-bottom: 3px;
-}
-
-.userid {
-  text-decoration: underline;
-}
-.userid:hover {
-  color: var(--v-secondary-base);
-}
-
-.table_wrap {
-  overflow: scroll;
-}
-table {
-  width: 90%;
-  min-width: 400px;
-  margin-top: 10px;
-  margin-left: auto;
-  margin-right: auto;
-  border-collapse: collapse;
-  border: solid 3px var(--v-background-lighten5);
-}
-
-table th,
-table td {
-  /* width: 33%; */
-  border: solid 1px var(--v-background-lighten5);
-  padding: 6px;
-}
-
-.v-text-field {
-  max-width: 120px;
+.table-wrap {
+  overflow-x: scroll;
 }
 </style>

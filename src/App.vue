@@ -1,126 +1,86 @@
 <template>
-  <v-app :style="{ background: $vuetify.theme.themes.dark.background }">
-    <div id="app">
-      <div id="nav">
-        <v-navigation-drawer v-model="drawer" absolute temporary>
-          <v-list-item>
-            <v-list-item-content>
-              <h2>Menu</h2>
-              <router-link to="/">Home</router-link> <br />
-              <router-link to="/rank">ランキング</router-link> <br />
-              <router-link to="/message">過去ログ検索</router-link> <br />
-              <router-link to="/chat">コメビュ</router-link> <br />
-              <router-link to="/stream">コメつき配信</router-link> <br />
-              <router-link to="/api">API</router-link> <br />
-              <br />
-              <router-link to="/contact">Contact</router-link>
-              <span>
-                <img
-                  id="loginBtn"
-                  alt="config"
-                  src="./assets/login.png"
-                  @click="callModal()"
-                />
-              </span>
-            </v-list-item-content>
-          </v-list-item>
-        </v-navigation-drawer>
-      </div>
-      <login-modal
-        :isLogin="isLogin"
-        v-if="showModal"
-        @close="closeModal()"
-        @updateLoginStatus="isLogin = $event"
-      />
-      <div class="headerbar">
-        <v-btn
-          color="var(--v-primary-darken2)"
-          outlined
-          @click.stop="drawer = !drawer"
-          >Menu</v-btn
-        >
-        <h2 id="pagetitle"></h2>
-      </div>
-      <router-view id="router-view" />
-    </div>
-  </v-app>
+  <div id="nav">
+    <Button @click="menu = true" aria-label="menu" icon="pi pi-list" />
+    <h2 id="pagetitle"></h2>
+    <Sidebar v-model:visible="menu">
+      <h3 style="margin: 0">Menu</h3>
+      <router-link to="/">Masaoroid</router-link><br />
+      <router-link to="rank">ランキング</router-link><br />
+      <router-link to="/message">過去ログ検索</router-link><br />
+      <router-link to="/chat">コメビュ</router-link><br />
+      <router-link to="/stream">コメつき配信</router-link><br />
+      <router-link to="/api">OPENREC API</router-link><br />
+      <router-link to="/contact">問い合わせ</router-link>
+    </Sidebar>
+  </div>
+  <router-view id="router-view" />
+  <Toast />
 </template>
 
-<script>
-import LoginModal from "./components/loginModal";
-export default {
-  components: {
-    LoginModal,
-  },
-  data() {
-    return {
-      drawer: null,
-      isLogin: false,
-      showModal: false,
-    };
-  },
-  mounted() {
-    this.updateLoginStatus();
-  },
-  methods: {
-    updateLoginStatus() {
-      if (
-        localStorage.getItem("orAccessToken") &&
-        localStorage.getItem("orUuid")
-      ) {
-        this.isLogin = true;
-      } else {
-        this.isLogin = false;
-      }
-    },
-    callModal() {
-      this.showModal = true;
-    },
-    closeModal() {
-      this.showModal = false;
-    },
-  },
-};
+<script setup>
+import { ref } from "vue";
+import Sidebar from "primevue/sidebar";
+
+const menu = ref(false);
 </script>
 
 <style>
-html {
+body {
+  margin: 0;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: var(--surface-a);
+  font-weight: 400;
+  color: var(--text-color);
+}
+
+#app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-#nav a,
-#nav span {
-  margin-left: 10px;
-  font-weight: bold;
-  font-size: 20px;
-  color: var(--v-primary-base-lighten1);
-}
 
-#nav a.router-link-exact-active {
-  color: var(--v-secondary-base);
+#nav {
+  display: flex;
+  margin-top: 2%;
+  margin-left: 2%;
+  margin-bottom: 2%;
+  text-align: left;
 }
-
-#loginBtn {
-  background-color: var(--v-background-lighten5);
-  border-radius: 18px;
-  padding: 5px;
-  max-width: 26px;
-}
-#loginBtn:hover {
-  background-color: var(--v-background-lighten4);
+#nav > h2 {
+  margin: 0;
+  padding-left: 1em;
 }
 
 #router-view {
   padding-left: 2%;
   padding-right: 2%;
 }
-
-.headerbar {
-  display: flex;
-  padding: 1em 0em 1em 1em;
+.router-link-exact-active {
+  color: #03a9f4;
+  font-weight: bolder;
 }
-.headerbar h2 {
-  padding-left: 1em;
+
+a {
+  color: var(--text-color);
+}
+a:hover {
+  color: #03a9f4;
+}
+
+table {
+  width: 100%;
+  min-width: 300px;
+  border-collapse: collapse;
+  border: solid 3px var(--primary-color);
+  word-break: break-all;
+  margin-top: 10px;
+}
+
+table th,
+table td {
+  border: solid 1px var(--primary-color);
+  padding: 6px;
 }
 </style>
