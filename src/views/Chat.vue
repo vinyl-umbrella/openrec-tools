@@ -246,7 +246,9 @@ const connectWs = (wss) => {
   };
 
   sock.onclose = (e) => {
-    console.log(e.code);
+    if (e.code === 1006) {
+      connectWs(wss);
+    }
   };
 
   const findUserid = (id) => {
@@ -287,13 +289,14 @@ const pushEvent = (type, msg) => {
   }
 
   // scroll
-  if (infoBox.scrollHeight - infoBox.clientHeight - infoBox.scrollTop < 200) {
-    infoBox.scrollTop = infoBox.scrollHeight;
-    infoBox.lastElementChild.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-    });
-  }
+  setTimeout(() => {
+    if (infoBox.scrollHeight - infoBox.clientHeight - infoBox.scrollTop < 200) {
+      infoBox.lastElementChild.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
+  }, 0);
 };
 
 const getPastComment = async () => {
