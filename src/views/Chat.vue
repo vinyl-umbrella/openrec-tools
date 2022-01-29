@@ -26,6 +26,7 @@
         <Button
           icon="pi pi-cog"
           class="p-button-rounded p-button-outlined"
+          aria-label="config"
           @click="showModal = true"
         />
       </div>
@@ -98,7 +99,7 @@ import configModalVue from "@/components/configModal.vue";
 import openrec from "@/func/openrec";
 
 const vid = ref(null);
-const inputUrl = ref(null);
+const inputUrl = ref(useRoute().query.u);
 const inputComment = ref("");
 const streamInfo = ref({
   title: "title",
@@ -118,9 +119,7 @@ let sock = null;
 onMounted(() => {
   commentBox = document.getElementById("comment-box");
   infoBox = document.getElementById("info-box");
-  const route = useRoute();
-  if (route.query.u) {
-    inputUrl.value = route.query.u;
+  if (inputUrl.value) {
     getPastComment();
   }
 });

@@ -23,7 +23,7 @@
     <template #subtitle>{{ userInfo.id }}</template>
     <template #content>
       <div>登録日: {{ userInfo.date }}</div>
-      <div>{{ userInfo.introduction }}</div>
+      <div class="introduction">{{ userInfo.introduction }}</div>
     </template>
   </Card>
 </template>
@@ -134,5 +134,9 @@ onMounted(async () => {
 .p-card-title {
   display: flex;
   align-items: center;
+}
+
+.introduction {
+  white-space: pre-line;
 }
 </style>

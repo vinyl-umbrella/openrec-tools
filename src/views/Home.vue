@@ -11,6 +11,7 @@
     <Button
       :loading="nowloading"
       label="再生成"
+      aria-label="再生成"
       class="p-button-outlined"
       @click="getMasaoMessage()"
     />

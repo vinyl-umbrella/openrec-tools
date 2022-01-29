@@ -25,6 +25,7 @@
         <Button
           icon="pi pi-cog"
           class="p-button-rounded p-button-outlined"
+          aria-label="config"
           @click="showModal = true"
         />
       </div>

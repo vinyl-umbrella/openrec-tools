@@ -1,6 +1,6 @@
 <template>
   <div id="nav">
-    <Button @click="menu = true" icon="pi pi-list" />
+    <Button @click="menu = true" aria-label="menu" icon="pi pi-list" />
     <h2 id="pagetitle"></h2>
     <Sidebar v-model:visible="menu">
       <h3 style="margin: 0">Menu</h3>
@@ -57,9 +57,16 @@ body {
   padding-left: 2%;
   padding-right: 2%;
 }
+.router-link-exact-active {
+  color: #03a9f4;
+  font-weight: bolder;
+}
 
 a {
   color: var(--text-color);
+}
+a:hover {
+  color: #03a9f4;
 }
 
 table {
