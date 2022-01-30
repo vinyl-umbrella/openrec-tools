@@ -134,10 +134,11 @@ const connectWs = async (url) => {
   };
 
   let intervalId = setInterval(() => {
-    if (!sock) {
+    if (sock.readyState === 3) {
       clearInterval(intervalId);
+    } else {
+      sock.send("2");
     }
-    sock.send("2");
   }, 25000);
 };
 
