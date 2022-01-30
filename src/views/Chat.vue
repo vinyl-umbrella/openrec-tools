@@ -381,6 +381,16 @@ const calcAvg = () => {
 <style>
 .p-splitter-panel {
   overflow-y: scroll;
+  scrollbar-width: thin;
+}
+.p-splitter-panel::-webkit-scrollbar {
+  width: 8px;
+}
+.p-splitter-panel::-webkit-scrollbar-thumb {
+  background-color: var(--surface-a);
+}
+.p-splitter-panel::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .comments,

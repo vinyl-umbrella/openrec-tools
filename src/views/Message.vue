@@ -167,6 +167,15 @@ const showUserCard = (userid) => {
 .table-wrap {
   overflow-x: scroll;
 }
+.table-wrap::-webkit-scrollbar {
+  width: 8px;
+}
+.table-wrap::-webkit-scrollbar-thumb {
+  background-color: var(--surface-a);
+}
+.table-wrap::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
 
 .nextbtn {
   float: right;
