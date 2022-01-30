@@ -129,7 +129,7 @@ function commentFormatter(mode, comment) {
       name += `[Lv.${comment.badges[0].subscription.months}]`;
     }
     if (comment.user.is_premium) {
-      name = "${name}[P]";
+      name += "[P]";
     }
     if (comment.user.is_fresh) {
       name += "[Fresh]";
