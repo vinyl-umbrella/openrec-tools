@@ -127,6 +127,12 @@ const connectWs = async (url) => {
     }
   };
 
+  sock.onclose = (e) => {
+    if (e.code === 1006) {
+      connectWs(url);
+    }
+  };
+
   let intervalId = setInterval(() => {
     if (!sock) {
       clearInterval(intervalId);
