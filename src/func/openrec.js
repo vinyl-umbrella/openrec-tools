@@ -145,6 +145,9 @@ function commentFormatter(mode, comment) {
     if (comment.user.is_warned) {
       name += "[Warned]";
     }
+    if (comment.user.is_official) {
+      name += "[Official]";
+    }
     c.name = name;
   } else if (mode === "ws") {
     c.id = comment.chat_id;
@@ -184,6 +187,9 @@ function commentFormatter(mode, comment) {
     }
     if (comment.is_warned) {
       name += "[Warned]";
+    }
+    if (comment.user_type === 1) {
+      name += "[Official]";
     }
     c.name = name;
   }
