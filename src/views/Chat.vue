@@ -54,7 +54,7 @@
       <SplitterPanel :size="40" id="info-box">
         <div class="info" v-for="(event, index) in events" :key="index">
           {{ event.date }}
-          <span style="font-weight: bolder">[{{ event.type }}]</span>
+          <span style="font-weight: bolder">[{{ event.type }}]&nbsp;</span>
           <span v-if="event.url">
             <a :href="event.url" target="_blank" rel="noopener norefferer">
               {{ event.message }}
@@ -156,6 +156,10 @@ const connectWs = (wss) => {
             }
           }
 
+          if (msg.userId === "indegnasen" || msg.userId === "yocchan-umaimon") {
+            pushEvent("chat", `${msg.name} ${msg.message}`);
+          }
+
           comments.value.push(msg);
           if (comments.value.length > 2000) {
             comments.value.shift();
@@ -192,24 +196,28 @@ const connectWs = (wss) => {
           break;
 
         // ban 追加/削除
-        case 6:
-          pushEvent("ban", `追加 ${findUserid(msg.owner_to_banned_user_id)}`);
+        case 6: {
+          let banUser = findUserid(msg.owner_to_banned_user_id);
+          pushEvent("ban", `追加 ${banUser[0]} ${banUser[1]}`);
           break;
-        case 7:
-          pushEvent("ban", `解除 ${findUserid(msg.owner_to_banned_user_id)}`);
+        }
+        case 7: {
+          let banUser = findUserid(msg.owner_to_banned_user_id);
+          pushEvent("ban", `解除 ${banUser[0]} ${banUser[1]}`);
           break;
+        }
 
         // staff 追加/削除
         case 8:
           pushEvent(
             "staff",
-            `追加 ${findUserid(msg.owner_to_moderator_user_id)}`
+            `追加 ${findUserid(msg.owner_to_moderator_user_id)[0]}`
           );
           break;
         case 9:
           pushEvent(
             "staff",
-            `解除 ${findUserid(msg.owner_to_moderator_user_id)}`
+            `解除 ${findUserid(msg.owner_to_moderator_user_id)[0]}`
           );
           break;
 
@@ -253,13 +261,15 @@ const connectWs = (wss) => {
 
   const findUserid = (id) => {
     let name = `unknown(${id})`;
+    let msg = [];
     for (let i = comments.value.length - 1; i >= 0; i--) {
       if (id === comments.value[i].recxuser_id) {
         name = comments.value[i].name;
+        msg.push(name, comments.value[i].message);
         break;
       }
     }
-    return name;
+    return msg;
   };
 
   let intervalId = setInterval(() => {

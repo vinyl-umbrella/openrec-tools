@@ -106,20 +106,22 @@ function checkBL(userid, msg) {
 function commentFormatter(mode, comment) {
   let c = {
     id: 0,
-    name: "",
-    color: "",
-    recxuser_id: 0,
-    message: comment.message,
-    stamp: null,
     capture: null,
-    yell: null,
+    color: "",
+    message: comment.message,
+    name: "",
+    recxuser_id: 0,
+    stamp: null,
     time: "",
+    userId: "",
+    yell: null,
   };
   if (mode == "rest") {
     c.id = comment.id;
     c.color = comment.chat_setting.name_color;
     c.recxuser_id = comment.user.recxuser_id;
     c.time = comment.posted_at.slice(11, -6);
+    c.userId = comment.user.id;
     if (comment.stamp) {
       c.stamp = comment.stamp.l_image_url;
     }
@@ -149,6 +151,7 @@ function commentFormatter(mode, comment) {
     c.color = comment.user_color;
     c.recxuser_id = comment.user_id;
     c.time = comment.cre_dt.slice(-8);
+    c.userId = comment.user_key;
 
     // stamp, capture, yell
     if (comment.stamp) {
