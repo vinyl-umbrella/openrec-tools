@@ -254,6 +254,7 @@ const connectWs = (wss) => {
   };
 
   sock.onclose = (e) => {
+    console.log(e.code);
     if (e.code === 1006) {
       connectWs(wss);
     }
@@ -261,11 +262,12 @@ const connectWs = (wss) => {
 
   const findUserid = (id) => {
     let name = `unknown(${id})`;
-    let msg = [];
+    let msg = [name];
     for (let i = comments.value.length - 1; i >= 0; i--) {
       if (id === comments.value[i].recxuser_id) {
         name = comments.value[i].name;
-        msg.push(name, comments.value[i].message);
+        msg[0] = name;
+        msg.push(comments.value[i].message);
         break;
       }
     }
@@ -301,7 +303,7 @@ const pushEvent = (type, msg) => {
 
   // scroll
   setTimeout(() => {
-    if (infoBox.scrollHeight - infoBox.clientHeight - infoBox.scrollTop < 200) {
+    if (infoBox.scrollHeight - infoBox.clientHeight - infoBox.scrollTop < 1000) {
       infoBox.lastElementChild.scrollIntoView({
         behavior: "smooth",
         block: "nearest",
