@@ -113,11 +113,13 @@ const getMessages = async (last) => {
     startdate: dt.value,
     border: last,
   };
-  if (dt.value) {
-    let copiedDate = dt.value;
+  if (dt.value && last === 0) {
+    let copiedDate = new Date(dt.value.getTime());
     copiedDate.setHours(copiedDate.getHours() + 9);
     copiedDate.setSeconds(0);
     postdata.startdate = copiedDate.toISOString().slice(0, -5);
+  } else {
+    postdata.startdate = null;
   }
 
   nowloading.value = true;
