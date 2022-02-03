@@ -15,6 +15,12 @@
       class="p-button-outlined"
       @click="getMasaoMessage()"
     />
+    <Button
+      label="コピー"
+      aria-label="コピー"
+      class="p-button-outlined"
+      @click="copyMessage()"
+    />
   </div>
 </template>
 
@@ -43,6 +49,24 @@ const getMasaoMessage = async () => {
       severity: "error",
       summary: "Failed",
       detail: "Failed to get msg",
+      life: 3000,
+    });
+  }
+};
+
+const copyMessage = async () => {
+  let msg = `( ･᷄෴･᷅.)「${message.value}」`;
+  try {
+    await navigator.clipboard.writeText(msg);
+    toast.add({
+      severity: "info",
+      summary: "Copied!",
+      life: 3000,
+    });
+  } catch {
+    toast.add({
+      severity: "error",
+      summary: "Failed to copy.",
       life: 3000,
     });
   }
