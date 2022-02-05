@@ -15,7 +15,6 @@ async function connectDB(dbname) {
 
 exports.msg = async function (req, res) {
     // intial value
-    let ip = req.header('x-forwarded-for');
     let userid = "";
     let search_string = "%";
     let startdate = "2015-01-01 00:00:00";
@@ -50,7 +49,7 @@ exports.msg = async function (req, res) {
         arr = [req.body.videoid, border, startdate, enddate, search_string]
     }
 
-    console.log(ip, "[message]", req.body.videoid, userid, search_string, border);
+    console.log("[message]", req.body.videoid, userid, search_string, border);
 
     try {
         const [results] = await conn.query(sql, arr);

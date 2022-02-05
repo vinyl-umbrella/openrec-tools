@@ -47,8 +47,7 @@ exports.rankAll = async function (req, res) {
     if (req.query.limit) {
         limit = Number(req.query.limit);
     }
-    let ip = req.header('x-forwarded-for');
-    console.log(ip, "[rank-all]");
+    console.log("[rank-all]");
 
     let conn = await connectDB(functions.config().oci.rankdb);
     let sql = "SELECT userid, count FROM all_rank ORDER BY count DESC LIMIT ?";
@@ -69,8 +68,7 @@ exports.rankAll = async function (req, res) {
 
 exports.rankUser = async function (req, res) {
     const userid = req.params.userid;
-    let ip = req.header('x-forwarded-for');
-    console.log(ip, "[rank-user]", userid);
+    console.log("[rank-user]", userid);
     const pool = cPool(functions.config().oci.rankdb);
 
     let tasks = [];
@@ -110,8 +108,7 @@ exports.rankYM = async function (req, res) {
         limit = Number(req.query.limit);
     }
     let tablename = "rank" + year + month;
-    let ip = req.header('x-forwarded-for');
-    console.log(ip, "[rank-ym]", year, month, limit);
+    console.log("[rank-ym]", year, month, limit);
 
     let conn = await connectDB(functions.config().oci.rankdb);
     let sql = "SELECT userid, count FROM ?? ORDER BY count DESC LIMIT ?";

@@ -13,8 +13,7 @@ def masaoroid(request):
     headers = {
         'Access-Control-Allow-Origin': '*'
     }
-    ip = request.headers.getlist("X-Forwarded-For")[0]
-    print(ip, "[masaoroid]")
+    print("[masaoroid]")
 
     try:
         with open('./learned.json', 'r') as file:
