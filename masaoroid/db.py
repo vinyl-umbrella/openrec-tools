@@ -15,7 +15,14 @@ def connectDB(conf):
 
 
 def get_futon_message() -> list:
-    masao_message = []
+    masao_message = [
+        ("ここはクソガキの檻", ),
+        ("ここにいるインターネットが得意なクソガキ達は、人の悪口を好み、人のプライベートを監視する等、社会に出してはならないクソガキが一定数いる。",),
+        ("いち早く更生し、社会適応できる事を期待するが、歪んだ思考のクセはこの檻を利用する以上、治療は困難であろう。",),
+        ("何をそんなに他人にムキになれるのだろうか。",),
+        ("もしかしたら彼らはゴム人間なのか、毒電波で操られているのか。",),
+        ("ともかくこのままでは幸せになる事は不可能であろう。",)
+    ]
     with connectDB(config.Config()) as conn:
         with conn.cursor() as cur:
             cur.execute("SHOW TABLES")
