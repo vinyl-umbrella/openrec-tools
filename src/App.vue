@@ -61,6 +61,7 @@ body {
 #router-view {
   padding-left: 2%;
   padding-right: 2%;
+  padding-bottom: 5em;
 }
 .router-link-exact-active {
   color: #03a9f4;

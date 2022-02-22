@@ -1,13 +1,6 @@
 <template>
   <div class="masaoroid">
     <h1>Masaoroid</h1>
-    <div>
-      <div class="masao-msg">
-        <p>{{ message }}</p>
-        <p class="warn">※本人の発言ではありません</p>
-      </div>
-      <div class="masao-face">( ･᷄෴･᷅.)</div>
-    </div>
     <Button
       :loading="nowloading"
       label="再生成"
@@ -21,6 +14,14 @@
       class="p-button-outlined"
       @click="copyMessage()"
     />
+
+    <div>
+      <div class="masao-face">( ･᷄෴･᷅.)</div>
+      <div class="masao-msg">
+        <p>{{ message }}</p>
+        <p class="warn">※本人の発言ではありません</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -104,8 +105,8 @@ const copyMessage = async () => {
   content: "";
   position: absolute;
   border: solid 12px transparent;
-  border-top: solid 12px var(--primary-color);
-  top: 100%;
+  border-bottom: solid 12px var(--primary-color);
+  top: -24px;
   left: 50%;
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
