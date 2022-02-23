@@ -76,10 +76,10 @@ const copyMessage = async () => {
 
 <style scoped>
 .masaoroid {
-  position: fixed;
+  position: absolute;
   width: 80vw;
   height: 80vh;
-  top: 50%;
+  top: 40%;
   left: 50%;
   margin-left: -40vw;
   margin-top: -20vh;
