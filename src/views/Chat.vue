@@ -133,7 +133,7 @@ onBeforeUnmount(() => {
 const connectWs = (wss) => {
   sock = new WebSocket(wss);
   const urlRegex = /https?:\/\/[a-zA-Z0-9.\-_@:/~?%&;=+#',()*!]+/;
-  sock.onmessage = (e) => {
+  sock.onmessage = async function (e) {
     let data = openrec.parseWsData(e.data);
     if (data[0] === "message") {
       let msg = data[1].data;
@@ -197,29 +197,27 @@ const connectWs = (wss) => {
 
         // ban 追加/削除
         case 6: {
-          let banUser = findUserid(msg.owner_to_banned_user_id);
+          let banUser = await findUserid(msg.owner_to_banned_user_id);
           pushEvent("ban", `追加 ${banUser[0]} ${banUser[1]}`);
           break;
         }
         case 7: {
-          let banUser = findUserid(msg.owner_to_banned_user_id);
+          let banUser = await findUserid(msg.owner_to_banned_user_id);
           pushEvent("ban", `解除 ${banUser[0]} ${banUser[1]}`);
           break;
         }
 
         // staff 追加/削除
-        case 8:
-          pushEvent(
-            "staff",
-            `追加 ${findUserid(msg.owner_to_moderator_user_id)[0]}`
-          );
+        case 8: {
+          let staffUser = await findUserid(msg.owner_to_moderator_user_id)[0];
+          pushEvent("staff", `追加 ${staffUser}`);
           break;
-        case 9:
-          pushEvent(
-            "staff",
-            `解除 ${findUserid(msg.owner_to_moderator_user_id)[0]}`
-          );
+        }
+        case 9: {
+          let staffUser = await findUserid(msg.owner_to_moderator_user_id)[0];
+          pushEvent("staff", `解除 ${staffUser}`);
           break;
+        }
 
         case 10:
           break;
@@ -260,16 +258,34 @@ const connectWs = (wss) => {
     }
   };
 
-  const findUserid = (id) => {
+  const findUserid = async function (id) {
     let name = `unknown(${id})`;
-    let msg = [name];
+    let msg = [name, ""];
     for (let i = comments.value.length - 1; i >= 0; i--) {
       if (id === comments.value[i].recxuser_id) {
         name = comments.value[i].name;
         msg[0] = name;
-        msg.push(comments.value[i].message);
-        break;
+        msg[1] = comments.value[i].message;
+        return msg;
       }
+    }
+
+    // if not in comments, find from api
+    let res = await fetch(
+      "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v1/userdata/recxuserid",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          recxuserid: id,
+        }),
+      }
+    );
+    if (res.ok) {
+      let userdata = await res.json();
+      msg[0] = `${userdata.nickname}(${userdata.id})`;
     }
     return msg;
   };
@@ -303,7 +319,10 @@ const pushEvent = (type, msg) => {
 
   // scroll
   setTimeout(() => {
-    if (infoBox.scrollHeight - infoBox.clientHeight - infoBox.scrollTop < 1000) {
+    if (
+      infoBox.scrollHeight - infoBox.clientHeight - infoBox.scrollTop <
+      1000
+    ) {
       infoBox.lastElementChild.scrollIntoView({
         behavior: "smooth",
         block: "nearest",
