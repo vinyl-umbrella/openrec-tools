@@ -38,9 +38,6 @@ body {
   background-color: var(--surface-a);
   font-weight: 400;
   color: var(--text-color);
-}
-
-#app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
