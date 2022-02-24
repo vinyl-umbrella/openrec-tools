@@ -245,6 +245,19 @@ const connectWs = (wss) => {
           });
           break;
 
+        // extension
+        case 43: {
+          let extension_data = JSON.parse(msg.extension_data);
+          if (
+            extension_data.feature === "youtube-movie" &&
+            extension_data.method === "register"
+          ) {
+            let youtubeUrl = `https://www.youtube.com/watch?v=${extension_data.data.youtubeMovie.id}&t=${extension_data.data.youtubeMovie.playPosition}`;
+            pushEvent(extension_data.feature, [youtubeUrl, youtubeUrl]);
+          }
+          break;
+        }
+
         default:
           console.log(data[1]);
       }
@@ -309,7 +322,7 @@ const pushEvent = (type, msg) => {
     url: null,
     message: msg,
   };
-  if (type === "capture" || type === "url") {
+  if (type === "capture" || type === "url" || type == "youtube-movie") {
     data.message = msg[0];
     data.url = msg[1];
     events.value.push(data);
@@ -353,12 +366,14 @@ const getPastComment = async () => {
     }
     comments.value = await openrec.getComments(vid.value);
 
-    setTimeout(() => {
-      commentBox.lastElementChild.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      });
-    }, 0);
+    if (comments.value.length > 0) {
+      setTimeout(() => {
+        commentBox.lastElementChild.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
+      }, 0);
+    }
     connectWs(openrec.getWsUrl(info.mid));
   } catch (e) {
     toast.add({
