@@ -77,7 +77,7 @@ table {
   min-width: 300px;
   border-collapse: collapse;
   border: solid 3px var(--primary-color);
-  word-break: break-all;
+  word-break: break-word;
   margin-top: 10px;
 }
 

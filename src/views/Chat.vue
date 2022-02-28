@@ -436,7 +436,7 @@ const calcAvg = () => {
   background-color: var(--surface-a);
   padding: 3px;
   border-radius: 3px;
-  word-break: break-all;
+  word-break: break-word;
 }
 
 .user-name {
