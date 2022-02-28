@@ -209,13 +209,13 @@ const connectWs = (wss) => {
 
         // staff 追加/削除
         case 8: {
-          let staffUser = await findUserid(msg.owner_to_moderator_user_id)[0];
-          pushEvent("staff", `追加 ${staffUser}`);
+          let staffUser = await findUserid(msg.owner_to_moderator_user_id);
+          pushEvent("staff", `追加 ${staffUser[0]}`);
           break;
         }
         case 9: {
-          let staffUser = await findUserid(msg.owner_to_moderator_user_id)[0];
-          pushEvent("staff", `解除 ${staffUser}`);
+          let staffUser = await findUserid(msg.owner_to_moderator_user_id);
+          pushEvent("staff", `解除 ${staffUser[0]}`);
           break;
         }
 
