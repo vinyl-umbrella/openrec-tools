@@ -84,7 +84,35 @@ const chartOptions = ref({
 });
 const toast = useToast();
 
+const getUserdata = async (userid) => {
+  let res = await fetch(
+    "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v1/userdata",
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json,text/plain,*/*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: userid,
+      }),
+    }
+  );
+  if (res.ok) {
+    let j = await res.json();
+    if (j.name_color) {
+      return j;
+    }
+  }
+  return {};
+};
+
 onMounted(async () => {
+  let data = await getUserdata(props.userid);
+  console.log(data);
+  if (data.name_color) {
+    graphData.value.datasets[0].backgroundColor = data.name_color;
+  }
   try {
     let info = await openrec.getUserInfo(props.userid);
     userInfo.value.id = info.id;
@@ -100,6 +128,10 @@ onMounted(async () => {
         "https://www.openrec.tv/viewapp/images/v4/default/profile.png";
     }
   } catch (e) {
+    if (data) {
+      userInfo.value.id = data.id;
+      userInfo.value.name = data.nickname;
+    }
     toast.add({
       severity: "error",
       summary: "Failed",
