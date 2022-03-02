@@ -63,7 +63,9 @@
 
 <script setup>
 import { onMounted, ref } from "vue";
+import { useToast } from "primevue/usetoast";
 
+const toast = useToast();
 const isLogin = ref(false);
 const uuid = ref(null);
 const token = ref(null);
@@ -108,6 +110,14 @@ const getMyInfo = async () => {
       isLogin.value = true;
       userInfo.value.name = j.nickname;
       userInfo.value.id = j.id;
+    } else {
+      let j = await res.json();
+      toast.add({
+        severity: "error",
+        summary: "Login failed",
+        detail: j.message,
+        life: 3000,
+      });
     }
   }
 };
