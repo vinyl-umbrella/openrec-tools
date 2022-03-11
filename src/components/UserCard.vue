@@ -50,7 +50,7 @@ const graphData = ref({
   labels: [],
   datasets: [
     {
-      backgroundColor: "#42A5F5",
+      backgroundColor: "#eee",
       data: [],
     },
   ],
