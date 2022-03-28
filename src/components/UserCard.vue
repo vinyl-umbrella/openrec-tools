@@ -109,7 +109,6 @@ const getUserdata = async (userid) => {
 
 onMounted(async () => {
   let data = await getUserdata(props.userid);
-  console.log(data);
   if (data.name_color) {
     graphData.value.datasets[0].backgroundColor = data.name_color;
   }
