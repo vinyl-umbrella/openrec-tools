@@ -43,7 +43,16 @@
         <div class="comments" v-for="comment in comments" :key="comment.id">
           <div class="user-name">
             <span :style="{ color: comment.color }">{{ comment.name }}</span>
-            <span>{{ comment.time }}</span>
+            <span>
+              <Button
+                icon="pi pi-angle-double-left"
+                class="p-button-sm p-button-rounded p-button-text"
+                aria-label="quote"
+                style="height: 1em; width: 1em"
+                @click="quoteMsg(comment.message)"
+              />
+              <span>{{ comment.time }}</span>
+            </span>
           </div>
           <span v-if="comment.message">{{ comment.message }}</span>
           <span v-else-if="comment.stamp">
@@ -70,6 +79,7 @@
         type="text"
         v-model="inputComment"
         placeholder="コメント"
+        id="input-box"
         @keydown.enter="postComment"
       />
       <Button
@@ -400,6 +410,11 @@ const postComment = async () => {
       });
     }
   }
+};
+
+const quoteMsg = (msg) => {
+  inputComment.value = msg + "←";
+  document.getElementById("input-box").focus();
 };
 
 const calcSpeed = () => {
