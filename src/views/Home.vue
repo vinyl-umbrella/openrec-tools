@@ -9,6 +9,7 @@
       @click="getMasaoMessage()"
     />
     <Button
+      icon="pi pi-copy"
       label="コピー"
       aria-label="コピー"
       class="p-button-outlined"
