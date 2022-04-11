@@ -1,0 +1,4 @@
+This is a Brave Rewards publisher verification file.
+
+Domain: futonchan-openchat.web.app
+Token: f04f1f49f9c709dac2c81e03d5b673188d66e185937cf3ecb9e2a42cd2cb7f64
