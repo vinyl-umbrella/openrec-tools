@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { defineProps, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import Card from "primevue/card";
 import Chart from "primevue/chart";
 import openrec from "@/func/openrec";
