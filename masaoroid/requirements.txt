@@ -1,7 +1,6 @@
 flake8==3.9.2
-markovify==0.9.3
-mccabe==0.6.1
-mecab-python3==1.0.4
+markovify==0.9.4
+mecab-python3==1.0.5
 pycodestyle==2.7.0
 pyflakes==2.3.1
 PyMySQL==1.0.2
