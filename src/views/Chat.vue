@@ -248,6 +248,13 @@ const connectWs = (wss) => {
           });
           break;
 
+        // vote progress
+        case 30:
+          msg.votes.forEach((ele) => {
+            pushEvent("vote", `[progress] ${ele.text} ${ele.count}票 ${ele.ratio}%`);
+          });
+          break;
+
         case 31:
           pushEvent("vote", `[end] ${msg.title}`);
           msg.votes.forEach((ele) => {
@@ -344,7 +351,7 @@ const pushEvent = (type, msg) => {
   setTimeout(() => {
     if (
       infoBox.scrollHeight - infoBox.clientHeight - infoBox.scrollTop <
-      1000
+      500
     ) {
       infoBox.lastElementChild.scrollIntoView({
         behavior: "smooth",
