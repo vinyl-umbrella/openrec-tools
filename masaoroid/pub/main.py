@@ -1,6 +1,10 @@
 import markovify
 
 
+with open('./learned.json', 'r') as file:
+    TEXT_MODEL = markovify.NewlineText.from_json(file.read())
+
+
 def masaoroid(request):
     """Responds to any HTTP request.
     Args:
@@ -13,19 +17,12 @@ def masaoroid(request):
     headers = {
         'Access-Control-Allow-Origin': '*'
     }
-    print("[masaoroid]")
 
     try:
-        with open('./learned.json', 'r') as file:
-            text_model = markovify.NewlineText.from_json(file.read())
         sentence = None
         while sentence is None:
-            sentence = text_model.make_short_sentence(max_chars=100, min_chars=10)
+            sentence = TEXT_MODEL.make_short_sentence(max_chars=100, min_chars=10)
         message = sentence.replace(" ", "")
         return (message, 200, headers)
     except:
         return ("error", 500, headers)
-
-
-if __name__ == "__main__":
-    print(masaoroid("")[0])

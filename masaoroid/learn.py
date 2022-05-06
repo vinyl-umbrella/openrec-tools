@@ -35,7 +35,7 @@ parsed_text = parse_text(messages)
 text_model = markovify.NewlineText(
     format_text(parsed_text),
     state_size=2,
-    well_formed=False
+    well_formed=True
 )
 
 # Make Leared file as JSON
