@@ -39,7 +39,7 @@
         background-color: var(--surface-b);
       "
     >
-      <SplitterPanel :size="60" id="comment-box">
+      <SplitterPanel :size="70" id="comment-box">
         <div class="comments" v-for="comment in comments" :key="comment.id">
           <div class="user-name">
             <span :style="{ color: comment.color }">{{ comment.name }}</span>
@@ -60,7 +60,7 @@
           </span>
         </div>
       </SplitterPanel>
-      <SplitterPanel :size="40" id="info-box">
+      <SplitterPanel :size="30" id="info-box">
         <div class="info" v-for="(event, index) in events" :key="index">
           {{ event.date }}
           <span style="font-weight: bolder">[{{ event.type }}]&nbsp;</span>
