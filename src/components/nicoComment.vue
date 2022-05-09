@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { defineExpose, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import anime from "animejs";
 
 const messages = ref([]);
