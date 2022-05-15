@@ -1,28 +1,6 @@
 const functions = require("firebase-functions");
-const mysql = require('mysql2/promise');
+const db = require('./db')
 
-
-async function connectDB(dbname) {
-    let conn = await mysql.createConnection({
-        host: functions.config().oci.ip,
-        user: functions.config().oci.user,
-        password: functions.config().oci.pass,
-        database: dbname,
-        charset: 'utf8mb4'
-    })
-    return conn;
-}
-
-function cPool(dbname) {
-    let pool = mysql.createPool({
-        host: functions.config().oci.ip,
-        user: functions.config().oci.user,
-        password: functions.config().oci.pass,
-        database: dbname,
-        charset: 'utf8mb4'
-    })
-    return pool;
-}
 
 function ymlist() {
     let dt = new Date();
@@ -49,8 +27,8 @@ exports.rankAll = async function (req, res) {
     }
     console.log("[rank-all]");
 
-    let conn = await connectDB(functions.config().oci.rankdb);
-    let sql = "SELECT userid, count FROM all_rank ORDER BY count DESC LIMIT ?";
+    let conn = await db.connectDB(functions.config().ocijp.db);
+    let sql = "SELECT rank_all.userid, rank_all.count, user.nickname FROM rank_all LEFT OUTER JOIN user ON user.id = rank_all.userid  ORDER BY count DESC LIMIT ?";
     try {
         [results] = await conn.query(sql, [limit]);
         res.send(results);
@@ -59,7 +37,7 @@ exports.rankAll = async function (req, res) {
             res.status(404).send({});
         } else {
             console.log(e);
-            res.status(500).send(e);
+            res.status(500).send();
         }
     } finally {
         conn.end();
@@ -69,7 +47,7 @@ exports.rankAll = async function (req, res) {
 exports.rankUser = async function (req, res) {
     const userid = req.params.userid;
     console.log("[rank-user]", userid);
-    const pool = cPool(functions.config().oci.rankdb);
+    const pool = db.cPool(functions.config().ocijp.db);
 
     let tasks = [];
     let data = {};
@@ -77,7 +55,7 @@ exports.rankUser = async function (req, res) {
 
     for (let ym of l) {
         let tablename = "rank" + ym;
-        let sql = "SELECT count FROM ?? WHERE userid = BINARY ?";
+        let sql = "SELECT count FROM ?? WHERE userid = ?";
 
         try {
             tasks.push(pool.query(sql, [tablename, userid]));
@@ -110,17 +88,17 @@ exports.rankYM = async function (req, res) {
     let tablename = "rank" + year + month;
     console.log("[rank-ym]", year, month, limit);
 
-    let conn = await connectDB(functions.config().oci.rankdb);
-    let sql = "SELECT userid, count FROM ?? ORDER BY count DESC LIMIT ?";
+    let conn = await db.connectDB(functions.config().ocijp.db);
+    let sql = "SELECT userid, count, user.nickname FROM ?? LEFT OUTER JOIN user ON user.id = ??.userid  ORDER BY count DESC LIMIT ?";
     try {
-        [results] = await conn.query(sql, [tablename, limit]);
+        [results] = await conn.query(sql, [tablename,  tablename, limit]);
         res.send(results);
     } catch (e) {
         if (e.code == 'ER_NO_SUCH_TABLE') {
             res.status(404).send({});
         } else {
             console.log(e);
-            res.status(500).send(e);
+            res.status(500).send();
         }
     } finally {
         conn.end();

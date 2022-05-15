@@ -1,24 +1,13 @@
 const functions = require("firebase-functions");
-const mysql = require('mysql2/promise');
-
-
-async function connectDB(dbname) {
-    let conn = await mysql.createConnection({
-        host: functions.config().oci.ip,
-        user: functions.config().oci.user,
-        password: functions.config().oci.pass,
-        database: dbname,
-        charset: 'utf8mb4'
-    })
-    return conn;
-}
+const db = require("./db");
 
 exports.getUserdata = async function (req, res) {
     if (!req.body.id) {
         res.status(404).send();
+        return;
     }
 
-    let conn = await connectDB(functions.config().oci.logdb);
+    let conn = await db.connectDB(functions.config().ocijp.db);
     let sql = "SELECT id, recxuser_id, nickname, name_color FROM user WHERE id = ?";
     try {
         [results] = await conn.query(sql, [req.body.id]);
@@ -41,9 +30,10 @@ exports.getUserdata = async function (req, res) {
 exports.getUserdataWithRecxuserId = async function (req, res) {
     if (!req.body.recxuserid) {
         res.status(404).send();
+        return;
     }
 
-    let conn = await connectDB(functions.config().oci.logdb);
+    let conn = await db.connectDB(functions.config().ocijp.db);
     let sql = "SELECT id, recxuser_id, nickname, name_color FROM user WHERE recxuser_id = ?";
     try {
         [results] = await conn.query(sql, [req.body.recxuserid]);
