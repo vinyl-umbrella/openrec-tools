@@ -145,7 +145,6 @@ onMounted(() => {
 const getRank = async () => {
   let rankApi =
     "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v2/rank";
-  rankApi = "http://127.0.0.1:5001/futonchan-openchat/asia-northeast1/api/v2/rank";
   let res;
   nowloading.value = true;
   if (selectedSpan.value == "all") {
