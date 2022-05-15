@@ -23,5 +23,14 @@
         ]
       }
     ]
+  },
+  "functions": {
+    "ignore": [
+      "**/__test__/**",
+      "**/node_modules/**",
+      "**/.gitignore",
+      "**/*.log",
+      "**/*.md"
+    ]
   }
 }
