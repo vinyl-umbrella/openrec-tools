@@ -38,7 +38,7 @@
             <td>{{ index + 1 }}</td>
             <td>
               <span
-                @click="showUserCard(item)"
+                @click="showUserCard(graphData.userid[index])"
                 style="text-decoration: underline; cursor: pointer"
               >
                 {{ item }}
@@ -81,6 +81,7 @@ const graphData = ref({
       data: [],
     },
   ],
+  userid: [],
 });
 const chartOptions = ref({
   responsive: true,
@@ -144,6 +145,7 @@ onMounted(() => {
 const getRank = async () => {
   let rankApi =
     "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v2/rank";
+  rankApi = "http://127.0.0.1:5001/futonchan-openchat/asia-northeast1/api/v2/rank";
   let res;
   nowloading.value = true;
   if (selectedSpan.value == "all") {
@@ -157,11 +159,18 @@ const getRank = async () => {
     let j = await res.json();
     let tempIds = [];
     let tempCount = [];
+    let tempNicknames = [];
     for (let data of j) {
+      if (data["nickname"]) {
+        tempNicknames.push(data["nickname"]);
+      } else {
+        tempNicknames.push(data["userid"]);
+      }
       tempIds.push(data["userid"]);
       tempCount.push(data["count"]);
     }
-    graphData.value.labels = tempIds;
+    graphData.value.userid = tempIds;
+    graphData.value.labels = tempNicknames;
     graphData.value.datasets[0].data = tempCount;
   } else {
     toast.add({
