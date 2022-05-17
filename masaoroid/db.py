@@ -30,7 +30,7 @@ def get_futon_message() -> list:
 
             print("collecting data from SQL")
             for table in tables:
-                if table[0] == "user":
+                if table[0] == "user" or table[0].startswith("rank"):
                     continue
 
                 query = "SELECT message FROM {tablename} WHERE userid = 'indegnasen'".format(tablename=table[0])
