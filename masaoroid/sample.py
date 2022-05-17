@@ -5,9 +5,10 @@ with open('./learned.json', 'r') as file:
 
 
 while True:
-    sentence = None
-    while sentence is None:
-        sentence = text_model.make_short_sentence(max_chars=90, min_chars=10)
+    for i in range(10):
+        sentence = None
+        while sentence is None:
+            sentence = text_model.make_short_sentence(max_chars=90, min_chars=10)
 
-    print(sentence.replace(" ", ""))
+        print(sentence.replace(" ", ""))
     input()
