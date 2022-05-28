@@ -15,7 +15,7 @@
       <br />
       <router-link to="/api" @click="menu = false">OPENREC API</router-link>
       <br />
-      <router-link to="/contact" @click="menu = false">問い合わせ</router-link>
+      <router-link to="/about" @click="menu = false">問い合わせ</router-link>
     </Sidebar>
   </div>
   <router-view id="router-view" />

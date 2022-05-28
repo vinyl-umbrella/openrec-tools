@@ -63,13 +63,13 @@ const routes = [
     },
   },
   {
-    path: "/contact",
-    name: "Contact",
-    component: () => import("@/views/Contact.vue"),
+    path: "/about",
+    name: "About",
+    component: () => import("@/views/About.vue"),
     meta: {
-      title: "Contact",
+      title: "About",
       desc: "要望、連絡先などのお問い合わせフォーム。google formからお願いします。",
-      h2: "Contact",
+      h2: "About",
     },
   },
 ];
