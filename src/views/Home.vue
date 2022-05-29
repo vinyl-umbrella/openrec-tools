@@ -17,7 +17,7 @@
     />
 
     <div>
-      <div class="masao-face">( ･᷄෴･᷅.)</div>
+      <div class="masao-face">{{ face }}</div>
       <div class="masao-msg">
         <p>{{ message }}</p>
         <p class="warn">※本人の発言ではありません</p>
@@ -31,8 +31,14 @@ import { ref, onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
 
 const message = ref("loading...");
+const face = ref("( ･᷄෴･᷅.)");
 const nowloading = ref(true);
 const toast = useToast();
+const faceList = [
+  "( ᴖ෴ᴖ.)", "( ･᷄෴･᷅.)", "( ･᷅෴･᷄.)", "(৹ ˃෴˂.৹)",
+  "(  ⌯᷄︎෴⌯᷅︎ .)", "( ///෴///.)", "(⃔ ･᷄෴･᷅.)⃕↝", "( థ෴థ．)",
+  "(´-෴-.)", "癶( ･᷄෴･᷅.癶)"
+]
 
 onMounted(() => {
   getMasaoMessage();
@@ -46,6 +52,7 @@ const getMasaoMessage = async () => {
   nowloading.value = false;
   if (res.ok) {
     message.value = await res.text();
+    face.value = faceList[Math.floor(Math.random() * faceList.length)];
   } else {
     toast.add({
       severity: "error",
@@ -57,7 +64,7 @@ const getMasaoMessage = async () => {
 };
 
 const copyMessage = async () => {
-  let msg = `( ･᷄෴･᷅.)「${message.value}」`;
+  let msg = `${face.value}「${message.value}」`;
   try {
     await navigator.clipboard.writeText(msg);
     toast.add({
