@@ -2,22 +2,20 @@ const functions = require("firebase-functions");
 const db = require('./db')
 
 
-function ymlist() {
-    let dt = new Date();
-    dt.setHours(dt.getHours() + 9);
-    let y = dt.getFullYear();
-    let l = [];
-    for (let i = 1; i < 13; i++) {
-        let m = (dt.getMonth() - i + 12) % 12 + 1;
-        if (m < 10) {
-            m = "0" + m;
+async function ymlist() {
+    let conn = await db.connectDB(functions.config().ocijp.db);
+    const showTables = "SHOW TABLES WHERE Tables_in_openchat LIKE 'rank20%';"
+    try {
+        let [results] = await conn.query(showTables);
+        for (let i = 0; i < results.length; i++) {
+            results[i] = results[i]["Tables_in_openchat"].slice(4);
         }
-        if (m == 12) {
-            y--;
-        }
-        l.push(String(y) + String(m));
+        return results;
+    } catch (e) {
+        return [];
+    } finally {
+        conn.end();
     }
-    return l;
 }
 
 exports.rankAll = async function (req, res) {
@@ -51,7 +49,7 @@ exports.rankUser = async function (req, res) {
 
     let tasks = [];
     let data = {};
-    let l = ymlist();
+    let l = await ymlist();
 
     for (let ym of l) {
         let tablename = "rank" + ym;
@@ -64,7 +62,7 @@ exports.rankUser = async function (req, res) {
             res.status(500).send();
         }
     }
-    results = await Promise.all(tasks);
+    let results = await Promise.all(tasks);
     pool.end();
 
     for (let i = 0; i < results.length; i++) {
