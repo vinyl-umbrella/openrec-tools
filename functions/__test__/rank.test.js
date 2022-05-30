@@ -14,7 +14,7 @@ describe('rank test', () => {
     it('rank user', async () => {
         let res = await request(app.api).get('/v2/rank/user/indegnasen');
         expect(res.statusCode).toBe(200);
-        expect(Object.keys(res.body).length).toBe(12);
+        expect(Object.keys(res.body).length).toBeGreaterThan(20);
     })
 
     it('rank ym', async () => {
