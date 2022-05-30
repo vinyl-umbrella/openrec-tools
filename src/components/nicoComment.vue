@@ -37,12 +37,12 @@ onMounted(() => {
 const addMsg = (msgObj) => {
   let classname = "";
   // check empty
-  let index = messages.value.findIndex((item) => item.message == "");
+  let index = messages.value.findIndex((item) => item.message === "");
   if (index !== -1) {
     messages.value[index].stamp = false;
-    if (msgObj.type == "yell") {
+    if (msgObj.type === "yell") {
       // 色付け
-    } else if (msgObj.type == "stamp") {
+    } else if (msgObj.type === "stamp") {
       messages.value[index].stamp = true;
     }
     messages.value[index].message = msgObj.text;

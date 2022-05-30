@@ -95,7 +95,7 @@ function checkBL(userid, msg) {
     result = false;
   } else if (
     ngwords &&
-    ngwords != "" &&
+    ngwords !== "" &&
     ngwords.split(",").filter((word) => msg.indexOf(word) !== -1).length !== 0
   ) {
     result = false;
@@ -116,7 +116,7 @@ function commentFormatter(mode, comment) {
     userId: "",
     yell: null,
   };
-  if (mode == "rest") {
+  if (mode === "rest") {
     c.id = comment.id;
     c.color = comment.chat_setting.name_color;
     c.recxuser_id = comment.user.recxuser_id;
@@ -217,7 +217,7 @@ async function postComment(videoId, inputComment) {
     body: JSON.stringify(data),
   };
   let j = await (await fetch(url, param)).json();
-  if (j.status != 0) {
+  if (j.status !== 0) {
     throw j.message;
   }
 }

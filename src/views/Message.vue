@@ -134,7 +134,7 @@ const getMessages = async (last) => {
 
   if (res.ok) {
     let j = await res.json();
-    if (j.length == 0) {
+    if (j.length === 0) {
       toast.add({
         severity: "info",
         summary: "Failed",
@@ -142,7 +142,7 @@ const getMessages = async (last) => {
         life: 3000,
       });
     } else {
-      if (last == 0) {
+      if (last === 0) {
         messages.value = j;
       } else {
         messages.value = messages.value.concat(j);

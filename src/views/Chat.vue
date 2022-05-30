@@ -339,7 +339,7 @@ const pushEvent = (type, msg) => {
     url: null,
     message: msg,
   };
-  if (type === "capture" || type === "url" || type == "youtube-movie") {
+  if (type === "capture" || type === "url" || type === "youtube-movie") {
     data.message = msg[0];
     data.url = msg[1];
     events.value.push(data);

@@ -31,7 +31,7 @@ exports.rankAll = async function (req, res) {
         [results] = await conn.query(sql, [limit]);
         res.send(results);
     } catch (e) {
-        if (e.code == 'ER_NO_SUCH_TABLE') {
+        if (e.code === 'ER_NO_SUCH_TABLE') {
             res.status(404).send({});
         } else {
             console.log(e);
@@ -66,7 +66,7 @@ exports.rankUser = async function (req, res) {
     pool.end();
 
     for (let i = 0; i < results.length; i++) {
-        if (results[i][0].length != 0) {
+        if (results[i][0].length !== 0) {
             data[l[i]] = results[i][0][0]["count"];
         } else {
             data[l[i]] = 0;
@@ -92,7 +92,7 @@ exports.rankYM = async function (req, res) {
         [results] = await conn.query(sql, [tablename,  tablename, limit]);
         res.send(results);
     } catch (e) {
-        if (e.code == 'ER_NO_SUCH_TABLE') {
+        if (e.code === 'ER_NO_SUCH_TABLE') {
             res.status(404).send({});
         } else {
             console.log(e);
