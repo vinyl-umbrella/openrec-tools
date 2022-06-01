@@ -147,6 +147,10 @@ const getRank = async () => {
     "https://asia-northeast1-futonchan-openchat.cloudfunctions.net/api/v2/rank";
   let res;
   nowloading.value = true;
+  if (limit.value === null) {
+    limit.value = 30;
+  }
+
   if (selectedSpan.value === "all") {
     res = await fetch(`${rankApi}/all?limit=${limit.value}`);
   } else {
