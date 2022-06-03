@@ -25,14 +25,11 @@ def get_futon_message() -> list:
     ]
     with connectDB(config.Config()) as conn:
         with conn.cursor() as cur:
-            cur.execute("SHOW TABLES")
+            cur.execute("SHOW TABLES WHERE `Tables_in_openchat` NOT LIKE 'rank%' AND `Tables_in_openchat` != 'user'")
             tables = cur.fetchall()
 
             print("collecting data from SQL")
             for table in tables:
-                if table[0] == "user" or table[0].startswith("rank"):
-                    continue
-
                 query = "SELECT message FROM {tablename} WHERE userid = 'indegnasen'".format(tablename=table[0])
                 cur.execute(query)
                 data = cur.fetchall()
