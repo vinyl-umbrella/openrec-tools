@@ -86,7 +86,6 @@ const copyMessage = async () => {
 .masaoroid {
   position: absolute;
   width: 80vw;
-  height: 80vh;
   top: 40%;
   left: 50%;
   margin-left: -40vw;
