@@ -4,6 +4,8 @@ import markovify
 
 import db
 
+TAGGER = MeCab.Tagger("-Owakati /usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd")
+
 
 def parse_text(all_messages: str):
     parsed = ""
@@ -15,7 +17,7 @@ def parse_text(all_messages: str):
             for line in message[0].replace("。", "\n").split("\n"):
                 if line == "\n":
                     continue
-                parsed += MeCab.Tagger("-Owakati /usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd").parse(line)
+                parsed += TAGGER.parse(line)
 
     return parsed
 
