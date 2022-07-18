@@ -262,6 +262,11 @@ const connectWs = (wss) => {
           });
           break;
 
+        //
+        case 33:
+          pushEvent("info", `${msg.message}`);
+          break
+
         // extension
         case 43: {
           let extension_data = JSON.parse(msg.extension_data);
